@@ -4,3 +4,4 @@ obj/*
 *.sdf
 .svn/*
 _ReSharper.*
+*.ReSharper.user

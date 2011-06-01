@@ -71,7 +71,7 @@ namespace RomTerraria
                     prefix = "CHAT MESSAGE";
                     packet = HandleChatMsg(data);   //pass data to handler. 
                     //ALL handlers assume a Packet struct as input.
-                    //and ALL handlers return a Packet struct.
+                    //and ALL handlers return a Packet struct as output.
 
                     break;
                 case 0x1A:
@@ -144,19 +144,18 @@ namespace RomTerraria
             var match = false;
             if (p.Text[0] == 0x2F) // match backslash
             {
-
+                match = true;
                 var commands = p.Text.Split(' ');
                 switch (commands[0])
                 {
                     case ("/meteor"):
                         WorldEvents.SpawnMeteorCB();
-                        match = true;
                         break;
                     case ("/broadcast"):
                         cmdBroadcast(commands, p);
-                        match = true;
                         break;
                     default:
+                        cmdUnknown(commands, p);
                         break;
                 }
 
@@ -165,9 +164,33 @@ namespace RomTerraria
             //this will directly be used by WSASend so don't fuck it up!
             //p.packet[10] = 0x7E;
             if (match)
-                return new Packet(new byte[] { }, 0);
+                return new Packet(new byte[] { }, -1);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        /// <summary>
+        /// Helper function to send chat messages
+        /// </summary>
+        /// <param name="msg">Message to send</param>
+        /// <param name="playerId">Player index to send to, or -1 for broadcast</param>
+        /// <param name="color">The color, as a Color type.</param>
+        private static void SendChatMsg(string msg, int playerId, Color color)
+        {
+            NetMessage.SendData(25, playerId, -1, msg, 8, color.R, color.G, color.B);
+            return;
+        }
+
+        /// <summary>
+        /// Unknown Command Handler
+        /// </summary>
+        /// <param name="commands">TArray of space-delimited words</param>
+        /// <param name="p">Data class for ChatMsg</param>
+        private static void cmdUnknown(string[] commands, packet_ChatMsg p)
+        {
+            SendChatMsg("ERROR: Unknown command " + commands[0], -1, Color.GreenYellow);
+            //NetMessage.SendData(25, p.PlayerId, -1, "ERROR: Unknown command " + commands[0], 8, 0x99, 0xff, 0x99);
+            return;
         }
 
         /// <summary>
@@ -186,12 +209,11 @@ namespace RomTerraria
                     msg = msg + " " + commands[i];
                     i++;
                 }
-                NetMessage.SendData(25, -1, -1, msg, 8, 0xff, 0xcc, 0x66);
+                SendChatMsg(msg, -1, Color.Orange);
             }
             else
             {
-                
-                NetMessage.SendData(25, p.PlayerId, -1, "USAGE: /echo <word>", 8, 0x99, 0xff, 0x99);
+                SendChatMsg("USAGE: /broadcast <message>",p.PlayerId, Color.GreenYellow);
             }
         }
     }
