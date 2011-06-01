@@ -3,3 +3,4 @@ obj/*
 *.suo
 *.sdf
 .svn/*
+_ReSharper.*
