@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 
 namespace RomTerraria {
     
@@ -34,9 +35,10 @@ namespace RomTerraria {
 #region Meteors - amckhome@tpg.com.au
         public static void SpawnMeteor( ) {
             var d = new SpawnMeteorCallback( SpawnMeteorCB );
+
         }
 
-        private static void SpawnMeteorCB( ) {
+        public static void SpawnMeteorCB( ) {
             if( meteor != null ) {
                 try {
                     var rand = new Random( );

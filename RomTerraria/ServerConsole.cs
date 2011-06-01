@@ -102,7 +102,7 @@ namespace RomTerraria {
         public void AddChatLine( string msg ) {
             if( ConsoleText.InvokeRequired ) {
                 var d = new AddChatLineCallback(AddChatLine);
-                Invoke( d, new object[] { msg } );
+                BeginInvoke( d, new object[] { msg } );
             } else {
                 ConsoleText.AppendText( Environment.NewLine + msg );
             }

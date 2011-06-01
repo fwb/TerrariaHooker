@@ -399,12 +399,40 @@ namespace RomTerraria
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
             //act on packet fields, generate new data etc.
-            
+            var match = false;
+            if (p.text[0] == 0x2F) // match backslash
+            {
+                
+                var commands = p.text.Split(' ');
+                switch (commands[0])
+                {
+                    case ("/meteor"):
+                        WorldEvents.SpawnMeteorCB();
+                        match = true;
+                        break;
+                    case ("/broadcast"):
+                        if (commands.Length > 1)
+                        {
+                            Terraria.NetMessage.SendData(25, -1, -1, commands[1], 8, 0x99, 0xff, 0x99);
+                        } else
+                        {
+                            Terraria.NetMessage.SendData(25, p.playerId, -1, "USAGE: /echo <word>", 8, 0xff, 0xcc, 0x66);
+                        }
+                        match = true;
+                        break;
+                    default:
+                        match = false;
+                        break;
+                }
+
+            }
             //create new Packet(data, length). use a length of -1 to indicate the packet is to be dropped.
             //this will directly be used by WSASend so don't fuck it up!
-            p.packet[10] = 0x7E;
-            var result = new Packet(p.packet, p.packet.Length);
-            return result;
+            //p.packet[10] = 0x7E;
+            if (match)
+                return new Packet(new byte[] {}, 0);
+
+            return new Packet(p.packet, p.packet.Length);
         }
 
 
