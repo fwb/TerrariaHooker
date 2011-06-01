@@ -413,10 +413,17 @@ namespace RomTerraria
                     case ("/broadcast"):
                         if (commands.Length > 1)
                         {
-                            Terraria.NetMessage.SendData(25, -1, -1, commands[1], 8, 0x99, 0xff, 0x99);
+                            string msg = null;
+                            int i = 1;
+                            while (i<commands.Length)
+                            {
+                                msg = msg + " " + commands[i];
+                                i++;
+                            }
+                            Terraria.NetMessage.SendData(25, -1, -1, msg, 8, 0xff, 0xcc, 0x66);
                         } else
                         {
-                            Terraria.NetMessage.SendData(25, p.playerId, -1, "USAGE: /echo <word>", 8, 0xff, 0xcc, 0x66);
+                            Terraria.NetMessage.SendData(25, p.playerId, -1, "USAGE: /echo <word>", 8, 0x99, 0xff, 0x99);
                         }
                         match = true;
                         break;
