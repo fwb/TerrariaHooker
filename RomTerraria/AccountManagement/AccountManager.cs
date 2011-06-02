@@ -1,4 +1,4 @@
-namespace RomTerraria {
+namespace RomTerraria.AccountManagement {
     class AccountManager {
         // Properties:
 

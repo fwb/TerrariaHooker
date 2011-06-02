@@ -1,34 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net;
 
-namespace RomTerraria {
+namespace RomTerraria.AccountManagement {
+
     class Account {
-        // Properties:
-        // Rights
-        //      Admin
-        //      Use restricted items
-        //      Teleport
-        //      Start world events
-        // Is logged in
-        // Timers: name, ReuseTimer object
-        // Is banned
+        public bool IsLoggedIn { get; set; }
+        public bool IsBanned { get; set; }
         
-        // Fields: 
-        // IP address list
-        // Known usernames
-        // Registered account name
-        // Steam ID
+        private Dictionary<Rights, bool> rights;
+        private Dictionary<String, ReuseTimer> timers; 
+        private List<IPAddress> ips;
+        private List<String> usernames;
+        private string accountName;
+        private string steamName;
 
-        // Methods:
-        // Check permissions
-        // Get IPs
-        // Get usernames
-        // Start timer
-        // Reset timer
-        // Check timer
-        // Kick
+        public Account(  ) {
+            
+        }
+
+        public bool CheckRights( Rights r ) {
+            return rights[r];
+        }
+
+        public void GetIPs( ) {
+            
+        }
+
+        public void GetUsernames( ) {
+            
+        }
+        
+        public void StartTimer( ReuseTimer t ) {
+            
+        }
+        
+        public void ResetTimer( ReuseTimer t ) {
+            
+        }
+        
+        public bool CheckTimer( ReuseTimer t ) {
+            
+        }
+        
+        public void Kick( ) {
+            
+        }
     }
 
 }
