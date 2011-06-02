@@ -27,6 +27,7 @@ namespace RomTerraria
 
         Type worldGen;
         Type main;
+        Type netplay;
         //Type npc;
 
         FieldInfo bloodMoon;
@@ -34,6 +35,7 @@ namespace RomTerraria
         FieldInfo shadowOrbSmashed;
         FieldInfo spawnEye;
         FieldInfo time;
+        public FieldInfo serverSock;
 
         public MethodInfo dropMeteor;
         MethodInfo erasePlayer;
@@ -54,6 +56,7 @@ namespace RomTerraria
             {
                 worldGen = terrariaAssembly.GetType("Terraria.WorldGen");
                 main = terrariaAssembly.GetType("Terraria.Main");
+                netplay = terrariaAssembly.GetType("Terraria.NetPlay");
                 //npc = terrariaAssembly.GetType( "Terraria.NPC" );
 
                 foreach (var f in worldGen.GetFields())
@@ -90,6 +93,8 @@ namespace RomTerraria
                     }
                 }
 
+                //for Commands.cs
+             
 
                 foreach (var f in main.GetFields())
                 {
@@ -107,7 +112,6 @@ namespace RomTerraria
                 }
 
                 serverConsole = new ServerConsole( this );
-                
                 serverConsole.Hide( );
 
             }

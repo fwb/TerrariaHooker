@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.Xna.Framework;
 using Terraria;
+using System.Reflection;
 
 namespace RomTerraria
 {
@@ -9,6 +10,30 @@ namespace RomTerraria
     {
         public static string[] ignoreList = new string[10];
         public static int numberIgnored;
+
+        private static Assembly terrariaAssembly;
+        private static Type netplay;
+        private static FieldInfo serverSock;
+
+        static Commands()
+        {
+            terrariaAssembly = Assembly.GetAssembly(typeof(Main));
+            if (terrariaAssembly == null)
+            {
+                return;
+            }
+            netplay = terrariaAssembly.GetType("Terraria.Netplay");
+
+            foreach (var f in netplay.GetFields())
+            {
+                if (f.Name == "serverSock")
+                {
+                    //System.Windows.Forms.MessageBox.Show("Got serversock");
+                    serverSock = f;
+                }
+            }
+        }
+
         /// <summary>
         /// Process a data packet, determining data type and where defined, 
         /// calling additional handlers to break apart data into a more workable
@@ -220,6 +245,9 @@ namespace RomTerraria
                     case ("/ignore"):
                         cmdIgnore(commands, p);
                         break;
+                    case ("/kick"):
+                        cmdKick(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -235,24 +263,69 @@ namespace RomTerraria
             return new Packet(p.Packet, p.Packet.Length);
         }
 
-        private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
+        /// <summary>
+        /// Kick a named player from the server
+        /// </summary>
+        /// <param name="commands">The commands array</param>
+        /// <param name="packetChatMsg">Data class for ChatMsg</param>
+        private static void cmdKick(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            
             if (commands.Length > 1)
             {
-                //TODO: too common to be in each command, reproduce code in a helper function
-                //GetParamsAsString(commands, delimiter);
-                int i = 1;
-                string name = null;
-                while (i < commands.Length)
+                var name = GetParamsAsString(commands);
+
+                var t = (ServerSock[]) serverSock.GetValue(null);
+                foreach (ServerSock b in t)
                 {
-                    name = name + " " + commands[i];
-                    i++;
+                    if (b.name == name)
+                    {
+                        b.kill = true;
+                        return;
+                    }
                 }
-                name = name.Trim();
+            } else
+            {
+                SendChatMsg("USAGE: /kick <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+            }
+        }
+
+        /// <summary>
+        /// Helper function, returns all arguments to a command as a single, delimited string.
+        /// </summary>
+        /// <param name="commands">The commands.</param>
+        /// <param name="delimiter">The delimiter.</param>
+        /// <returns></returns>
+        private static string GetParamsAsString(string[] commands, string delimiter = " ")
+        {
+            if (commands.Length == 1)
+                return null;
+
+            int i = 1;
+            string param = null;
+            while (i < commands.Length)
+            {
+                param = param + delimiter + commands[i];
+                i++;
+            }
+            param = param.Trim();
+            return param;
+        }
+
+        private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            //actually, even this commands.length check can be replaced by getparams as string
+            //if result == null, return or usage.
+            if (commands.Length > 1)
+            {
+                var name = GetParamsAsString(commands);
 
                 ignoreList[numberIgnored] = name;
                 numberIgnored++;
                 SendChatMsg("Player " + name + " ignored.", packetChatMsg.PlayerId, Color.Red);
+            } else
+            {
+                SendChatMsg("USAGE: /ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
             }
         }
 
@@ -288,14 +361,7 @@ namespace RomTerraria
         {
             if (commands.Length > 1)
             {
-                string msg = null;
-                int i = 1;
-                while (i < commands.Length)
-                {
-                    msg = msg + " " + commands[i];
-                    i++;
-                }
-                msg = msg.Trim();
+                var msg = GetParamsAsString(commands);
                 SendChatMsg(msg, -1, Color.Orange);
             }
             else
