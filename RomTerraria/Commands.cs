@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -9,7 +10,11 @@ namespace RomTerraria
     class Commands
     {
         public static string[] ignoreList = new string[10];
+        public static byte[] bannedItems = new byte[] { 0xCF, 0xA7 }; //banned items.0xCF = lava bucket, 0xA7 = dynomite
         public static int numberIgnored;
+
+        private static bool itemBanEnabled;
+
 
         private static Assembly terrariaAssembly;
         private static Type netplay;
@@ -17,6 +22,7 @@ namespace RomTerraria
 
         static Commands()
         {
+
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
             {
@@ -48,7 +54,7 @@ namespace RomTerraria
                 if (ignored)
                     return CreateDummyPacket(data);
 
-                return new Packet(data, data.Length);
+                //return new Packet(data, data.Length);
 
             }
 
@@ -83,7 +89,7 @@ namespace RomTerraria
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
-                    //packet = new packet_PlayerState(data);
+                    packet = HandlePlayerState(data);
                     break;
                 case 0x10:
                     prefix = "PLAYER CURRENT/MAX HEALTH UPDATE";
@@ -159,16 +165,40 @@ namespace RomTerraria
                     break;
             }
 
-            var sBuffer = new StringBuilder();
-            foreach (byte t in data)
+            if (direction == 1) {
+                var sBuffer = new StringBuilder();
+                foreach (byte t in data)
+                {
+                    sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
+                }
+                //string s = System.Text.Encoding.ASCII.GetString(newBuffer);
+                //MakeItHarder.serverConsole.AddChatLine(sBuffer.ToString().ToUpper());
+
+                MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
+                }
+            return packet;
+
+        }
+
+        private static Packet HandlePlayerState(byte[] data)
+        {
+            Packet packet = new Packet(data, data.Length);
+            if (!itemBanEnabled) return packet;
+
+            packet_PlayerState p = new packet_PlayerState(data);
+            if (p.usingItem)
             {
-                sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
+                foreach (byte i in bannedItems)
+                {
+                    var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
+                    if (id == i)
+                    {
+                        packet = CreateDummyPacket(data);
+                        var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
+                        MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
+                    }
+                }
             }
-            //string s = System.Text.Encoding.ASCII.GetString(newBuffer);
-            //MakeItHarder.serverConsole.AddChatLine(sBuffer.ToString().ToUpper());
-
-            MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
-
             return packet;
 
         }
@@ -216,12 +246,7 @@ namespace RomTerraria
                 return false;
 
             string playerName = Main.player[playerId].name;
-            foreach (string p in ignoreList)
-            {
-                if (p == playerName)
-                    return true;
-            }
-            return false;
+            return ignoreList.Any(p => p == playerName);
         }
 
         private static Packet HandleChatMsg(byte[] data)
@@ -248,6 +273,9 @@ namespace RomTerraria
                     case ("/kick"):
                         cmdKick(commands, p);
                         break;
+                    case ("/itemban"):
+                        cmdItemBanToggle();
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -258,9 +286,14 @@ namespace RomTerraria
             //this will directly be used by WSASend so don't fuck it up!
             //p.packet[10] = 0x7E;
             if (match)
-                return new Packet(new byte[] { }, -1);
+                return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdItemBanToggle()
+        {
+            itemBanEnabled = !itemBanEnabled;
         }
 
         /// <summary>
@@ -371,6 +404,7 @@ namespace RomTerraria
         }
     }
 
+
     #region packet definitions
     /// <summary>
     /// classes for packet structures.
@@ -428,6 +462,13 @@ namespace RomTerraria
         internal Vector2 Velocity;
         internal int SelectedItemId;
         internal int ButtonState;
+        internal bool keyUp;
+        internal bool keyDown;
+        internal bool keyLeft;
+        internal bool keyRight;
+        internal bool keyJump;
+        internal bool usingItem;
+        internal int direction = -1;
 
         internal packet_PlayerState(byte[] data)
             : base(data)
@@ -439,6 +480,15 @@ namespace RomTerraria
             Velocity.X = BitConverter.ToSingle(data, 16);
             Velocity.Y = BitConverter.ToSingle(data, 20);
 
+            //advanced state
+            if ((ButtonState & 1) == 1) keyUp = true;
+            if ((ButtonState & 2) == 2) keyDown = true;
+            if ((ButtonState & 4) == 4) keyLeft = true;
+            if ((ButtonState & 8) == 8) keyRight = true;
+            if ((ButtonState & 16) == 16) keyJump = true;
+            if ((ButtonState & 32) == 32) usingItem = true;
+            if ((ButtonState & 64) == 64) direction = 1;
+            //
         }
     }
 
