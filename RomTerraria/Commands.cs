@@ -7,14 +7,26 @@ namespace RomTerraria
 {
     class Commands
     {
+        public static string[] ignoreList = new string[10];
+        public static int numberIgnored;
         /// <summary>
         /// Process a data packet, determining data type and where defined, 
         /// calling additional handlers to break apart data into a more workable
         /// format.
         /// </summary>
         /// <param name="data">The data.</param>
-        public static Packet ProcessData(byte[] data)
+        public static Packet ProcessData(byte[] data, int direction)
         {
+            if (direction == 0)
+            {
+                var ignored = checkIgnores(data);
+                if (ignored)
+                    return CreateDummyPacket(data);
+
+                return new Packet(data, data.Length);
+
+            }
+
             byte type = data[4];
 
             string prefix;
@@ -136,6 +148,57 @@ namespace RomTerraria
 
         }
 
+        private static Packet CreateDummyPacket(byte[] data)
+        {
+            int msgLength = 1;
+            Packet newPacket = new Packet();
+            //info on message header
+            //bytes 0-3 are payload length
+            //byte 4 is message type
+            //payload is bytes 5-end of packet
+            //payload length must match expected length since C# uses Streams to handle data
+            //and EndRead retrieves the expected data length before WSARecv is invoked.
+
+            var msgHeader = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x02 }; //new data, type 0x02 is ignored by the server
+            var finalPacket = new byte[data.Length];
+            int lenDiff = 0;
+            if (msgHeader.Length < data.Length)
+                lenDiff = data.Length - msgHeader.Length;
+
+            var msgContents = new byte[lenDiff];
+            for (int b = 0; b < lenDiff; b++)
+            {
+                msgContents[b] = 0x2e; //just fill with periods, it's ignored anyway
+                msgLength++;
+            }
+
+            var msgLenBytes = BitConverter.GetBytes(msgLength);
+            Buffer.BlockCopy(msgLenBytes, 0, msgHeader, 0, 4);
+
+            Buffer.BlockCopy(msgHeader, 0, finalPacket, 0, msgHeader.Length);
+            Buffer.BlockCopy(msgContents, 0, finalPacket, msgHeader.Length, msgContents.Length);
+            newPacket.Data = finalPacket;
+            newPacket.Length = finalPacket.Length;
+            return newPacket;
+
+
+        }
+
+        private static bool checkIgnores(byte[] data)
+        {
+            byte playerId = data[5];
+            if (playerId > 8)
+                return false;
+
+            string playerName = Main.player[playerId].name;
+            foreach (string p in ignoreList)
+            {
+                if (p == playerName)
+                    return true;
+            }
+            return false;
+        }
+
         private static Packet HandleChatMsg(byte[] data)
         {
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
@@ -154,6 +217,9 @@ namespace RomTerraria
                     case ("/broadcast"):
                         cmdBroadcast(commands, p);
                         break;
+                    case ("/ignore"):
+                        cmdIgnore(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -167,6 +233,27 @@ namespace RomTerraria
                 return new Packet(new byte[] { }, -1);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            if (commands.Length > 1)
+            {
+                //TODO: too common to be in each command, reproduce code in a helper function
+                //GetParamsAsString(commands, delimiter);
+                int i = 1;
+                string name = null;
+                while (i < commands.Length)
+                {
+                    name = name + " " + commands[i];
+                    i++;
+                }
+                name = name.Trim();
+
+                ignoreList[numberIgnored] = name;
+                numberIgnored++;
+                SendChatMsg("Player " + name + " ignored.", packetChatMsg.PlayerId, Color.Red);
+            }
         }
 
         /// <summary>
@@ -189,7 +276,6 @@ namespace RomTerraria
         private static void cmdUnknown(string[] commands, packet_ChatMsg p)
         {
             SendChatMsg("ERROR: Unknown command " + commands[0], -1, Color.GreenYellow);
-            //NetMessage.SendData(25, p.PlayerId, -1, "ERROR: Unknown command " + commands[0], 8, 0x99, 0xff, 0x99);
             return;
         }
 
@@ -209,6 +295,7 @@ namespace RomTerraria
                     msg = msg + " " + commands[i];
                     i++;
                 }
+                msg = msg.Trim();
                 SendChatMsg(msg, -1, Color.Orange);
             }
             else

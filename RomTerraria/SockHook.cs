@@ -13,7 +13,7 @@ namespace RomTerraria
     /// </summary>
     internal struct WSABuffer
     {
-        internal int len;
+        internal Int32 len;
         // Length of Buffer
         internal IntPtr buf;
         // Pointer to Buffer
@@ -62,7 +62,7 @@ namespace RomTerraria
             [In] IntPtr socketHandle,
             [In, Out] ref WSABuffer Buffer,
             [In] int BufferCount,
-            [In] IntPtr bytesTransferred,
+            [In,Out] IntPtr bytesTransferred,
             [In, Out] ref SocketFlags socketFlags,
             [In] IntPtr overlapped,
             [In] IntPtr completionRoutine);
@@ -112,7 +112,7 @@ namespace RomTerraria
                 [In] IntPtr socketHandle,
                 [In, Out] ref WSABuffer Buffer,
                 [In] int BufferCount,
-                [In] IntPtr bytesTransferred,
+                [In,Out] IntPtr bytesTransferred,
                 [In, Out] ref SocketFlags socketFlags,
                 [In] IntPtr overlapped,
                 [In] IntPtr completionRoutine)
@@ -131,52 +131,11 @@ namespace RomTerraria
             {
                 var newBuffer = new byte[bytes];
                 Marshal.Copy(Buffer.buf, newBuffer, 0, bytes);
-                //processData(newBuffer); //processData calls on RECV will strictly be read-only.
-                //fairly simple, since it's designed around the Packet struct and ignoring that
-                //forces normal program flow.
-#region old_WSARecv_blocking_code.
-                    //ok, this is fucking ridiculous. modifying the bytesTransferred ref should prevent processing by the application
-                    //however probably .net or even xNA is fucking that up. going to intercept WSASend, so that when it tries to reply
-                    //with a 0x19 pid 0x00 0x00 0x00 bytes[] text message we'll block that, fairly trivially.
-                    /*if (newBuffer[4] == 0x19)
-                    {
-                        var n = new byte[5] { 0x01, 0x00, 0x00, 0x00, 0x15 };
-                        GCHandle fake = GCHandle.Alloc(n, GCHandleType.Pinned);
-                        IntPtr fakePtr = fake.AddrOfPinnedObject();
-                        //bytesTransferred = 5;
-                        //Marshal.WriteInt32(bytesTransferred, 9);
-                        int p = 0;
-                        foreach (byte b in n)
-                        {
-                            Marshal.WriteByte(Buffer.buf,p,b);
-                            p++;
-                        }
-                        Marshal.WriteInt32(bytesTransferred, p); 
-                        //Marshal.WriteInt32(bytesTransferred,0x00);
-                        //Marshal.WriteIntPtr(Buffer.buf, 0, IntPtr.Zero);
-                        //Buffer.len = 0;
-
-                        //bytesTransferred = 0;
-                        //Marshal.WriteIntPtr(buffer.Pointer, fakePtr);
-                        //buffer.len = 0;););
-
-                        return 0;
-                        //return SocketError.TryAgain;
-                    }*/
-
-
-                    /*
-                    var sBuffer = new StringBuilder();
-                    foreach (byte t in newBuffer)
-                    {
-                        sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
-                    }
+                var packet = Commands.ProcessData(newBuffer, 0); 
                 
-                    //string s = System.Text.Encoding.ASCII.GetString(newBuffer);
-                
-                    //MakeItHarder.serverConsole.AddChatLine(sBuffer.ToString().ToUpper());
-                    */
-#endregion
+                //write packet data to buffer. may be unchanged.
+                Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
+
 
             }
             return result;
@@ -228,7 +187,7 @@ namespace RomTerraria
             //I absolutely wish this code wasn't here, but unfortunately it's necessary.
             if (newBuffer[4] == 0x19)
             {
-                var n = Commands.ProcessData(newBuffer);
+                var n = Commands.ProcessData(newBuffer, 1);
                 if (n.Length == -1)
                 {
                     return 0;
@@ -239,6 +198,7 @@ namespace RomTerraria
                     Marshal.WriteByte(Buffer.buf, i, b);
                     i++;
                 }
+                
                 Buffer.len = n.Length;
             }
 
