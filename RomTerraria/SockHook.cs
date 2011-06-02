@@ -181,11 +181,11 @@ namespace RomTerraria
             [In] IntPtr completionRoutine)
         {
 
-            var newBuffer = new byte[Buffer.len]; //buffer to hold sent bytes
-            Marshal.Copy(Buffer.buf,newBuffer,0,Buffer.len);
+            //var newBuffer = new byte[Buffer.len]; //buffer to hold sent bytes
+            //Marshal.Copy(Buffer.buf,newBuffer,0,Buffer.len);
 
             //I absolutely wish this code wasn't here, but unfortunately it's necessary.
-            if (newBuffer[4] == 0x19)
+            /*if (newBuffer[4] == 0x19)
             {
                 var n = Commands.ProcessData(newBuffer, 1);
                 if (n.Length == -1)
@@ -200,7 +200,7 @@ namespace RomTerraria
                 }
                 
                 Buffer.len = n.Length;
-            }
+            }*/
 
             //call WSASend
             return WSASend(socketHandle, ref Buffer, BufferCount, bytesTransferred, socketFlags, overlapped,

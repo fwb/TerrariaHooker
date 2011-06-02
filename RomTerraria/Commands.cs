@@ -34,7 +34,6 @@ namespace RomTerraria
             {
                 if (f.Name == "serverSock")
                 {
-                    //System.Windows.Forms.MessageBox.Show("Got serversock");
                     serverSock = f;
                 }
             }
@@ -53,8 +52,6 @@ namespace RomTerraria
                 var ignored = checkIgnores(data);
                 if (ignored)
                     return CreateDummyPacket(data);
-
-                //return new Packet(data, data.Length);
 
             }
 
@@ -171,8 +168,6 @@ namespace RomTerraria
                 {
                     sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
                 }
-                //string s = System.Text.Encoding.ASCII.GetString(newBuffer);
-                //MakeItHarder.serverConsole.AddChatLine(sBuffer.ToString().ToUpper());
 
                 MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
                 }
@@ -182,11 +177,11 @@ namespace RomTerraria
 
         private static Packet HandlePlayerState(byte[] data)
         {
-            Packet packet = new Packet(data, data.Length);
+            var packet = new Packet(data, data.Length);
             if (!itemBanEnabled) return packet;
 
-            packet_PlayerState p = new packet_PlayerState(data);
-            if (p.usingItem)
+            var p = new packet_PlayerState(data);
+            if (p.UsingItem)
             {
                 foreach (byte i in bannedItems)
                 {
@@ -206,7 +201,7 @@ namespace RomTerraria
         private static Packet CreateDummyPacket(byte[] data)
         {
             int msgLength = 1;
-            Packet newPacket = new Packet();
+            var newPacket = new Packet();
             //info on message header
             //bytes 0-3 are payload length
             //byte 4 is message type
@@ -259,6 +254,8 @@ namespace RomTerraria
             {
                 match = true;
                 var commands = p.Text.Split(' ');
+                commands[0] = commands[0].ToLower();
+
                 switch (commands[0])
                 {
                     case ("/meteor"):
@@ -274,26 +271,49 @@ namespace RomTerraria
                         cmdKick(commands, p);
                         break;
                     case ("/itemban"):
-                        cmdItemBanToggle();
+                        cmdItemBanToggle(p);
+                        break;
+                    case ("/unignore"):
+                        cmdUnIgnore(commands, p);
                         break;
                     default:
                         cmdUnknown(commands, p);
                         break;
                 }
-
             }
-            //create new Packet(data, length). use a length of -1 to indicate the packet is to be dropped.
-            //this will directly be used by WSASend so don't fuck it up!
-            //p.packet[10] = 0x7E;
+
             if (match)
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
         }
 
-        private static void cmdItemBanToggle()
+        private static void cmdUnIgnore(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null)
+            {
+                SendChatMsg("USAGE: /ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+
+            for (int i = 0; i < numberIgnored;i++ )
+            {
+                if (ignoreList[i] == name)
+                {
+                    ignoreList[i] = null;
+                    SendChatMsg("Player " + name + " unignored.", packetChatMsg.PlayerId, Color.Red);
+                }
+            }
+      
+
+        }
+
+        private static void cmdItemBanToggle(packet_ChatMsg p)
         {
             itemBanEnabled = !itemBanEnabled;
+            string state = itemBanEnabled ? "enabled." : "disabled.";
+            SendChatMsg("Item ban " + state, p.PlayerId, Color.Green);
         }
 
         /// <summary>
@@ -303,24 +323,23 @@ namespace RomTerraria
         /// <param name="packetChatMsg">Data class for ChatMsg</param>
         private static void cmdKick(string[] commands, packet_ChatMsg packetChatMsg)
         {
-            
-            if (commands.Length > 1)
-            {
-                var name = GetParamsAsString(commands);
-
-                var t = (ServerSock[]) serverSock.GetValue(null);
-                foreach (ServerSock b in t)
-                {
-                    if (b.name == name)
-                    {
-                        b.kill = true;
-                        return;
-                    }
-                }
-            } else
+            var name = GetParamsAsString(commands);
+            if (name == null)
             {
                 SendChatMsg("USAGE: /kick <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
             }
+
+            var t = (ServerSock[]) serverSock.GetValue(null);
+            foreach (ServerSock b in t)
+            {
+                if (b.name == name)
+                {
+                    b.kill = true;
+                    return;
+                }
+            }
+
         }
 
         /// <summary>
@@ -347,19 +366,16 @@ namespace RomTerraria
 
         private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
         {
-            //actually, even this commands.length check can be replaced by getparams as string
-            //if result == null, return or usage.
-            if (commands.Length > 1)
-            {
-                var name = GetParamsAsString(commands);
-
-                ignoreList[numberIgnored] = name;
-                numberIgnored++;
-                SendChatMsg("Player " + name + " ignored.", packetChatMsg.PlayerId, Color.Red);
-            } else
+            var name = GetParamsAsString(commands);
+            if (name == null)
             {
                 SendChatMsg("USAGE: /ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
             }
+
+            ignoreList[numberIgnored] = name;
+            numberIgnored++;
+            SendChatMsg("Player " + name + " ignored.", packetChatMsg.PlayerId, Color.Red);
         }
 
         /// <summary>
@@ -392,15 +408,14 @@ namespace RomTerraria
         /// <param name="p">Data class for ChatMsg</param>
         private static void cmdBroadcast(string[] commands, packet_ChatMsg p)
         {
-            if (commands.Length > 1)
+            var msg = GetParamsAsString(commands);
+            if (msg == null)
             {
-                var msg = GetParamsAsString(commands);
-                SendChatMsg(msg, -1, Color.Orange);
+                SendChatMsg("USAGE: /broadcast <message>", p.PlayerId, Color.GreenYellow);
+                return;
             }
-            else
-            {
-                SendChatMsg("USAGE: /broadcast <message>",p.PlayerId, Color.GreenYellow);
-            }
+
+            SendChatMsg(msg, -1, Color.Orange);
         }
     }
 
@@ -462,13 +477,13 @@ namespace RomTerraria
         internal Vector2 Velocity;
         internal int SelectedItemId;
         internal int ButtonState;
-        internal bool keyUp;
-        internal bool keyDown;
-        internal bool keyLeft;
-        internal bool keyRight;
-        internal bool keyJump;
-        internal bool usingItem;
-        internal int direction = -1;
+        internal bool KeyUp;
+        internal bool KeyDown;
+        internal bool KeyLeft;
+        internal bool KeyRight;
+        internal bool KeyJump;
+        internal bool UsingItem;
+        internal int Direction = -1;
 
         internal packet_PlayerState(byte[] data)
             : base(data)
@@ -481,13 +496,13 @@ namespace RomTerraria
             Velocity.Y = BitConverter.ToSingle(data, 20);
 
             //advanced state
-            if ((ButtonState & 1) == 1) keyUp = true;
-            if ((ButtonState & 2) == 2) keyDown = true;
-            if ((ButtonState & 4) == 4) keyLeft = true;
-            if ((ButtonState & 8) == 8) keyRight = true;
-            if ((ButtonState & 16) == 16) keyJump = true;
-            if ((ButtonState & 32) == 32) usingItem = true;
-            if ((ButtonState & 64) == 64) direction = 1;
+            if ((ButtonState & 1) == 1) KeyUp = true;
+            if ((ButtonState & 2) == 2) KeyDown = true;
+            if ((ButtonState & 4) == 4) KeyLeft = true;
+            if ((ButtonState & 8) == 8) KeyRight = true;
+            if ((ButtonState & 16) == 16) KeyJump = true;
+            if ((ButtonState & 32) == 32) UsingItem = true;
+            if ((ButtonState & 64) == 64) Direction = 1;
             //
         }
     }
