@@ -122,7 +122,8 @@ namespace RomTerraria
                                     overlapped, completionRoutine);
             if (result != 0)
             {
-                MakeItHarder.serverConsole.AddChatLine("Socket Error!");
+                //MakeItHarder.serverConsole.AddChatLine("Socket Error!");
+                Console.WriteLine("Socket Error!\n");
                 return result;
             }
 

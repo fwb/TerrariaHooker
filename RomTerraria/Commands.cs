@@ -169,7 +169,8 @@ namespace RomTerraria
                     sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
                 }
 
-                MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
+                //MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
+                Console.WriteLine(prefix + " ::" + sBuffer.ToString().ToUpper() + "\n");
                 }
             return packet;
 
@@ -190,7 +191,9 @@ namespace RomTerraria
                     {
                         packet = CreateDummyPacket(data);
                         var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
-                        MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
+                        //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
+                        Console.WriteLine("Player: " + p.Name + " tried to use " + itemName + "\n");
+
                     }
                 }
             }
@@ -331,14 +334,25 @@ namespace RomTerraria
             }
 
             var t = (ServerSock[]) serverSock.GetValue(null);
-            foreach (ServerSock b in t)
+
+            //now that this can have up to 255 sockets, maybe it's best to just iterate up to max.
+            for (int i = 0; i < Main.maxNetPlayers;i++ )
+            {
+                if (t[i].name == name)
+                {
+                    t[i].kill = true;
+                    return;
+                }
+            }
+
+            /*foreach (ServerSock b in t)
             {
                 if (b.name == name)
                 {
                     b.kill = true;
                     return;
                 }
-            }
+            }*/
 
         }
 
