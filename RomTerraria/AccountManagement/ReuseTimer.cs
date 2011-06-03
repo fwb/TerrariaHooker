@@ -12,6 +12,10 @@ namespace RomTerraria.AccountManagement {
             // default constructor sets duration to 5 minutes and starts the timer
         }
 
+        public ReuseTimer( double minutes ) : this( minutes, true ) {
+            // use a specified duration and start the timer
+        }
+
         public ReuseTimer( double minutes, bool runNow ) {
             duration = TimeSpan.FromMinutes( minutes );
             if( runNow ) {

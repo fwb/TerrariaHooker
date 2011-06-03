@@ -1,15 +1,30 @@
+using System.Collections.Generic;
+using System.Net;
+
 namespace RomTerraria.AccountManagement {
+
     class AccountManager {
-        // Properties:
+        private List<Account> accounts;
 
-        // Fields:
-        // List of accounts
-
-        // Methods:
-        //  Load registered accounts from external source
-        //  Login
-        //  Does account exist
-        //  Create new account ( unknown source )
-        //  Add IP to account after login to registered account from previously unknown IP
+        private void LoadAccounts( ) {
+            
+        }
+        
+        public void Login( Account a ) {
+            
+        }
+        
+        public bool AccountExists( Account a ) {
+            return true;
+        }
+        
+        public void CreateAccount( ) {
+            
+        }
+        
+        public void AddIP( Account a, IPAddress ip ) {
+            
+        }
     }
+
 }
