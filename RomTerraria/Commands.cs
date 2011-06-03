@@ -121,6 +121,12 @@ namespace RomTerraria
                 case 0x1B:
                     prefix = "PLAYER FIRED PROJECTILE";
                     break;
+                case 0x1C:
+                    prefix = "?PLAYER PROJECTILE HIT NPC";
+                    break;
+                case 0x1D:
+                    prefix = "PLAYER DESTROY PROJECTILE";
+                    break;
                 case 0x1E:
                     prefix = "PLAYER TOGGLED PVP";
                     break;
@@ -165,7 +171,7 @@ namespace RomTerraria
             }
 
             //this code is currently unreachable, as the hook is on direction 0 only.
-            if (direction == 1) {
+            if (direction == 0) {
                 var sBuffer = new StringBuilder();
                 foreach (byte t in data)
                 {
@@ -216,7 +222,7 @@ namespace RomTerraria
                         packet = CreateDummyPacket(data);
                         var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
                         //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
-                        Console.WriteLine("Player: {0} tried to use {1}\n", p.Name, itemName);
+                        Console.WriteLine("Player: {0} tried to use {1}\n", Main.player[p.PlayerId].name, itemName);
 
                     }
                 }
@@ -263,6 +269,13 @@ namespace RomTerraria
 
         private static bool checkIgnores(byte[] data)
         {
+            //projectile packet. apparently the usual byte for playerId is actually
+            //projectileId in this packet, so we'll have to pass for now. It's either
+            //this or add an exception in the try {} to check data[4] and if it's 0x1B,
+            //playerId will be byte[29]ish.
+            if (data[4] == 0x1B || data[4] == 0x1C || data[4] == 0x1D)
+                return false;
+
             byte playerId;
             try
             {
@@ -569,21 +582,18 @@ namespace RomTerraria
     /// in the event of WSASend calls. Typically the name won't be used unless the data is already
     /// known to be of a type where name is useful, so any irregularities are of no consequence.
     /// </summary>
+    //USE A CLASS INHERITING PACKET_BASE UNLESS YOU KNOW THAT PLAYERID IS AT INDEX 5
+    //CHILD CLASSES OVERRIDE PLAYERID IF THE PACKET THEY ARE DEFINING DIFFERS FROM BASE
     public class packet_Base
     {
         internal byte Type;
         internal int PlayerId;
-        internal string Name;
         internal byte[] Packet;
 
         public packet_Base(byte[] data)
         {
             Packet = data;
             Type = data[4];
-            PlayerId = data[5];
-            Name = Main.player[PlayerId].name;
-            if (Name == "")
-                Name = "SYSTEM";
         }
     }
 
@@ -600,6 +610,7 @@ namespace RomTerraria
         internal packet_ChatMsg(byte[] data)
             : base(data)
         {
+            PlayerId = data[5];
             R = data[6];
             G = data[7];
             B = data[8];
@@ -607,6 +618,42 @@ namespace RomTerraria
         }
 
     }
+
+    public class packet_FireProjectile : packet_Base
+    {
+        internal short Identity;
+        internal int ProjectileType;
+        internal int Owner;
+        internal Vector2 Position;
+        internal Vector2 Velocity;
+        internal float KnockBack;
+        internal short Damage;
+
+        internal packet_FireProjectile(byte[] data)
+            : base(data)
+        {
+
+            Identity = BitConverter.ToInt16(data, 5);
+            Position.X = BitConverter.ToSingle(data, 7);
+            Position.Y = BitConverter.ToSingle(data, 11);
+            Velocity.X = BitConverter.ToSingle(data, 15);
+            Velocity.Y = BitConverter.ToSingle(data, 19);
+            KnockBack = BitConverter.ToSingle(data, 23);
+            Damage = BitConverter.ToInt16(data, 27);
+
+            PlayerId = data[29]; //overriding base class constructor
+
+            Owner = data[29];
+            ProjectileType = data[30];
+
+            //rest of the bytes in the packet are AI related
+            //it would be a fair performance hit to get human-readable
+            //data from it, since it's set when the packet is received
+            //but only read when it needs to be acted on.
+
+        }
+    }
+    //
 
     public class packet_PlayerDied : packet_Base
     {
@@ -617,6 +664,7 @@ namespace RomTerraria
         internal packet_PlayerDied(byte[] data) 
             : base(data)
         {
+            PlayerId = data[5];
             HitDirection = data[6] - 1;
             DamageTaken = BitConverter.ToInt16(data, 7);
             WasPVP = data[9] != 0;
@@ -643,6 +691,7 @@ namespace RomTerraria
         internal packet_PlayerState(byte[] data)
             : base(data)
         {
+            PlayerId = data[5];
             ButtonState = data[6];
             SelectedItemId = data[7];
             Position.X = BitConverter.ToSingle(data, 8);
