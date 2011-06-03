@@ -40,7 +40,7 @@ namespace RomTerraria.AccountManagement {
         }
         
         public bool CheckTimer( ReuseTimer t ) {
-            
+            return true;
         }
         
         public void Kick( ) {
