@@ -34,7 +34,7 @@ namespace RomTerraria
 
         protected override void LoadContent()
         {
-            this.Window.Title += " (using RomTerraria Launcher - http://www.romsteady.net)";
+            //this.Window.Title += " (using RomTerraria Launcher - http://www.romsteady.net)";
             terrariaAssembly = Assembly.GetAssembly(typeof(Terraria.Main));
             if (terrariaAssembly != null)
             {
@@ -72,7 +72,7 @@ namespace RomTerraria
                     }
                 }
             }
-            base.LoadContent();
+            /*base.LoadContent();
             Terraria.Main.showSplash = false;
             Terraria.Main.menuMultiplayer = true;
             Terraria.Main.worldPathName = Terraria.Main.loadWorldPath[ServerWorldID];
@@ -82,7 +82,7 @@ namespace RomTerraria
 
             ServerLoadWorld( );
 
-            Terraria.Main.menuMode = 10;
+            Terraria.Main.menuMode = 10;*/
 
             //foreach (var ip in Dns.GetHostAddresses(""))
             //{
@@ -95,7 +95,7 @@ namespace RomTerraria
             //ipService.GetIPCompleted += new RSN.GetIPCompletedEventHandler(ipService_GetIPCompleted);
             //ipService.GetIPAsync();
 
-            spriteBatch = new SpriteBatch(this.GraphicsDevice);
+            //spriteBatch = new SpriteBatch(this.GraphicsDevice);
         }
 
 

@@ -50,9 +50,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Terraria">
-      <HintPath>..\..\..\..\..\Desktop\terraria\v1.1\terraria\Terraria.exe</HintPath>
-      <Private>False</Private>
+    <Reference Include="TerrariaServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <ExecutableExtension>.exe</ExecutableExtension>
+      <HintPath>..\..\..\Media\Projects\Terraria\Dist\TerrariaServer.exe</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

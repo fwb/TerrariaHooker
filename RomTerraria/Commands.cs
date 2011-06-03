@@ -9,7 +9,7 @@ namespace RomTerraria
 {
     class Commands
     {
-        public static string[] ignoreList = new string[10];
+        public static string[] ignoreList = new string[100];
         public static byte[] bannedItems = new byte[] { 0xCF, 0xA7 }; //banned items.0xCF = lava bucket, 0xA7 = dynomite
         public static int numberIgnored;
 

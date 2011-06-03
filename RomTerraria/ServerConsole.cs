@@ -56,17 +56,18 @@ namespace RomTerraria {
         private MakeItHarder mih;
         private delegate void AddChatLineCallback( string text );
 
-        public ServerConsole( MakeItHarder m ) {
-            mih = m;
+        
+        public ServerConsole() {
+            //mih = m;
             InitializeComponent( );
             LoadLauncherSettings( );
             //LoadTerrariaAssembly( );
         }
 
         private void LoadLauncherSettings( ) {
-            enableInvasion.Checked = mih.InfiniteInvasion;
-            enableBloodMoon.Checked = mih.InfiniteBloodMoon;
-            enableEyeSpawn.Checked = mih.InfiniteEye;
+            //enableInvasion.Checked = mih.InfiniteInvasion;
+            //enableBloodMoon.Checked = mih.InfiniteBloodMoon;
+            //enableEyeSpawn.Checked = mih.InfiniteEye;
         }
 
         private void LoadPlayerInfo( ) {
@@ -82,7 +83,7 @@ namespace RomTerraria {
         private void LoadNPCInfo( ) {
             npcPicker.Items.Clear( );
             var npc = new Terraria.NPC( );
-            for( var i=1; i<44; i++ ) {
+            for( var i=1; i<=45; i++ ) {
                 try {
                     npc.SetDefaults( i );
                 } catch {

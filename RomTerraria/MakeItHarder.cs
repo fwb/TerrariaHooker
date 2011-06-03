@@ -111,8 +111,7 @@ namespace RomTerraria
                     }
                 }
 
-                serverConsole = new ServerConsole( this );
-                serverConsole.Hide( );
+                
 
             }
         }

@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32.SafeHandles;
 using Terraria;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -10,18 +15,51 @@ namespace RomTerraria
 {
     static class Program
     {
+        [DllImport("kernel32.dll",
+            EntryPoint = "GetStdHandle",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+        [DllImport("kernel32.dll",
+            EntryPoint = "AllocConsole",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            CallingConvention = CallingConvention.StdCall)]
+        private static extern int AllocConsole();
+        private const int STD_OUTPUT_HANDLE = -11;
+        private const int MY_CODE_PAGE = 437;
+
+       static void showServerConsole()
+        {
+           //run new form in thread, otherwise the console window/main process
+           //will be locked
+           Application.Run(new ServerConsole());
+
+
+        }
+        
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main() {
+
             Application.EnableVisualStyles( );
             Launcher l = new Launcher();
             l.ShowDialog(); // You have to use ShowDialog() here or it creates a second message pump and that makes XNA very unhappy.
 
             if( l.DialogResult == DialogResult.Yes ) {
-                using( var s = new ServerOverride( ) ) {
-                    s.ServerWorldID = l.LaunchWorldID;
+                AllocConsole();
+                IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+                var safeFileHandle = new SafeFileHandle(stdHandle, true);
+                var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+                var encoding = System.Text.Encoding.GetEncoding(MY_CODE_PAGE);
+                var standardOutput = new StreamWriter(fileStream, encoding) {AutoFlush = true};
+                Console.SetOut(standardOutput);  
+
+                using( Main s = new ServerOverride( ) ) {
+                    /*s.ServerWorldID = l.LaunchWorldID;
                     s.ServerPassword = l.LaunchWorldPassword;
 
                     if( l.InstallInfiniteInvasion ||
@@ -38,9 +76,18 @@ namespace RomTerraria
                                 InfiniteEye = l.InstallEye,
                                 EnableConsole = l.EnableServerConsole
                             } );
-                        }
+                        }*/
 
-                    s.Run( );
+                    
+                    //NEW 1.0.3
+                    var n = new SockHook();
+                    n.InitializeHooks();
+                    
+                    var sf = new Thread(showServerConsole);
+                    sf.Start();
+
+                    s.DedServ();
+                    //
                 }
             }  else if (l.DialogResult == DialogResult.OK) {
 #if DEBUG

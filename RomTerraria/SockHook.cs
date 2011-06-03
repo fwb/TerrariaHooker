@@ -208,8 +208,7 @@ namespace RomTerraria
 
         }
 
-        
-
+       
 
         /// <summary>
         /// Loads and wakes WSARecv and WSASend hooks. Process-local.
@@ -220,15 +219,18 @@ namespace RomTerraria
             {
                 CreateWSARecvHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSARecv"), new DWSARecv(WSARecvHooked), this);
                 CreateWSARecvHook.ThreadACL.SetExclusiveACL(new[] { 0 });
-                MakeItHarder.serverConsole.AddChatLine("WSARecv Hook succeeded.");
+                //MakeItHarder.serverConsole.AddChatLine("WSARecv Hook succeeded.");
+                Console.WriteLine("WSARecv Hook succeeded.");
 
-                CreateWSASendHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSASend"), new DWSASend(WSASendHooked), this);
-                CreateWSASendHook.ThreadACL.SetExclusiveACL(new[] { 0 });
-                MakeItHarder.serverConsole.AddChatLine("WSASend Hook succeeded.");
+                //CreateWSASendHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSASend"), new DWSASend(WSASendHooked), this);
+                //CreateWSASendHook.ThreadACL.SetExclusiveACL(new[] { 0 });
+                //MakeItHarder.serverConsole.AddChatLine("WSASend Hook succeeded.");
+                //Console.WriteLine("WSASend Hook succeeded.");
             }
             catch (Exception extInfo)
             {
-                MakeItHarder.serverConsole.AddChatLine("Hook failed: " + extInfo);
+                //MakeItHarder.serverConsole.AddChatLine("Hook failed: " + extInfo);
+                Console.WriteLine("Hook failed: " + extInfo);
                 return;
             }
             RemoteHooking.WakeUpProcess();

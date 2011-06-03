@@ -39,10 +39,11 @@ namespace RomTerraria.AccountManagement {
             
         }
         
-        public bool CheckTimer( ReuseTimer t ) {
-            
+        public bool CheckTimer( ReuseTimer t )
+        {
+            return false;
         }
-        
+
         public void Kick( ) {
             
         }
