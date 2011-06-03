@@ -9,10 +9,8 @@ namespace RomTerraria
 {
     class Commands
     {
-        public static string[] ignoreList = new string[100];
         public static byte[] bannedItems = new byte[] { 0xCF, 0xA7 }; //banned items.0xCF = lava bucket, 0xA7 = dynomite
-        public static int numberIgnored;
-
+    
         private static bool itemBanEnabled;
 
         private static int[] justHostiled = new int[10];
@@ -48,13 +46,6 @@ namespace RomTerraria
         /// <param name="data">The data.</param>
         public static Packet ProcessData(byte[] data, int direction)
         {
-            if (direction == 0)
-            {
-                var ignored = checkIgnores(data);
-                if (ignored)
-                    return CreateDummyPacket(data);
-
-            }
 
             byte type = data[4];
 
@@ -267,29 +258,6 @@ namespace RomTerraria
 
         }
 
-        private static bool checkIgnores(byte[] data)
-        {
-            //projectile packet. apparently the usual byte for playerId is actually
-            //projectileId in this packet, so we'll have to pass for now. It's either
-            //this or add an exception in the try {} to check data[4] and if it's 0x1B,
-            //playerId will be byte[29]ish.
-            if (data[4] == 0x1B || data[4] == 0x1C || data[4] == 0x1D)
-                return false;
-
-            byte playerId;
-            try
-            {
-                playerId = data[5];
-            }
-            catch { return false; }
-
-            if (playerId > 8)
-                return false;
-
-            string playerName = Main.player[playerId].name;
-            return ignoreList.Any(p => p == playerName);
-        }
-
         private static Packet HandleChatMsg(byte[] data)
         {
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
@@ -310,17 +278,11 @@ namespace RomTerraria
                     case (".broadcast"):
                         cmdBroadcast(commands, p);
                         break;
-                    case (".ignore"):
-                        cmdIgnore(commands, p);
-                        break;
                     case (".kick"):
                         cmdKick(commands, p);
                         break;
                     case (".itemban"):
                         cmdItemBanToggle(p);
-                        break;
-                    case (".unignore"):
-                        cmdUnIgnore(commands, p);
                         break;
                     case (".ban"):
                         cmdBanUser(commands, p);
@@ -404,24 +366,6 @@ namespace RomTerraria
             }
         }
 
-        private static void cmdUnIgnore(string[] commands, packet_ChatMsg packetChatMsg)
-        {
-            var name = GetParamsAsString(commands);
-            if (name == null)
-            {
-                SendChatMsg("USAGE: .ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
-
-            for (int i = 0; i < numberIgnored;i++ )
-            {
-                if (ignoreList[i] == name)
-                {
-                    ignoreList[i] = null;
-                    SendChatMsg("Player " + name + " unignored.", packetChatMsg.PlayerId, Color.Red);
-                }
-            }
-        }
 
         private static void cmdItemBanToggle(packet_ChatMsg p)
         {
@@ -516,20 +460,6 @@ namespace RomTerraria
             return -1;
         }
         //END OF HELPERS
-
-        private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
-        {
-            var name = GetParamsAsString(commands);
-            if (name == null)
-            {
-                SendChatMsg("USAGE: .ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
-
-            ignoreList[numberIgnored] = name;
-            numberIgnored++;
-            SendChatMsg("Player " + name + " ignored.", packetChatMsg.PlayerId, Color.Red);
-        }
 
         /// <summary>
         /// Helper function to send chat messages
