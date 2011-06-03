@@ -15,7 +15,8 @@ namespace RomTerraria
 
         private static bool itemBanEnabled;
 
-
+        private static int[] justHostiled = new int[10];
+        private static int numberHostiled;
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
@@ -146,6 +147,7 @@ namespace RomTerraria
                     break;
                 case 0x2c:
                     prefix = "PLAYER DIED";
+                    packet = handleDeath(data);
                     break;
                 case 0x2d:
                     prefix = "PLAYER PARTY UPDATE";
@@ -174,6 +176,25 @@ namespace RomTerraria
                 }
             return packet;
 
+        }
+
+        //basic death handler.
+        private static Packet handleDeath(byte[] data)
+        {
+            if (Main.player[data[5]].hostile)
+            {
+                for (var i = 0; i < numberHostiled; i++)
+                {
+                    if (justHostiled[i] == data[5])
+                    {
+                        justHostiled[i] = 0x00;
+                        numberHostiled--;
+                        Main.player[data[5]].hostile = false;
+                    }
+                }
+
+            }
+            return new Packet(data, data.Length);
         }
 
         private static Packet HandlePlayerState(byte[] data)
@@ -239,7 +260,13 @@ namespace RomTerraria
 
         private static bool checkIgnores(byte[] data)
         {
-            byte playerId = data[5];
+            byte playerId;
+            try
+            {
+                playerId = data[5];
+            }
+            catch { return false; }
+
             if (playerId > 8)
                 return false;
 
@@ -285,6 +312,9 @@ namespace RomTerraria
                     case (".kickban"):
                         cmdKickBan(commands, p);
                         break;
+                    case (".star"):
+                        cmdLaunchStar(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -295,6 +325,32 @@ namespace RomTerraria
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null)
+            {
+                SendChatMsg("USAGE: .star <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+            var id = getPlayerIdFromName(name);
+
+            //if the player is already hostile, don't do anything
+            if (!Main.player[id].hostile)
+            {
+                Main.player[id].hostile = true;
+                justHostiled[numberHostiled] = id;
+                numberHostiled++;
+            }
+
+            Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
+                                                       //as far as i can tell, main.myplayer only owns projectile
+                                                       //12 [star] and everything else is either unowned, or self-owned
+            Projectile.NewProjectile(Main.player[id].position.X, Main.player[id].position.Y-300, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
+            SendChatMsg("Sending death to " + name + " .", packetChatMsg.PlayerId, Color.Red);
+
         }
 
         private static void cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
@@ -480,7 +536,7 @@ namespace RomTerraria
         /// <param name="p">Data class for ChatMsg</param>
         private static void cmdUnknown(string[] commands, packet_ChatMsg p)
         {
-            SendChatMsg("ERROR: Unknown command " + commands[0], -1, Color.GreenYellow);
+            SendChatMsg("ERROR: Unknown command " + commands[0], p.PlayerId, Color.GreenYellow);
             return;
         }
 
