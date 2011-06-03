@@ -279,6 +279,12 @@ namespace RomTerraria
                     case (".unignore"):
                         cmdUnIgnore(commands, p);
                         break;
+                    case (".ban"):
+                        cmdBanUser(commands, p);
+                        break;
+                    case (".kickban"):
+                        cmdKickBan(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -289,6 +295,41 @@ namespace RomTerraria
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null)
+            {
+                SendChatMsg("USAGE: .kickban <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+
+            var id = getPlayerIdFromName(name);
+            if (id != -1)
+            {
+                kickUser(id);
+                banUser(id);
+                SendChatMsg("Player " + name + " kicked and banned.", packetChatMsg.PlayerId, Color.Red);
+            }
+        }
+
+        private static void cmdBanUser(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null)
+            {
+                SendChatMsg("USAGE: .ban <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+
+            var id = getPlayerIdFromName(name);
+            if (id != -1) {
+                    Netplay.AddBan(id);
+                    SendChatMsg("Banned user: " + name, packetChatMsg.PlayerId, Color.Red);
+                    return;
+            }
         }
 
         private static void cmdUnIgnore(string[] commands, packet_ChatMsg packetChatMsg)
@@ -334,13 +375,15 @@ namespace RomTerraria
             }
 
             var t = (ServerSock[]) serverSock.GetValue(null);
-
+            
             //now that this can have up to 255 sockets, maybe it's best to just iterate up to max.
-            for (int i = 0; i < Main.maxNetPlayers;i++ )
+            //nb: this might not even be necessary, if user[i] maps directly to socket[i] which i think it might.
+            for (var i = 0; i < Main.maxNetPlayers;i++ )
             {
                 if (t[i].name == name)
                 {
-                    t[i].kill = true;
+                    kickUser(i);
+                    SendChatMsg("Player " + name + " kicked.", packetChatMsg.PlayerId, Color.Red);
                     return;
                 }
             }
@@ -377,6 +420,32 @@ namespace RomTerraria
             param = param.Trim();
             return param;
         }
+
+        private static void banUser(int id)
+        {
+            Netplay.AddBan(id);
+            return;
+        }
+
+        private static void kickUser(int id)
+        {
+            var t = (ServerSock[])serverSock.GetValue(null);
+            t[id].kill = true;
+            return;
+        }
+
+        private static int getPlayerIdFromName(string name)
+        {
+            for (int i = 0; i < Main.maxNetPlayers; i++)
+            {
+                if (Main.player[i].name.ToLower() == name.ToLower())
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        //END OF HELPERS
 
         private static void cmdIgnore(string[] commands, packet_ChatMsg packetChatMsg)
         {
