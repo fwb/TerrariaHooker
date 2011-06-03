@@ -349,7 +349,7 @@ namespace RomTerraria
                                                        //as far as i can tell, main.myplayer only owns projectile
                                                        //12 [star] and everything else is either unowned, or self-owned
             Projectile.NewProjectile(Main.player[id].position.X, Main.player[id].position.Y-300, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
-            SendChatMsg("Sending death to " + name + " .", packetChatMsg.PlayerId, Color.Red);
+            SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
 
         }
 
