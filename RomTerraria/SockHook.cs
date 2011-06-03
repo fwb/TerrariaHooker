@@ -7,7 +7,6 @@ using System.Net.Sockets;
 namespace RomTerraria
 {
    
-
     /// <summary>
     /// Winsock Struct, implemented as an IntPtr to unmanaged memory.
     /// </summary>
@@ -132,11 +131,19 @@ namespace RomTerraria
             {
                 var newBuffer = new byte[bytes];
                 Marshal.Copy(Buffer.buf, newBuffer, 0, bytes);
-                var packet = Commands.ProcessData(newBuffer, 0); 
                 
-                //write packet data to buffer. may be unchanged.
-                Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
-
+                //wrap ProcessData call, so an exception in it shouldn't cause
+                //easyhook to detach.
+                try
+                {
+                    var packet = Commands.ProcessData(newBuffer, 0);
+                    //write packet data to buffer
+                    Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
+                } catch (Exception e)
+                {
+                    Console.WriteLine("Fatal error in Commands.cs: " + e + "\n");
+                    Console.WriteLine("HOOK MAY BE DETACHED\n");    
+                }
 
             }
             return result;

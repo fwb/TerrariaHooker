@@ -164,6 +164,7 @@ namespace RomTerraria
                     break;
             }
 
+            //this code is currently unreachable, as the hook is on direction 0 only.
             if (direction == 1) {
                 var sBuffer = new StringBuilder();
                 foreach (byte t in data)
@@ -171,8 +172,7 @@ namespace RomTerraria
                     sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
                 }
 
-                //MakeItHarder.serverConsole.AddChatLine(prefix + " : :" + sBuffer.ToString().ToUpper());
-                Console.WriteLine(prefix + " ::" + sBuffer.ToString().ToUpper() + "\n");
+                Console.WriteLine("{0} ::{1}\n", prefix, sBuffer.ToString().ToUpper());
                 }
             return packet;
 
@@ -181,6 +181,10 @@ namespace RomTerraria
         //basic death handler.
         private static Packet handleDeath(byte[] data)
         {
+            //right now, death handler just fixes up hostile state if a star was dropped
+            //on them using .star.);
+            var p = new packet_PlayerDied(data);
+
             if (Main.player[data[5]].hostile)
             {
                 for (var i = 0; i < numberHostiled; i++)
@@ -192,7 +196,6 @@ namespace RomTerraria
                         Main.player[data[5]].hostile = false;
                     }
                 }
-
             }
             return new Packet(data, data.Length);
         }
@@ -213,7 +216,7 @@ namespace RomTerraria
                         packet = CreateDummyPacket(data);
                         var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
                         //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
-                        Console.WriteLine("Player: " + p.Name + " tried to use " + itemName + "\n");
+                        Console.WriteLine("Player: {0} tried to use {1}\n", p.Name, itemName);
 
                     }
                 }
@@ -405,8 +408,6 @@ namespace RomTerraria
                     SendChatMsg("Player " + name + " unignored.", packetChatMsg.PlayerId, Color.Red);
                 }
             }
-      
-
         }
 
         private static void cmdItemBanToggle(packet_ChatMsg p)
@@ -605,6 +606,21 @@ namespace RomTerraria
             Text = Encoding.ASCII.GetString(data, 9, data.Length - 9);
         }
 
+    }
+
+    public class packet_PlayerDied : packet_Base
+    {
+        internal int HitDirection;
+        internal double DamageTaken;
+        internal bool WasPVP;
+
+        internal packet_PlayerDied(byte[] data) 
+            : base(data)
+        {
+            HitDirection = data[6] - 1;
+            DamageTaken = BitConverter.ToInt16(data, 7);
+            WasPVP = data[9] != 0;
+        }
     }
 
     /// <summary>
