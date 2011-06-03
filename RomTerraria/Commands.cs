@@ -250,7 +250,7 @@ namespace RomTerraria
             //...
             //act on packet fields, generate new data etc.
             var match = false;
-            if (p.Text[0] == 0x2F) // match backslash
+            if (p.Text[0] == 0x2E) // match backslash
             {
                 match = true;
                 var commands = p.Text.Split(' ');
@@ -258,22 +258,22 @@ namespace RomTerraria
 
                 switch (commands[0])
                 {
-                    case ("/meteor"):
+                    case (".meteor"):
                         WorldEvents.SpawnMeteorCB();
                         break;
-                    case ("/broadcast"):
+                    case (".broadcast"):
                         cmdBroadcast(commands, p);
                         break;
-                    case ("/ignore"):
+                    case (".ignore"):
                         cmdIgnore(commands, p);
                         break;
-                    case ("/kick"):
+                    case (".kick"):
                         cmdKick(commands, p);
                         break;
-                    case ("/itemban"):
+                    case (".itemban"):
                         cmdItemBanToggle(p);
                         break;
-                    case ("/unignore"):
+                    case (".unignore"):
                         cmdUnIgnore(commands, p);
                         break;
                     default:
@@ -293,7 +293,7 @@ namespace RomTerraria
             var name = GetParamsAsString(commands);
             if (name == null)
             {
-                SendChatMsg("USAGE: /ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                SendChatMsg("USAGE: .ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
 
@@ -326,7 +326,7 @@ namespace RomTerraria
             var name = GetParamsAsString(commands);
             if (name == null)
             {
-                SendChatMsg("USAGE: /kick <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                SendChatMsg("USAGE: .kick <player>", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
 
@@ -369,7 +369,7 @@ namespace RomTerraria
             var name = GetParamsAsString(commands);
             if (name == null)
             {
-                SendChatMsg("USAGE: /ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                SendChatMsg("USAGE: .ignore <player>", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
 
@@ -386,7 +386,7 @@ namespace RomTerraria
         /// <param name="color">The color, as a Color type.</param>
         private static void SendChatMsg(string msg, int playerId, Color color)
         {
-            NetMessage.SendData(25, playerId, -1, msg, 8, color.R, color.G, color.B);
+            NetMessage.SendData(25, playerId, -1, msg, 255, color.R, color.G, color.B);
             return;
         }
 
@@ -411,7 +411,7 @@ namespace RomTerraria
             var msg = GetParamsAsString(commands);
             if (msg == null)
             {
-                SendChatMsg("USAGE: /broadcast <message>", p.PlayerId, Color.GreenYellow);
+                SendChatMsg("USAGE: .broadcast <message>", p.PlayerId, Color.GreenYellow);
                 return;
             }
 
