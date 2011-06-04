@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using ConsoleRedirection;
 
 namespace RomTerraria {
 
@@ -53,6 +55,7 @@ namespace RomTerraria {
             }
         }
 
+        private TextWriter _writer = null;
         private MakeItHarder mih;
         private delegate void AddChatLineCallback( string text );
 
@@ -61,6 +64,11 @@ namespace RomTerraria {
             //mih = m;
             InitializeComponent( );
             LoadLauncherSettings( );
+            _writer = new StdOutRedirect(textBox1);
+            // Redirect the out Console stream
+            Console.SetOut(_writer);
+
+
             //LoadTerrariaAssembly( );
         }
 
@@ -201,13 +209,16 @@ namespace RomTerraria {
 
         }
 
-        private void button3_Click(object sender, EventArgs e)
+
+        private void button4_Click(object sender, EventArgs e)
         {
-            sockHook = new SockHook();
-            
-            TestbedControl a = new TestbedControl();
-            panel1.Controls.Add(a);
-            panel1.Refresh();
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+         
+ 
         }
 
         

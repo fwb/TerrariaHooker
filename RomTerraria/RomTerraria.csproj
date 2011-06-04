@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="ServerOverride.cs" />
     <Compile Include="SockHook.cs" />
+    <Compile Include="StdOutRedirect.cs" />
     <Compile Include="TestbedControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

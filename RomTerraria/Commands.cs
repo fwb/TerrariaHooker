@@ -9,7 +9,8 @@ namespace RomTerraria
 {
     class Commands
     {
-        public static byte[] bannedItems = new byte[] { 0xCF, 0xA7 }; //banned items.0xCF = lava bucket, 0xA7 = dynomite
+        public static byte[] bannedItems = new byte[] { 0xCF,   //lava bucket
+                                                        0xA7 }; //dynamite
     
         private static bool itemBanEnabled;
 
@@ -46,11 +47,10 @@ namespace RomTerraria
         /// <param name="data">The data.</param>
         public static Packet ProcessData(byte[] data, int direction)
         {
-
             byte type = data[4];
 
             string prefix;
-            string details = null;
+            //string details = null;
             var packet = new Packet(data, data.Length);
 
             switch (type)
@@ -267,6 +267,9 @@ namespace RomTerraria
             if (p.Text[0] == 0x2E) // match backslash
             {
                 match = true;
+
+                //split is probably no slower than substring, if the size of the strings
+                //we are pulling from user-text is variable.
                 var commands = p.Text.Split(' ');
                 commands[0] = commands[0].ToLower();
 
@@ -333,6 +336,7 @@ namespace RomTerraria
 
         private static void cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            //NOTE: much more efficient to use string.Substring(x); to get the name from the command
             var name = GetParamsAsString(commands);
             if (name == null)
             {
@@ -424,15 +428,12 @@ namespace RomTerraria
             if (commands.Length == 1)
                 return null;
 
-            int i = 1;
             string param = null;
-            while (i < commands.Length)
-            {
+
+            for (int i = 1; i < commands.Length; i++)
                 param = param + delimiter + commands[i];
-                i++;
-            }
-            param = param.Trim();
-            return param;
+
+            return param.Trim();
         }
 
         private static void banUser(int id)

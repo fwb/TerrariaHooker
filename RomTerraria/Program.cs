@@ -30,6 +30,11 @@ namespace RomTerraria
         private const int STD_OUTPUT_HANDLE = -11;
         private const int MY_CODE_PAGE = 437;
 
+
+        public static string msgBuf = "";
+        public static StringReader sr;
+        public static StreamWriter sw;
+
        static void showServerConsole()
         {
            //run new form in thread, otherwise the console window/main process
@@ -43,8 +48,9 @@ namespace RomTerraria
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main() {
-
+        static void Main()
+        {
+            
             Application.EnableVisualStyles( );
             Launcher l = new Launcher();
             l.ShowDialog(); // You have to use ShowDialog() here or it creates a second message pump and that makes XNA very unhappy.
@@ -54,9 +60,11 @@ namespace RomTerraria
                 IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
                 var safeFileHandle = new SafeFileHandle(stdHandle, true);
                 var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
-                var encoding = System.Text.Encoding.GetEncoding(MY_CODE_PAGE);
+                var encoding = Encoding.GetEncoding(MY_CODE_PAGE);
                 var standardOutput = new StreamWriter(fileStream, encoding) {AutoFlush = true};
-                Console.SetOut(standardOutput);  
+                Console.SetOut(standardOutput);
+              
+
 
                 using( Main s = new ServerOverride( ) ) {
                     /*s.ServerWorldID = l.LaunchWorldID;
