@@ -19,13 +19,28 @@ namespace RomTerraria.AccountManagement {
         public Account(  ) {
             usernames = new List<string>( );
             rights = new Dictionary<Rights, bool>( );
-            timers = new Dictionary<string, ReuseTimer>( );
             ips = new List<IPAddress>( );
+
+            timers = new Dictionary<string, ReuseTimer>( );
+            ignored = new List<string>( );
+        }
+
+        public Account( List<string> usernames, Dictionary<Rights, bool> rights, 
+                        List<IPAddress> ips ) {
+            this.usernames = usernames;
+            this.rights = rights;
+            this.ips = ips;
+
+            timers = new Dictionary<string, ReuseTimer>( );
             ignored = new List<string>( );
         }
 
         public bool CheckRights( Rights r ) {
             return rights[r];
+        }
+
+        public void SetRights( Rights r, bool b ) {
+            rights[r] = b;
         }
 
         public List<IPAddress> GetIPs( ) {
