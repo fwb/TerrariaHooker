@@ -9,7 +9,7 @@ namespace RomTerraria.AccountManagement {
         public bool IsBanned { get; set; }
 
         private List<String> usernames;
-        private Dictionary<Rights, bool> rights;
+        private Rights rights;
         private Dictionary<String, ReuseTimer> timers; 
         private List<IPAddress> ips;
         private List<String> ignored; 
@@ -18,14 +18,14 @@ namespace RomTerraria.AccountManagement {
 
         public Account(  ) {
             usernames = new List<string>( );
-            rights = new Dictionary<Rights, bool>( );
+            rights = Rights.NONE;
             ips = new List<IPAddress>( );
 
             timers = new Dictionary<string, ReuseTimer>( );
             ignored = new List<string>( );
         }
 
-        public Account( List<string> usernames, Dictionary<Rights, bool> rights, 
+        public Account( List<string> usernames, Rights rights, 
                         List<IPAddress> ips ) {
             this.usernames = usernames;
             this.rights = rights;
@@ -35,12 +35,12 @@ namespace RomTerraria.AccountManagement {
             ignored = new List<string>( );
         }
 
-        public bool CheckRights( Rights r ) {
-            return rights[r];
+        public Rights CheckRights(  ) {
+            return rights;
         }
 
-        public void SetRights( Rights r, bool b ) {
-            rights[r] = b;
+        public void SetRights( Rights r ) {
+            rights = rights | r;
         }
 
         public List<IPAddress> GetIPs( ) {

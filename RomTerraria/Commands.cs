@@ -292,7 +292,7 @@ namespace RomTerraria
                         cmdBroadcast(commands, p);
                         break;
                     case (".kick"):
-                        if( AccountManager.CheckRights( p.PlayerId, Rights.ADMIN ) ) {
+                        if ((AccountManager.GetRights(p.PlayerId) & Rights.ADMIN) == Rights.ADMIN) {
                             cmdKick( commands, p );
                         }
                         break;

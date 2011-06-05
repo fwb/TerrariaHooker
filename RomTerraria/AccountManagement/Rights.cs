@@ -1,10 +1,12 @@
 namespace RomTerraria.AccountManagement {
 
     public enum Rights {
-        ADMIN = 1,
-        USEITEMS = 2,
-        TELEPORT = 3,
-        EVENTS = 4
+        NONE = 0,
+        
+        USEITEMS = 4,
+        TELEPORT = 8,
+        EVENTS = 16,
+        ADMIN = USEITEMS | TELEPORT | EVENTS
     }
 
 }

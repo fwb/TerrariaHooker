@@ -49,19 +49,18 @@ namespace RomTerraria.AccountManagement {
 
         public static void CreateAccount( string username, string ip, bool admin = false ) {
             var usernames = new List<string>( );
-            var rights = new Dictionary<Rights, bool>( );
+            var rights = Rights.NONE;
             var ips = new List<IPAddress>( );
 
             usernames.Add( username );
-            if( admin ) {
-                rights.Add( Rights.ADMIN, true );
-                rights.Add( Rights.EVENTS, true );
-            } else {
-                rights.Add( Rights.ADMIN, false );
-                rights.Add( Rights.EVENTS, false );
+            if( admin )
+            {
+                rights = Rights.ADMIN | Rights.EVENTS;
+            } else
+            {
+                rights = Rights.NONE;
             }
-            rights.Add( Rights.TELEPORT, true );
-            rights.Add( Rights.USEITEMS, true );
+            rights = rights | Rights.USEITEMS | Rights.TELEPORT;
             ips.Add( IPAddress.Parse( ip ) );  
             //ips.Add( new IPAddress( new byte[] { 192, 168, 1, 242 } ) );
 
@@ -95,11 +94,11 @@ namespace RomTerraria.AccountManagement {
             return null;
         }
 
-        public static bool CheckRights( int playerId, Rights r ) {
+        public static Rights GetRights( int playerId) {
             if( activeAccounts.ContainsKey( playerId ) ) {
-                return activeAccounts[playerId].CheckRights( r );
+                return activeAccounts[playerId].CheckRights();
             }
-            return false;
+            return Rights.NONE;
         }
     }
 
