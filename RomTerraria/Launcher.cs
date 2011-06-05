@@ -23,26 +23,6 @@ namespace RomTerraria
             InitializeComponent();
         }
 
-        public int NewWidth
-        {
-            get
-            {
-                int w = 1024;
-                int.TryParse(width.Text, out w);
-                return w;
-            }
-        }
-
-        public int NewHeight
-        {
-            get
-            {
-                int h = 768;
-                int.TryParse(height.Text, out h);
-                return h;
-            }
-        }
-
         public bool InstallHealthTrainer
         {
             get
@@ -75,14 +55,6 @@ namespace RomTerraria
             }
         }
 
-        public bool InstallInfiniteInvasion
-        {
-            get
-            {
-                return enableInvasion.Checked;
-            }
-        }
-
         public bool InstallUncheckShadowOrb
         {
             get
@@ -91,29 +63,6 @@ namespace RomTerraria
             }
         }
 
-        public bool InstallBloodMoon
-        {
-            get
-            {
-                return enableBloodMoon.Checked;
-            }
-        }
-
-        public bool InstallHiDef
-        {
-            get
-            {
-                return enableHiDef.Checked;
-            }
-        }
-
-        public bool InstallClock
-        {
-            get
-            {
-                return enableClock.Checked;
-            }
-        }
 
         public bool InstallPony
         {
@@ -123,9 +72,6 @@ namespace RomTerraria
             }
         }
 
-        public bool InstallHardcore {
-            get { return enableHardcore.Checked; }
-        }
 
         public int RefreshTimer {
             get { return howOftenToRecharge.Value; }
@@ -142,13 +88,24 @@ namespace RomTerraria
             get { return (serverPassword.Text ?? "").Trim( ); }
         }
 
-        public bool InstallEye {
-            get { return enableEyeSpawn.Checked; }
+        public int LaunchWorldPort
+        {
+            get
+            {
+                int port = 7777;
+                int.TryParse(networkPort.Text, out port);
+                return port;
+            }
+
+        }
+        public int LaunchWorldPlayers
+        {
+            get { int players = 8;
+                int.TryParse(maxNetPlayers.Text, out players);
+                return players;
+            }
         }
 
-        public bool EnableServerConsole {
-            get { return enableServerConsole.Checked; }
-        }
 
         public class WorldData {
             public int ID;
@@ -160,40 +117,24 @@ namespace RomTerraria
 
         private void Launcher_Load(object sender, EventArgs e)
         {
-            width.Text = settings.Width.ToString();
-            height.Text = settings.Height.ToString();
-            enableTrainer.Checked = settings.EnableTrainer;
-            enableMinimap.Checked = settings.EnableMinimap;
-            enableManaRecharge.Checked = settings.EnableManaRecharge;
-            enableRealTimeMinimap.Checked = settings.EnableSurroundingAreaMinimap;
-            enableHiDef.Checked = settings.EnableHiDef;
-            enableClock.Checked = settings.EnableClock;
-            howOftenToRecharge.Value = settings.RefreshTimer;
-            letMeMakeItEasier.Checked = settings.EnableCheats;
+            networkPort.Text = settings.LoadWorldPort;
+            serverPassword.Text = settings.LoadWorldPassword;
+            maxNetPlayers.Text = settings.LoadWorldMaxNetPlayers;
 
             //Server stuff
             Terraria.Main.LoadWorlds( );
             selectWorld.Items.Clear( );
+            
             for( int i = 0; i < 5; i++ ) {
-                if( !String.IsNullOrWhiteSpace( Terraria.Main.loadWorld[i] ) ) {
-                    selectWorld.Items.Add( new WorldData( ) { ID = i, Name = Terraria.Main.loadWorld[i] } );
+                if( !String.IsNullOrWhiteSpace( Main.loadWorld[i] ) ) {
+                    selectWorld.Items.Add( new WorldData( ) { ID = i, Name = Main.loadWorld[i] } );
                 }
             }
         }
 
         private void launchTerraria_Click(object sender, EventArgs e)
         {
-            settings.Width = NewWidth;
-            settings.Height = NewHeight;
-            settings.EnableTrainer = enableTrainer.Checked;
-            settings.EnableMinimap = enableMinimap.Checked;
-            settings.EnableManaRecharge = enableManaRecharge.Checked;
-            settings.EnableSurroundingAreaMinimap = enableRealTimeMinimap.Checked;
-            settings.EnableHiDef = enableHiDef.Checked;
-            settings.EnableClock = enableClock.Checked;
-            settings.RefreshTimer = howOftenToRecharge.Value;
-            settings.EnableCheats = letMeMakeItEasier.Checked;
-            settings.Save();
+
         }
 
 
@@ -250,20 +191,6 @@ namespace RomTerraria
             MessageBox.Show("TerrariaCraftables.txt is in your documents folder.");
         }
 
-        private void selectWorld_SelectedIndexChanged( object sender, EventArgs e ) {
-            launchServer.Enabled = (LaunchWorldID >= 0);
-        }
-
-        private void enableHardcore_CheckedChanged( object sender, EventArgs e ) {
-            if( enableHardcore.Checked ) {
-                var answer = MessageBox.Show( "This could cause loss of character. Are you sure?",
-                                              "Warning",
-                                              MessageBoxButtons.YesNo, MessageBoxIcon.Warning );
-                if( answer == System.Windows.Forms.DialogResult.No ) {
-                    enableHardcore.Checked = false;
-                }
-            }
-        }
 
         private void letMeMakeItEasier_CheckChanged( object sender, EventArgs e ) {
             if( letMeMakeItEasier.Checked ) {
@@ -281,6 +208,19 @@ namespace RomTerraria
 
         private void ResetPortClick( object sender, EventArgs e ) {
             networkPort.Text = "7777";
+        }
+
+        private void launchServer_Click(object sender, EventArgs e)
+        {
+            settings.LoadWorldPassword = serverPassword.Text;
+            settings.LoadWorldPort = networkPort.Text;
+            settings.LoadWorldMaxNetPlayers = maxNetPlayers.Text;
+            settings.Save();
+        }
+
+        private void networkPort_TextChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }

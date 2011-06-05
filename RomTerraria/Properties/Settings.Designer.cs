@@ -25,102 +25,6 @@ namespace RomTerraria.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1024")]
-        public int Width {
-            get {
-                return ((int)(this["Width"]));
-            }
-            set {
-                this["Width"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("768")]
-        public int Height {
-            get {
-                return ((int)(this["Height"]));
-            }
-            set {
-                this["Height"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableTrainer {
-            get {
-                return ((bool)(this["EnableTrainer"]));
-            }
-            set {
-                this["EnableTrainer"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableMinimap {
-            get {
-                return ((bool)(this["EnableMinimap"]));
-            }
-            set {
-                this["EnableMinimap"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableManaRecharge {
-            get {
-                return ((bool)(this["EnableManaRecharge"]));
-            }
-            set {
-                this["EnableManaRecharge"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableSurroundingAreaMinimap {
-            get {
-                return ((bool)(this["EnableSurroundingAreaMinimap"]));
-            }
-            set {
-                this["EnableSurroundingAreaMinimap"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableHiDef {
-            get {
-                return ((bool)(this["EnableHiDef"]));
-            }
-            set {
-                this["EnableHiDef"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableClock {
-            get {
-                return ((bool)(this["EnableClock"]));
-            }
-            set {
-                this["EnableClock"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int RefreshTimer {
             get {
@@ -133,13 +37,37 @@ namespace RomTerraria.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool EnableCheats {
+        [global::System.Configuration.DefaultSettingValueAttribute("7777")]
+        public string LoadWorldPort {
             get {
-                return ((bool)(this["EnableCheats"]));
+                return ((string)(this["LoadWorldPort"]));
             }
             set {
-                this["EnableCheats"] = value;
+                this["LoadWorldPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LoadWorldPassword {
+            get {
+                return ((string)(this["LoadWorldPassword"]));
+            }
+            set {
+                this["LoadWorldPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public string LoadWorldMaxNetPlayers {
+            get {
+                return ((string)(this["LoadWorldMaxNetPlayers"]));
+            }
+            set {
+                this["LoadWorldMaxNetPlayers"] = value;
             }
         }
     }
