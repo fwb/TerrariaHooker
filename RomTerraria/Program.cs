@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using ConsoleRedirection;
 using Microsoft.Win32.SafeHandles;
 using Terraria;
 using Microsoft.Xna.Framework.Graphics;
@@ -27,13 +28,15 @@ namespace RomTerraria
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
         private static extern int AllocConsole();
+        
+
         private const int STD_OUTPUT_HANDLE = -11;
+        private const int STD_INPUT_HANDLE = -10;
         private const int MY_CODE_PAGE = 437;
+        public static FileStream fileStreamSTDIN = null;
+        public static IntPtr STDIN_HANDLE;
+       
 
-
-        public static string msgBuf = "";
-        public static StringReader sr;
-        public static StreamWriter sw;
 
        static void showServerConsole()
         {
@@ -57,16 +60,23 @@ namespace RomTerraria
 
             if( l.DialogResult == DialogResult.Yes ) {
                 AllocConsole();
+                //STD_OUT_HANDLE related
                 IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
                 var safeFileHandle = new SafeFileHandle(stdHandle, true);
                 var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
                 var encoding = Encoding.GetEncoding(MY_CODE_PAGE);
                 var standardOutput = new StreamWriter(fileStream, encoding) {AutoFlush = true};
                 Console.SetOut(standardOutput);
-              
+                //STD_IN_HANDLE
+                STDIN_HANDLE = GetStdHandle(STD_INPUT_HANDLE);
 
 
-                using( Main s = new ServerOverride( ) ) {
+                
+
+
+                using( Main s = new ServerOverride( ) )
+                {
+                    
                     /*s.ServerWorldID = l.LaunchWorldID;
                     s.ServerPassword = l.LaunchWorldPassword;
 
@@ -94,7 +104,13 @@ namespace RomTerraria
                     var sf = new Thread(showServerConsole);
                     sf.Start();
 
+                    //for (int i = 0; i <= 40;i++ )
+                        //Console.ReadLine();
+
+
+                    
                     s.DedServ();
+                    //Console.SetIn(RomTerraria.Program.r);
                     //
                 }
             }  else if (l.DialogResult == DialogResult.OK) {

@@ -27,4 +27,5 @@ namespace ConsoleRedirection
             get { return Encoding.UTF8; }
         }
     }
+
 }

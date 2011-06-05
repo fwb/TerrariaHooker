@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using ConsoleRedirection;
@@ -16,6 +17,14 @@ namespace RomTerraria {
     public partial class ServerConsole : Form {
 
         public static SockHook sockHook;
+
+        [DllImport("kernel32.dll")]
+        static extern bool WriteConsoleInput(IntPtr hConsoleInput,
+           INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsWritten);
+
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
 
         public class PlayerInfo : ListViewItem {
             public int Id { get; set; }
@@ -54,6 +63,7 @@ namespace RomTerraria {
                 return Name;
             }
         }
+
 
         private TextWriter _writer = null;
         private MakeItHarder mih;
@@ -209,18 +219,45 @@ namespace RomTerraria {
 
         }
 
-
-        private void button4_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            textBox1.AppendText(consoleInput.Text + Environment.NewLine);
+            //hooray!
+            char[] c = consoleInput.Text.ToCharArray();
+            var n = new INPUT_RECORD[c.Length+1];
+            int index = 0;
+            foreach (char i in c)
+            {
+                n[index].EventType = 0x0001;
+                n[index].KeyEvent = new KEY_EVENT_RECORD();
+                n[index].KeyEvent.bKeyDown = 1;
+                n[index].KeyEvent.wRepeatCount = 1;
+                n[index].KeyEvent.UnicodeChar = i;
+                index++;
+            }
 
+            n[index].EventType = 0x0001;
+            n[index].KeyEvent = new KEY_EVENT_RECORD();
+            n[index].KeyEvent.bKeyDown = 1;
+            n[index].KeyEvent.dwControlKeyState = 0;
+            n[index].KeyEvent.wRepeatCount = 1;
+            n[index].KeyEvent.wVirtualKeyCode = 0x0D;
+            n[index].KeyEvent.UnicodeChar = (char) 0x0D;
+            n[index].KeyEvent.wVirtualScanCode = (ushort)MapVirtualKey(0x0D, 0x00);
+
+            uint events;
+            WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length+1, out events);
+            consoleInput.Clear();
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-         
- 
-        }
 
+        private void consoleInputKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            { // enter key pressed
+                button3_Click(sender, e);
+            }
+        }
         
     }
 

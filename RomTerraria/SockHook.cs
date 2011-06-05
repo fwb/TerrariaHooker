@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using EasyHook;
 using System.Net.Sockets;
@@ -25,7 +26,7 @@ namespace RomTerraria
     /// </summary>
     public class SockHook :  IEntryPoint
     {
-
+        
         public LocalHook CreateWSARecvHook;
         public LocalHook CreateWSASendHook;
 
