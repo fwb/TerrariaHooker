@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using Terraria;
@@ -16,16 +17,29 @@ namespace RomTerraria.AccountManagement {
 
         private static void LoadAccounts( ) {
             CreateAccount( "Forfeit", "192.168.1.242", true );
+            var a = FindAccount( "Forfeit" );
+            a.AddIP( IPAddress.Parse( "173.66.80.83" ) );  
+
+            CreateAccount( "ass", "192.168.0.90", true );
+            var b = FindAccount( "ass" );
+            b.AddIP( IPAddress.Parse( "123.243.252.109" ) );
         }
         
-        public static bool Login( int playerId, string username, string password ) {
-            var ip = IPAddress.Parse( Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( ) );
+        public static bool Login( int playerId, string username ) {
+            var endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
+            var ipstr = endpoint;
+            for( int i = 0; i < endpoint.Length; i++ ) {
+                if( endpoint.Substring( i, 1 ) == ":" ) {
+                    ipstr = endpoint.Substring( 0, i );
+                }
+            }
+            var ip = IPAddress.Parse( ipstr );
             var account = FindAccount( username, ip );
-                //Netplay.CheckBan(Netplay.serverSock[this.whoAmI].tcpClient.Client.RemoteEndPoint.ToString()
             if( account != null ) {
                 activeAccounts.Add( playerId, account );
                 return true;
             }
+
             return false;
         }
 
@@ -54,8 +68,15 @@ namespace RomTerraria.AccountManagement {
             accounts.Add( new Account( usernames, rights, ips ) );
         }
 
-        public static void AddIP( Account a, IPAddress ip ) {
-            
+        private static Account FindAccount( string username ) {
+            foreach( var account in accounts ) {
+                foreach( var u in account.GetUsernames( ) ) {
+                    if( u.Equals( username ) ) {
+                        return account;
+                    }
+                }
+            }
+            return null;
         }
 
         private static Account FindAccount( string username, IPAddress ip ) {
@@ -75,9 +96,8 @@ namespace RomTerraria.AccountManagement {
         }
 
         public static bool CheckRights( int playerId, Rights r ) {
-            var account = activeAccounts[playerId];
-            if( account != null ) {
-                return account.CheckRights( r );
+            if( activeAccounts.ContainsKey( playerId ) ) {
+                return activeAccounts[playerId].CheckRights( r );
             }
             return false;
         }

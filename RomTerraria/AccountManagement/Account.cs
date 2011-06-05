@@ -47,8 +47,16 @@ namespace RomTerraria.AccountManagement {
             return ips;
         }
 
+        public void AddIP( IPAddress ip ) {
+            if( !ips.Contains( ip ) ) {
+                ips.Add( ip );
+            }
+        }
+
         public void AddUsername( string s ) {
-            usernames.Add( s );
+            if( !usernames.Contains( s ) ) {
+                usernames.Add( s );
+            }
         }
 
         public List<String> GetUsernames( ) {

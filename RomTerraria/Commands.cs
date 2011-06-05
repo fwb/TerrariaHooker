@@ -165,15 +165,14 @@ namespace RomTerraria
             }
 
             //this code is currently unreachable, as the hook is on direction 0 only.
-            if (direction == 0) {
-                var sBuffer = new StringBuilder();
-                foreach (byte t in data)
-                {
-                    sBuffer.Append(Convert.ToInt32(t).ToString("x").PadLeft(2, '0') + " ");
-                }
+            //if( direction == 0 ) {
+            //    var sBuffer = new StringBuilder( );
+            //    foreach( byte t in data ) {
+            //        sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
+            //    }
 
-                Console.WriteLine("{0} ::{1}\n", prefix, sBuffer.ToString().ToUpper());
-                }
+            //    Console.WriteLine( "{0} ::{1}\n", prefix, sBuffer.ToString( ).ToUpper( ) );
+            //}
             return packet;
 
         }
@@ -323,8 +322,8 @@ namespace RomTerraria
 
         private static void cmdLogin( string[] commands, packet_ChatMsg p ) {
             if( commands.Length == 2 ) {
-                if( AccountManager.Login( p.PlayerId, commands[0], commands[1] ) ) {
-                    return;
+                if( AccountManager.Login( p.PlayerId, commands[1] ) ) {
+                   return;
                 }
             }
 
