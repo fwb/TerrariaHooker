@@ -1,15 +1,22 @@
 namespace RomTerraria.AccountManagement {
+
     class Ban {
-        // Properties:
+        public string Reason { get; private set; }
 
-        // Fields:
-        // Start time
-        // Duration
-        // Reason
+        private ReuseTimer banTimer;
 
-        // Methods:
-        // Check if active
-        // Delete
-        // New ( default = 5m ), New ( duration )
+        public Ban( string reason ) : this( 5, reason ) {
+            // default 5 minute ban
+        }
+
+        public Ban( double duration, string reason ) {
+            banTimer = new ReuseTimer( duration );
+            Reason = reason;
+        }
+
+        public bool HasExpired( ) {
+            return banTimer.HasExpired( );
+        }
     }
+
 }

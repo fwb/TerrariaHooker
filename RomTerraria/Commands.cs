@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using RomTerraria.AccountManagement;
 using Terraria;
 using System.Reflection;
 
@@ -75,6 +76,8 @@ namespace RomTerraria
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
+                    // Clear AccountManager refs in HandleGreeting( )
+                    packet = HandleGreeting( data );        
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
@@ -222,6 +225,11 @@ namespace RomTerraria
 
         }
 
+        private static Packet HandleGreeting( byte[] data ) {
+            AccountManager.Logout( data[5] );
+            return new Packet( data, data.Length );
+        }
+
         private static Packet CreateDummyPacket(byte[] data)
         {
             int msgLength = 1;
@@ -275,6 +283,9 @@ namespace RomTerraria
 
                 switch (commands[0])
                 {
+                    case( ".login" ):
+                        cmdLogin( commands, p );
+                        break;
                     case (".meteor"):
                         WorldEvents.SpawnMeteorCB();
                         break;
@@ -282,7 +293,9 @@ namespace RomTerraria
                         cmdBroadcast(commands, p);
                         break;
                     case (".kick"):
-                        cmdKick(commands, p);
+                        if( AccountManager.CheckRights( p.PlayerId, Rights.ADMIN ) ) {
+                            cmdKick( commands, p );
+                        }
                         break;
                     case (".itemban"):
                         cmdItemBanToggle(p);
@@ -306,6 +319,16 @@ namespace RomTerraria
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdLogin( string[] commands, packet_ChatMsg p ) {
+            if( commands.Length == 2 ) {
+                if( AccountManager.Login( p.PlayerId, commands[0], commands[1] ) ) {
+                    return;
+                }
+            }
+
+            SendChatMsg( "USAGE: .login <username> <password>", p.PlayerId, Color.GreenYellow );
         }
 
         private static void cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
