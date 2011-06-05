@@ -85,7 +85,6 @@
             this.msgText.Name = "msgText";
             this.msgText.Size = new System.Drawing.Size(376, 20);
             this.msgText.TabIndex = 1;
-            this.msgText.TextChanged += new System.EventHandler(this.msgText_TextChanged);
             this.msgText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MsgTextKeyPress);
             // 
             // sendMessage

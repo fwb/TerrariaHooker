@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using ConsoleRedirection;
+using Microsoft.Win32.SafeHandles;
 
 namespace RomTerraria {
 
@@ -18,11 +19,19 @@ namespace RomTerraria {
 
         public static SockHook sockHook;
 
-        [DllImport("kernel32.dll")]
-        static extern bool WriteConsoleInput(IntPtr hConsoleInput,
+        [DllImport("kernel32.dll",
+            EntryPoint = "WriteConsoleInput",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            CallingConvention = CallingConvention.StdCall)]
+        static extern bool WriteConsoleInput(SafeFileHandle hConsoleInput,
            INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsWritten);
 
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll",
+            EntryPoint = "MapVirtualKey",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            CallingConvention = CallingConvention.StdCall)]
         static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
 
@@ -214,13 +223,9 @@ namespace RomTerraria {
             LoadPlayerInfo( );
         }
 
-        private void msgText_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
+       
             textBox1.AppendText(consoleInput.Text + Environment.NewLine);
             //hooray!
             char[] c = consoleInput.Text.ToCharArray();
@@ -229,7 +234,7 @@ namespace RomTerraria {
             foreach (char i in c)
             {
                 n[index].EventType = 0x0001;
-                n[index].KeyEvent = new KEY_EVENT_RECORD();
+                //n[index].KeyEvent = new KEY_EVENT_RECORD();
                 n[index].KeyEvent.bKeyDown = 1;
                 n[index].KeyEvent.wRepeatCount = 1;
                 n[index].KeyEvent.UnicodeChar = i;
@@ -237,7 +242,7 @@ namespace RomTerraria {
             }
 
             n[index].EventType = 0x0001;
-            n[index].KeyEvent = new KEY_EVENT_RECORD();
+            //n[index].KeyEvent = new KEY_EVENT_RECORD();
             n[index].KeyEvent.bKeyDown = 1;
             n[index].KeyEvent.dwControlKeyState = 0;
             n[index].KeyEvent.wRepeatCount = 1;
@@ -246,8 +251,10 @@ namespace RomTerraria {
             n[index].KeyEvent.wVirtualScanCode = (ushort)MapVirtualKey(0x0D, 0x00);
 
             uint events;
-            WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length+1, out events);
+            //WriteConsoleInput(Program.STDIN_HANDLE, n, (uint) c.Length + 1, out events);
+            WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length + 1, out events);
             consoleInput.Clear();
+            
         }
 
 

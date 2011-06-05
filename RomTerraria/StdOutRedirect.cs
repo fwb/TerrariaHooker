@@ -16,9 +16,16 @@ namespace ConsoleRedirection
 
         public override void Write(char value)
         {
-            base.Write(value);
-            MethodInvoker action = delegate { _output.AppendText(value.ToString()); };
-            _output.BeginInvoke(action);
+            try
+            {
+                base.Write(value);
+                MethodInvoker action = delegate { _output.AppendText(value.ToString()); };
+                _output.BeginInvoke(action);
+            }
+            catch (Exception ext)
+            {
+                MessageBox.Show(ext.ToString());
+            }
 
         }
 

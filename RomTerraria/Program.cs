@@ -16,26 +16,28 @@ namespace RomTerraria
 {
     static class Program
     {
+        
         [DllImport("kernel32.dll",
             EntryPoint = "GetStdHandle",
             SetLastError = true,
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr GetStdHandle(int nStdHandle);
-        [DllImport("kernel32.dll",
+        /*
+         [DllImport("kernel32.dll",
             EntryPoint = "AllocConsole",
             SetLastError = true,
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
-        private static extern int AllocConsole();
+        private static extern int AllocConsole();*/
         
 
-        private const int STD_OUTPUT_HANDLE = -11;
+        //private const int STD_OUTPUT_HANDLE = -11;
         private const int STD_INPUT_HANDLE = -10;
-        private const int MY_CODE_PAGE = 437;
-        public static FileStream fileStreamSTDIN = null;
-        public static IntPtr STDIN_HANDLE;
-       
+        //private const int MY_CODE_PAGE = 437;
+        //public static FileStream fileStreamSTDIN = null;
+        public static IntPtr STDIN_HANDLE1;
+        public static SafeFileHandle STDIN_HANDLE;
 
 
        static void showServerConsole()
@@ -59,20 +61,8 @@ namespace RomTerraria
             l.ShowDialog(); // You have to use ShowDialog() here or it creates a second message pump and that makes XNA very unhappy.
 
             if( l.DialogResult == DialogResult.Yes ) {
-                AllocConsole();
-                //STD_OUT_HANDLE related
-                IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-                var safeFileHandle = new SafeFileHandle(stdHandle, true);
-                var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
-                var encoding = Encoding.GetEncoding(MY_CODE_PAGE);
-                var standardOutput = new StreamWriter(fileStream, encoding) {AutoFlush = true};
-                Console.SetOut(standardOutput);
-                //STD_IN_HANDLE
-                STDIN_HANDLE = GetStdHandle(STD_INPUT_HANDLE);
-
-
-                
-
+                STDIN_HANDLE1 = GetStdHandle(STD_INPUT_HANDLE);
+                STDIN_HANDLE = new SafeFileHandle(STDIN_HANDLE1, false);
 
                 using( Main s = new ServerOverride( ) )
                 {
@@ -104,14 +94,16 @@ namespace RomTerraria
                     var sf = new Thread(showServerConsole);
                     sf.Start();
 
-                    //for (int i = 0; i <= 40;i++ )
-                        //Console.ReadLine();
 
+                    try
+                    {
+                        s.DedServ();
+                    }
+                    catch (Exception ext)
+                    {
+                        MessageBox.Show(ext.ToString());
+                    }
 
-                    
-                    s.DedServ();
-                    //Console.SetIn(RomTerraria.Program.r);
-                    //
                 }
             }  else if (l.DialogResult == DialogResult.OK) {
 #if DEBUG
