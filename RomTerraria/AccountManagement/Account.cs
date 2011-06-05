@@ -7,43 +7,59 @@ namespace RomTerraria.AccountManagement {
     class Account {
         public bool IsLoggedIn { get; set; }
         public bool IsBanned { get; set; }
-        
+
+        private List<String> usernames;
         private Dictionary<Rights, bool> rights;
         private Dictionary<String, ReuseTimer> timers; 
         private List<IPAddress> ips;
-        private List<String> usernames;
+        private List<String> ignored; 
         private string accountName;
         private string steamName;
 
         public Account(  ) {
-            
+            usernames = new List<string>( );
+            rights = new Dictionary<Rights, bool>( );
+            timers = new Dictionary<string, ReuseTimer>( );
+            ips = new List<IPAddress>( );
+            ignored = new List<string>( );
         }
 
         public bool CheckRights( Rights r ) {
             return rights[r];
         }
 
-        public void GetIPs( ) {
-            
+        public List<IPAddress> GetIPs( ) {
+            return ips;
         }
 
-        public void GetUsernames( ) {
-            
-        }
-        
-        public void StartTimer( ReuseTimer t ) {
-            
-        }
-        
-        public void ResetTimer( ReuseTimer t ) {
-            
-        }
-        
-        public bool CheckTimer( ReuseTimer t )
-        {
-            return false;
+        public void AddUsername( string s ) {
+            usernames.Add( s );
         }
 
+        public List<String> GetUsernames( ) {
+            return usernames;
+        } 
+
+        public bool IsIgnored( string player ) {
+            return ignored.Contains( player );
+        }
+        
+        public void StartTimer( string s ) {
+            timers.Add( s, new ReuseTimer( ) );
+        }
+
+        public void StartTimer( string s, double duration ) {
+            timers.Add( s, new ReuseTimer( duration ) );
+        }
+
+        public void ResetTimer( string s ) {
+            timers[s].Reset( );
+        }
+
+        public bool HasExpired( string s ) {
+            return timers[s].HasExpired( );
+        }
+        
         public void Kick( ) {
             
         }
