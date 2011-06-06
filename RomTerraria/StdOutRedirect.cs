@@ -10,8 +10,7 @@ namespace ConsoleRedirection
     public class StdOutRedirect : TextWriter
     {
         TextBox _output = null;
-        private static StringBuilder sb = new StringBuilder();
-        private static string line;
+        public StringBuilder sb = new StringBuilder();      
 
         public StdOutRedirect(TextBox output)
         {
@@ -22,17 +21,20 @@ namespace ConsoleRedirection
         {
             try
             {
-                //base.Write(value);
+                base.Write(value);
                 //using a stringbuilder here now, since STDOUT apparently sends data character-at-a-time
                 //so it was using an enormous amount of processor to append text to a textbox.
                 sb.Append(value);
                 if (value == (char)0x0A)
                 {
                     MethodInvoker action = delegate { _output.AppendText(sb.ToString()); };
-                    IAsyncResult ar = _output.BeginInvoke(action);
-                    //wait for waithandle.
-                    ar.AsyncWaitHandle.WaitOne();
-                    //clear stringbuffer.
+                    //this is iffy. it was originally begininvoke but an IAsyncResult was hanging
+                    //when the console was written to cross-thread. This works now, but it probably
+                    //causes some slowdown. I guess it can be switched back by making a delegate
+                    //on ServerConsole so that running AppendText as part of the threadpool doesn't
+                    //have issues, but then I suppose threads completing out of order would produce
+                    //console text out of order.
+                    _output.Invoke(action);
                     sb.Clear();
                 }
                 
