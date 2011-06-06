@@ -72,14 +72,15 @@ namespace RomTerraria
                     break;
                 case 0x06:
                     prefix = "PLAYER SEND COMPLETE [LOGIN]";
+                    // Clear AccountManager refs in HandleGreeting( )
+                    packet = HandleGreeting(data);  
                     break;
                 case 0x08:
                     prefix = "PLAYER REQUEST TILE DATA";
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                    // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting( data );        
+                          
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
@@ -313,6 +314,9 @@ namespace RomTerraria
                     case (".teleport"):
                         cmdTeleport(commands, p);
                         break;
+                    case (".teleportto"):
+                        cmdTeleportTo(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -323,6 +327,25 @@ namespace RomTerraria
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdTeleportTo(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null)
+            {
+                SendChatMsg("USAGE: .teleportto <player>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+
+            var id = getPlayerIdFromName(name);
+            if (id != -1)
+            {
+                Main.player[packetChatMsg.PlayerId].position.X = Main.player[id].position.X;
+                Main.player[packetChatMsg.PlayerId].position.Y = Main.player[id].position.Y;
+                NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
+            }
+
         }
 
         private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
@@ -336,7 +359,8 @@ namespace RomTerraria
             if (t.Length != 2)
             {
                 invalid = true;
-            } else
+            }
+            else
             {
                 if (float.TryParse(t[0], out finalCoords.X) == false)
                     invalid = true;
@@ -345,20 +369,15 @@ namespace RomTerraria
             }
             //
             
-
             var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
-            if (name == null || invalid)
+            if (name == null && invalid) //if the name is bad, but the vector is fine, we can continue
             {
-                SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
+                SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
 
-            Vector2 currentSpawn;
-            var targetId = getPlayerIdFromName(name);
-
-
-            currentSpawn.Y = Main.player[targetId].SpawnY;
-            currentSpawn.X = Main.player[targetId].SpawnX;
+            //if our name was null, but the vector was valid, our playerid is self:
+            int targetId = name == null ? packetChatMsg.PlayerId : getPlayerIdFromName(name);
 
             Main.player[targetId].position.X = finalCoords.X;
             Main.player[targetId].position.Y = finalCoords.Y;
