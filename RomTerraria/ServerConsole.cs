@@ -77,6 +77,7 @@ namespace RomTerraria {
         private TextWriter _writer = null;
         private MakeItHarder mih;
         private delegate void AddChatLineCallback( string text );
+        public static Stream _out;
 
         
         public ServerConsole() {
@@ -85,6 +86,8 @@ namespace RomTerraria {
             LoadLauncherSettings( );
             _writer = new StdOutRedirect(textBox1);
             // Redirect the out Console stream
+            _out = Console.OpenStandardOutput();
+
             Console.SetOut(_writer);
             sockHook = new SockHook();
             

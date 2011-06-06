@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -20,6 +21,8 @@ namespace RomTerraria
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
+        private static TextWriter w = new StreamWriter(ServerConsole._out);
+
 
         static Commands()
         {
@@ -174,7 +177,7 @@ namespace RomTerraria
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
-               Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
+               w.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
             }
             return packet;
 
@@ -368,8 +371,12 @@ namespace RomTerraria
                     invalid = true;
             }
             //
-            
-            var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
+           
+            //get the name, without the coords because well, they're not part of the name.
+            //i dont like using a lambda here.
+            //var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
+            var name = GetParamsAsString(commands," ", 1);
+
             if (name == null && invalid) //if the name is bad, but the vector is fine, we can continue
             {
                 SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
@@ -510,18 +517,20 @@ namespace RomTerraria
         /// </summary>
         /// <param name="commands">The commands.</param>
         /// <param name="delimiter">The delimiter.</param>
+        /// <param name="negOffset">Negative offset for name. Used if your commands have .command [name here] [additional parameters]</param>
         /// <returns></returns>
-        private static string GetParamsAsString(string[] commands, string delimiter = " ")
+        private static string GetParamsAsString(string[] commands, string delimiter = " ", int negOffset = 0)
         {
             if (commands.Length == 1)
                 return null;
 
             string param = null;
 
-            for (int i = 1; i < commands.Length; i++)
+            for (int i = 1; i < (commands.Length - negOffset); i++)
                 param = param + delimiter + commands[i];
 
-            return param.Trim();
+            //if theres no name (e.g. negative offset negates space for name), return null.
+            return param != null ? param.Trim() : null;
         }
 
         private static void banUser(int id)

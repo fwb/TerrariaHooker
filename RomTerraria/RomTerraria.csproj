@@ -78,7 +78,7 @@
   <ItemGroup>
     <Compile Include="AccountManagement\Account.cs" />
     <Compile Include="AccountManagement\AccountManager.cs" />
-    <Compile Include="Ban.cs" />
+    <Compile Include="AccountManagement\Ban.cs" />
     <Compile Include="AccountManagement\Rights.cs" />
     <Compile Include="AccountManagement\ReuseTimer.cs" />
     <Compile Include="Commands.cs" />
