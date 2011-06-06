@@ -109,8 +109,7 @@ namespace RomTerraria
             worldGenLoadWorld.Invoke( null, null );
             if( !(bool)worldGenLoadFailed.GetValue( null ) ) {
                 Terraria.Main.PlaySound( 10, -1, -1, 1 );
-                //Terraria.Netplay.StartServer( );
-                NetplayOverride.StartServer( );
+                Terraria.Netplay.StartServer( );
                 Terraria.Main.dayTime = (bool)worldGenTempDayTime.GetValue( null );
                 Terraria.Main.time = (double)worldGenTempTime.GetValue( null );
                 Terraria.Main.moonPhase = (int)worldGenTempMoonPhase.GetValue( null );
