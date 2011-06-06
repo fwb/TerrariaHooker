@@ -5,3 +5,4 @@ obj/*
 .svn/*
 _ReSharper.*
 *.ReSharper.user
+RomTerraria/*.csproj.user
