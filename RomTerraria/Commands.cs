@@ -92,6 +92,9 @@ namespace RomTerraria
                 case 0x10:
                     prefix = "PLAYER CURRENT/MAX HEALTH UPDATE";
                     break;
+                case 0x11:
+                    prefix = "PLAYER DESTROY BLOCK";
+                    break;
                 case 0x13:
                     prefix = "PLAYER USE DOOR";
                     break;
@@ -119,7 +122,7 @@ namespace RomTerraria
                     prefix = "PLAYER HURT PLAYER";
                     break;
                 case 0x1B:
-                    prefix = "PLAYER FIRED PROJECTILE";
+                    prefix = "PLAYER PROJECTILE UPDATE";
                     break;
                 case 0x1C:
                     prefix = "?PLAYER PROJECTILE HIT NPC";
@@ -177,7 +180,7 @@ namespace RomTerraria
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
-               w.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
+               Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
             }
             return packet;
 
