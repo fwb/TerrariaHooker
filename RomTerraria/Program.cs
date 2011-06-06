@@ -44,9 +44,8 @@ namespace RomTerraria
         {
             //run new form in thread, otherwise the console window/main process
             //will be locked
+            
             Application.Run(new ServerConsole());
-
-
         }
 
         /// <summary>
@@ -66,15 +65,17 @@ namespace RomTerraria
                 STDIN_HANDLE1 = GetStdHandle(STD_INPUT_HANDLE);
                 STDIN_HANDLE = new SafeFileHandle(STDIN_HANDLE1, false);
 
-                using (Main s = new ServerOverride())
+                
+                using (Main s = new Main())
                 {
 
                    //NEW 1.0.3
-                    var n = new SockHook();
-                    n.InitializeHooks();
-
                     var sf = new Thread(showServerConsole);
                     sf.Start();
+
+                    
+                    
+
 
                     //
                     Netplay.serverPort = l.LaunchWorldPort;
@@ -87,6 +88,7 @@ namespace RomTerraria
                     {
 
                         s.DedServ();
+                        
                     }
                     catch (Exception ext)
                     {

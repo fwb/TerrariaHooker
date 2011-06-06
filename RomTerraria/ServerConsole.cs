@@ -86,6 +86,8 @@ namespace RomTerraria {
             _writer = new StdOutRedirect(textBox1);
             // Redirect the out Console stream
             Console.SetOut(_writer);
+            sockHook = new SockHook();
+            
 
 
             //LoadTerrariaAssembly( );
@@ -265,6 +267,12 @@ namespace RomTerraria {
                 button3_Click(sender, e);
             }
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            sockHook.InitializeHooks();
+        }
+
         
     }
 

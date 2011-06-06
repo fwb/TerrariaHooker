@@ -117,13 +117,16 @@ namespace RomTerraria
                 [In] IntPtr overlapped,
                 [In] IntPtr completionRoutine)
         {
-
+            
             var result = WSARecv(socketHandle, ref Buffer, BufferCount, bytesTransferred, ref socketFlags,
-                                    overlapped, completionRoutine);
+                                     overlapped, completionRoutine);
+
             if (result != 0)
             {
                 //MakeItHarder.serverConsole.AddChatLine("Socket Error!");
+                System.Windows.Forms.MessageBox.Show("Died in the ass");
                 Console.WriteLine("Socket Error!\n");
+                
                 return result;
             }
 
@@ -142,6 +145,7 @@ namespace RomTerraria
                     Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
                 } catch (Exception e)
                 {
+                    System.Windows.Forms.MessageBox.Show("Died in the ass" + e);
                     Console.WriteLine("Fatal error in Commands.cs: " + e + "\n");
                     Console.WriteLine("HOOK MAY BE DETACHED\n");    
                 }
@@ -227,14 +231,20 @@ namespace RomTerraria
             try
             {
                 CreateWSARecvHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSARecv"), new DWSARecv(WSARecvHooked), this);
-                CreateWSARecvHook.ThreadACL.SetExclusiveACL(new[] { 0 });
+                CreateWSARecvHook.ThreadACL.SetExclusiveACL(new int[] {});
+                LocalHook.GlobalThreadACL.SetExclusiveACL(new int[] {});
+               
                 //MakeItHarder.serverConsole.AddChatLine("WSARecv Hook succeeded.");
                 Console.WriteLine("WSARecv Hook succeeded.");
+                //System.Windows.Forms.MessageBox.Show(CreateWSARecvHook.IsThreadIntercepted(0).ToString());
 
                 //CreateWSASendHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSASend"), new DWSASend(WSASendHooked), this);
                 //CreateWSASendHook.ThreadACL.SetExclusiveACL(new[] { 0 });
                 //MakeItHarder.serverConsole.AddChatLine("WSASend Hook succeeded.");
                 //Console.WriteLine("WSASend Hook succeeded.");
+
+                
+              
             }
             catch (Exception extInfo)
             {
@@ -243,6 +253,7 @@ namespace RomTerraria
                 return;
             }
             RemoteHooking.WakeUpProcess();
+            
         }
 
 

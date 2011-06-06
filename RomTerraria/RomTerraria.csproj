@@ -33,7 +33,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>C:\Media\Projects\Terraria\Dist</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -42,7 +42,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>C:\Media\Projects\Terraria\Dist</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -101,7 +101,6 @@
     <Compile Include="ServerConsole.Designer.cs">
       <DependentUpon>ServerConsole.cs</DependentUpon>
     </Compile>
-    <Compile Include="ServerOverride.cs" />
     <Compile Include="SockHook.cs" />
     <Compile Include="StdOutRedirect.cs" />
     <Compile Include="TestbedControl.cs">

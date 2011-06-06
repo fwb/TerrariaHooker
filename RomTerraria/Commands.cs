@@ -327,12 +327,28 @@ namespace RomTerraria
 
         private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
         {
-            var name = GetParamsAsString(commands);
-            if (name == null || name.Split(' ')[commands.Length - 2].Split(':').Length < 2)
+            var invalid = false;
+            var coords = commands[commands.Length - 1];
+            var t = coords.Split(':');
+            if (t.Length != 2)
+                invalid = true;
+
+            Vector2 finalCoords = new Vector2(0f, 0f);
+            if (float.TryParse(t[0], out finalCoords.X) == false)
+                invalid = true;
+            if (float.TryParse(t[1], out finalCoords.Y) == false)
+                invalid = true;
+
+            var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
+            if (name == null || invalid)
             {
                 SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
+
+            //NetMessage.SendData(0x0C,,getPlayerIdFromName(name));
+            
+
         }
 
         private static void cmdLogin( string[] commands, packet_ChatMsg p ) {
