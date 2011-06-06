@@ -327,17 +327,24 @@ namespace RomTerraria
 
         private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            Vector2 finalCoords = new Vector2(0f, 0f);
             var invalid = false;
+
+            //check if the last word in the message is an x:y coord pair
             var coords = commands[commands.Length - 1];
             var t = coords.Split(':');
             if (t.Length != 2)
+            {
                 invalid = true;
-
-            Vector2 finalCoords = new Vector2(0f, 0f);
-            if (float.TryParse(t[0], out finalCoords.X) == false)
-                invalid = true;
-            if (float.TryParse(t[1], out finalCoords.Y) == false)
-                invalid = true;
+            } else
+            {
+                if (float.TryParse(t[0], out finalCoords.X) == false)
+                    invalid = true;
+                if (float.TryParse(t[1], out finalCoords.Y) == false)
+                    invalid = true;
+            }
+            //
+            
 
             var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
             if (name == null || invalid)
@@ -346,8 +353,17 @@ namespace RomTerraria
                 return;
             }
 
-            //NetMessage.SendData(0x0C,,getPlayerIdFromName(name));
-            
+            Vector2 currentSpawn;
+            var targetId = getPlayerIdFromName(name);
+
+
+            currentSpawn.Y = Main.player[targetId].SpawnY;
+            currentSpawn.X = Main.player[targetId].SpawnX;
+
+            Main.player[targetId].position.X = finalCoords.X;
+            Main.player[targetId].position.Y = finalCoords.Y;
+
+            NetMessage.SendData(0x0D, -1, -1, "", targetId, 0f, 0f, 0f);
 
         }
 
