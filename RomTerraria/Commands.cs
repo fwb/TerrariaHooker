@@ -103,7 +103,7 @@ namespace RomTerraria
                     //active within the game world (outside of inventories). I assume
                     //the shit in FindOwner is to determine who the new owner of a newly
                     //dropped item is (owner is the current dropper, so they don't have
-                    //have preference on the item by being closest). Also seems to be called
+                    //preference on the item by being closest). Also seems to be called
                     //when you try to pick up an item you don't have room for, which explains
                     //the erroneus captures I was recieving.
 
@@ -173,7 +173,7 @@ namespace RomTerraria
                     break;
             }
 
-            //this code is currently unreachable, as the hook is on direction 0 only.
+#if DEBUG
             if( direction == 0 ) {
                 var sBuffer = new StringBuilder( );
                 foreach( byte t in data ) {
@@ -182,6 +182,7 @@ namespace RomTerraria
 
                Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
             }
+#endif
             return packet;
 
         }
@@ -291,18 +292,19 @@ namespace RomTerraria
 
                 switch (commands[0])
                 {
-                    case( ".login" ):
-                        cmdLogin( commands, p );
+                    case (".login"):
+                        cmdLogin(commands, p);
                         break;
                     case (".meteor"):
-                        WorldEvents.SpawnMeteorCB();
+                        cmdSpawnMeteor();
                         break;
                     case (".broadcast"):
                         cmdBroadcast(commands, p);
                         break;
                     case (".kick"):
-                        if ((AccountManager.GetRights(p.PlayerId) & Rights.ADMIN) == Rights.ADMIN) {
-                            cmdKick( commands, p );
+                        if ((AccountManager.GetRights(p.PlayerId) & Rights.ADMIN) == Rights.ADMIN)
+                        {
+                            cmdKick(commands, p);
                         }
                         break;
                     case (".itemban"):
@@ -327,12 +329,16 @@ namespace RomTerraria
                         cmdUnknown(commands, p);
                         break;
                 }
+                return CreateDummyPacket(data);
             }
 
-            if (match)
-                return CreateDummyPacket(data);
-
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        public static void cmdSpawnMeteor()
+        {
+            WorldEvents.SpawnMeteorCB();
+            return;
         }
 
         private static void cmdTeleportTo(string[] commands, packet_ChatMsg packetChatMsg)
@@ -396,11 +402,13 @@ namespace RomTerraria
 
         }
 
-        private static void cmdLogin( string[] commands, packet_ChatMsg p ) {
-            if( commands.Length == 2 ) {
-                if( AccountManager.Login( p.PlayerId, commands[1] ) ) {
-                   return;
-                }
+        private static void cmdLogin( string[] commands, packet_ChatMsg p )
+        {
+            var name = GetParamsAsString(commands);
+            if (name != null && AccountManager.Login(p.PlayerId, name))
+            {
+                SendChatMsg("Login successful.", p.PlayerId, Color.ForestGreen);
+                return;
             }
 
             SendChatMsg( "USAGE: .login <username> <password>", p.PlayerId, Color.GreenYellow );
@@ -650,7 +658,7 @@ namespace RomTerraria
 
     }
 
-    public class packet_FireProjectile : packet_Base
+    public class packet_UpdateProjectile : packet_Base
     {
         internal short Identity;
         internal int ProjectileType;
@@ -660,7 +668,7 @@ namespace RomTerraria
         internal float KnockBack;
         internal short Damage;
 
-        internal packet_FireProjectile(byte[] data)
+        internal packet_UpdateProjectile(byte[] data)
             : base(data)
         {
 

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using ConsoleRedirection;
 using Microsoft.Win32.SafeHandles;
+using Terraria;
 
 namespace RomTerraria {
 
@@ -18,6 +12,8 @@ namespace RomTerraria {
     public partial class ServerConsole : Form {
 
         public static SockHook sockHook;
+
+        private delegate void NCallback();
 
         [DllImport("kernel32.dll",
             EntryPoint = "WriteConsoleInput",
@@ -77,6 +73,7 @@ namespace RomTerraria {
         private TextWriter _writer = null;
         private MakeItHarder mih;
         private delegate void AddChatLineCallback( string text );
+        private delegate void SpawnMeteorCallback();
         public static Stream _out;
 
         
@@ -90,8 +87,6 @@ namespace RomTerraria {
 
             Console.SetOut(_writer);
             sockHook = new SockHook();
-            
-
 
             //LoadTerrariaAssembly( );
         }
@@ -175,10 +170,7 @@ namespace RomTerraria {
             }
         }
 
-        private void SpawnMeteor( ) {
-            WorldEvents.SpawnMeteor( );
-        }
-
+        
         private void PlayerSelectSliderScroll( object sender, EventArgs e ) {
             var playerNum = playerSelectSlider.Value;
             string playerName;
@@ -220,11 +212,20 @@ namespace RomTerraria {
             mih.InfiniteEye = enableEyeSpawn.Checked;
         }
 
-        private void SpawnMeteorButtonClick( object sender, EventArgs e ) {
-            SpawnMeteor( );
+        private void SpawnMeteorButtonClick( object sender, EventArgs e )
+        {
+            SpawnMeteor();
         }
 
-        private void RefreshPlayersClick( object sender, EventArgs e ) {
+        private void SpawnMeteor()
+        {
+            SpawnMeteorCallback d = new SpawnMeteorCallback(WorldEvents.SpawnMeteorCB);
+            Invoke(d, null);
+        }
+
+
+        private void RefreshPlayersClick( object sender, EventArgs e )
+        {
             LoadPlayerInfo( );
         }
 

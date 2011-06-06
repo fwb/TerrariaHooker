@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Windows.Forms;
 
 namespace RomTerraria {
     
-    static class WorldEvents {
+    public class WorldEvents {
 
         private static Assembly terrariaAssembly;
         private static Type worldGen;
         private static MethodInfo dropMeteor;
         private static MethodInfo meteor;
-
-        private delegate void SpawnMeteorCallback( );
+        private delegate void SpawnMeteorCallback();
 
         static WorldEvents( ) {
+
             terrariaAssembly = Assembly.GetAssembly( typeof( Terraria.Main ) );
             if( terrariaAssembly == null ) {
                 return;
@@ -33,11 +34,6 @@ namespace RomTerraria {
         }
 
 #region Meteors - amckhome@tpg.com.au
-        public static void SpawnMeteor( ) {
-            var d = new SpawnMeteorCallback( SpawnMeteorCB );
-
-        }
-
         public static void SpawnMeteorCB( ) {
             if( meteor != null ) {
                 try {
@@ -49,13 +45,21 @@ namespace RomTerraria {
                         x = rand.Next( 50, Terraria.Main.maxTilesX - 50 );
                         y = rand.Next( 50, Terraria.Main.maxTilesY - 50 );
                     }
-                    //meteorSpawnX.Text = x.ToString();
-                    //meteorSpawnY.Text = y.ToString();
 
-                    meteor.Invoke( null, new object[] { x, y } );
+                    //WhatDelegate del = (WhatDelegate)Delegate.CreateDelegate(typeof(WhatDelegate), meteor);
+                    //del.Invoke(x, y);
+                    //meteor.Invoke(theInstance, new object[] { x, y });
+
+                    //i think this only works from in Commands.cs because it's being called from a method
+                    //run while handling packets, so it's within the Terraria instance.
+                    //previously we could run code inside the instance from within makeitharder, as it was
+                    //a GameComponent loaded into terraria.
+                    meteor.Invoke(null, new object[] { x, y } );
+
+
                 }
-                catch {
-                    //
+                catch (Exception ext) {
+                    Console.Write(ext);
                 }
             }
         }
