@@ -66,14 +66,14 @@ namespace RomTerraria
                     break;
                 case 0x04:
                     prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
+                    // Clear AccountManager refs in HandleGreeting( )
+                    packet = HandleGreeting(data);  
                     break;
                 case 0x05:
                     prefix = "PLAYER UPDATE INVENTORY/EQUIP";
                     break;
                 case 0x06:
                     prefix = "PLAYER SEND COMPLETE [LOGIN]";
-                    // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting(data);  
                     break;
                 case 0x08:
                     prefix = "PLAYER REQUEST TILE DATA";
