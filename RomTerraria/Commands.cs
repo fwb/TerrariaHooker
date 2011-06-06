@@ -41,11 +41,13 @@ namespace RomTerraria
         }
 
         /// <summary>
-        /// Process a data packet, determining data type and where defined, 
+        /// Process a data packet, determining data type and where defined,
         /// calling additional handlers to break apart data into a more workable
         /// format.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="direction">The direction of travel. 0 = RECV, 1 = SEND</param>
+        /// <returns>A packet structure, complete with Data and Data Length</returns>
         public static Packet ProcessData(byte[] data, int direction)
         {
             byte type = data[4];
@@ -165,14 +167,14 @@ namespace RomTerraria
             }
 
             //this code is currently unreachable, as the hook is on direction 0 only.
-            //if( direction == 0 ) {
-            //    var sBuffer = new StringBuilder( );
-            //    foreach( byte t in data ) {
-            //        sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
-            //    }
+            if( direction == 0 ) {
+                var sBuffer = new StringBuilder( );
+                foreach( byte t in data ) {
+                    sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
+                }
 
-            //    Console.WriteLine( "{0} ::{1}\n", prefix, sBuffer.ToString( ).ToUpper( ) );
-            //}
+               Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
+            }
             return packet;
 
         }
@@ -308,6 +310,9 @@ namespace RomTerraria
                     case (".star"):
                         cmdLaunchStar(commands, p);
                         break;
+                    case (".teleport"):
+                        cmdTeleport(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -318,6 +323,16 @@ namespace RomTerraria
                 return CreateDummyPacket(data);
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var name = GetParamsAsString(commands);
+            if (name == null || name.Split(' ')[commands.Length - 2].Split(':').Length < 2)
+            {
+                SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
         }
 
         private static void cmdLogin( string[] commands, packet_ChatMsg p ) {

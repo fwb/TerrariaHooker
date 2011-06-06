@@ -2,11 +2,12 @@ using System;
 
 namespace RomTerraria.AccountManagement {
 
+    [Flags]
     public enum Rights {
         NONE = 0,
-        USEITEMS = 4,
-        TELEPORT = 8,
-        EVENTS = 16,
+        USEITEMS = 1,
+        TELEPORT = 2,
+        EVENTS = 4,
         ADMIN = USEITEMS | TELEPORT | EVENTS,
         DEFAULT = USEITEMS | EVENTS,
     }
