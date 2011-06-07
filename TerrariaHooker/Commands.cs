@@ -329,28 +329,28 @@ namespace TerrariaHooker
                         cmdItemBanToggle( commands, p);
                         break;
                     case (".ban"):
-                        cmdBanUser(commands, p);
+                        if (!cmdBanUser(commands, p)) cmdUsage("USAGE: .ban <player>",p.PlayerId);
                         break;
                     case (".kickban"):
                         cmdKickBan(commands, p);
                         break;
                     case (".star"):
-                        cmdLaunchStar(commands, p);
+                        if (!cmdLaunchStar(commands, p)) cmdUsage("USAGE: .star <player>",p.PlayerId);
                         break;
                     case (".teleport"):
-                        cmdTeleport(commands, p);
+                        if (!cmdTeleport(commands, p)) cmdUsage("USAGE: .teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>",p.PlayerId);
                         break;
                     case (".teleportto"):
-                        cmdTeleportTo(commands, p);
+                        if (!cmdTeleportTo(commands, p)) cmdUsage("USAGE: .teleportto <player>",p.PlayerId);
                         break;
                     case (".wl"):
                         cmdWhitelist( commands, p );
                         break;
                     case (".landmark"):
-                        cmdLandMark(commands, p);
+                        if(!cmdLandMark(commands, p)) cmdUsage("USAGE: .landmark <name>", p.PlayerId);
                         break;
                     case (".spawn"):
-                        cmdSpawnNPC(commands, p);
+                        if(!cmdSpawnNPC(commands, p)) cmdUsage("USAGE: .spawn <npcid> <player> [count]",p.PlayerId);
                         break;
                     default:
                         cmdUnknown(commands, p);
@@ -362,46 +362,34 @@ namespace TerrariaHooker
             return new Packet(p.Packet, p.Packet.Length);
         }
 
-        private static void usageCmdSpawn(int pid)
+        private static void cmdUsage(string usage, int pid)
         {
-            SendChatMsg("USAGE: .spawn <npc id> <player> [count]", pid, Color.GreenYellow);
-            return;
+            SendChatMsg(usage, pid, Color.GreenYellow);
         }
 
-        private static void cmdSpawnNPC(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdSpawnNPC(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if (commands.Length < 3)
-            {
-                usageCmdSpawn(packetChatMsg.PlayerId);
-                return;
-            }
+                return false;
                 
             int npcId;
             int count = 1;
             bool multi = false;
 
             if (int.TryParse(commands[1], out npcId) == false)
-            {
-                usageCmdSpawn(packetChatMsg.PlayerId);
-                return;
-            }
+                return false;
 
             if (int.TryParse(commands[commands.Length - 1], out count))
                 multi = true;
 
+            //don't spawn retard amounts
             if (count > 50) count = 50;
 
-            string targetName;
-            if (multi) 
-                targetName = GetParamsAsString(commands, " ", 1, 1);
-            else
-                targetName = GetParamsAsString(commands, " ", 0, 1);
+            string targetName = GetParamsAsString(commands, " ", multi ? 1 : 0, 1);
 
             if (targetName == null)
-            {
-                usageCmdSpawn(packetChatMsg.PlayerId);
-                return;
-            }
+                return false;
+
             var targetId = getPlayerIdFromName(targetName);
             if (targetId != -1)
             {
@@ -413,14 +401,15 @@ namespace TerrariaHooker
                     for (int i=0;i<count;i++)
                         NPC.NewNPC((int)Main.player[targetId].position.X, (int)Main.player[targetId].position.Y, npcId);
                 }
-                return;
+                return true;
             }
             SendChatMsg(String.Format("Player '{0}' not found", targetName),packetChatMsg.PlayerId,Color.Red);
+            return true;
 
 
         }
 
-        private static void cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
         {
             var tag = GetParamsAsString(commands);
             if (tag == null)
@@ -456,13 +445,14 @@ namespace TerrariaHooker
                     }
 
                     SendChatMsg("Available landmarks: "+ o.Substring(0,o.Length-2),packetChatMsg.PlayerId, Color.GreenYellow);
-                    return;
+                    return true;
                 }
 
                 //fallthru, no landmarks set (nLocs = 0)
                 SendChatMsg("No landmarks set.", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
+                return true;
             }
+
             foreach (var n in Main.sign)
             {
                 int found = n.text.IndexOf("<" + tag + ">");
@@ -475,11 +465,12 @@ namespace TerrariaHooker
                     Main.player[packetChatMsg.PlayerId].position.X = x;
                     Main.player[packetChatMsg.PlayerId].position.Y = y;
                     NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
-                    return;
+                    return true;
                 }
                 SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
+                return true;
             }
+            return true;
         }
 
         private static void SendAccessDeniedMsg( int pid, string cmd ) {
@@ -487,28 +478,26 @@ namespace TerrariaHooker
             Console.WriteLine( String.Format( "Player {0} attempted to use command {1}", pid, cmd ) );
         }
 
-        public static void cmdSpawnMeteor( string[] commands, packet_ChatMsg packetChatMsg )
+        public static bool cmdSpawnMeteor( string[] commands, packet_ChatMsg packetChatMsg )
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             WorldEvents.SpawnMeteorCB();
-            return;
+            return true;
         }
 
-        private static void cmdTeleportTo(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdTeleportTo(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             var name = GetParamsAsString(commands);
             if (name == null)
-            {
-                SendChatMsg("USAGE: .teleportto <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
+
 
             var id = getPlayerIdFromName(name);
             if (id != -1)
@@ -516,15 +505,18 @@ namespace TerrariaHooker
                 Main.player[packetChatMsg.PlayerId].position.X = Main.player[id].position.X;
                 Main.player[packetChatMsg.PlayerId].position.Y = Main.player[id].position.Y;
                 NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
+                return true;
             }
+            SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
+            return true;
 
         }
 
-        private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             Vector2 finalCoords = new Vector2(0f, 0f);
             var invalid = false;
@@ -551,10 +543,7 @@ namespace TerrariaHooker
             var name = GetParamsAsString(commands," ", 1);
 
             if (name == null && invalid) //if the name is bad, but the vector is fine, we can continue
-            {
-                SendChatMsg("USAGE: .teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
 
             //if our name was null, but the vector was valid, our playerid is self:
             int targetId = name == null ? packetChatMsg.PlayerId : getPlayerIdFromName(name);
@@ -563,6 +552,7 @@ namespace TerrariaHooker
             Main.player[targetId].position.Y = finalCoords.Y;
 
             NetMessage.SendData(0x0D, -1, -1, "", targetId, 0f, 0f, 0f);
+            return true;
 
         }
 
@@ -578,18 +568,16 @@ namespace TerrariaHooker
             SendChatMsg( "USAGE: .login <username>", p.PlayerId, Color.GreenYellow );
         }
 
-        private static void cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             var name = GetParamsAsString(commands);
             if (name == null)
-            {
-                SendChatMsg("USAGE: .star <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
+
             var id = getPlayerIdFromName(name);
 
             //if the player is already hostile, don't do anything
@@ -605,6 +593,7 @@ namespace TerrariaHooker
                                                        //12 [star] and everything else is either unowned, or self-owned
             Projectile.NewProjectile(Main.player[id].position.X, Main.player[id].position.Y-300, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
             SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
+            return true;
 
         }
 
@@ -631,25 +620,23 @@ namespace TerrariaHooker
             }
         }
 
-        private static void cmdBanUser(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdBanUser(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             var name = GetParamsAsString(commands);
             if (name == null)
-            {
-                SendChatMsg("USAGE: .ban <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
 
             var id = getPlayerIdFromName(name);
             if (id != -1) {
                     Netplay.AddBan(id);
                     SendChatMsg("Banned user: " + name, packetChatMsg.PlayerId, Color.Red);
-                    return;
+                    return true;
             }
+            return true;
         }
 
 
