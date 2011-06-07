@@ -54,7 +54,9 @@ namespace RomTerraria
         /// <returns>A packet structure, complete with Data and Data Length</returns>
         public static Packet ProcessData(byte[] data, int direction)
         {
-            byte type = data[4];
+            byte type;
+            try { type = data[4]; } 
+            catch { return new Packet(data, data.Length); }
 
             string prefix;
             //string details = null;

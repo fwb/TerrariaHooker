@@ -141,11 +141,11 @@ namespace RomTerraria
                 try
                 {
                     var packet = Commands.ProcessData(newBuffer, 0);
-                    //write packet data to buffer
+                    //write packet data to buffer. keep it in the try/catch because if
+                    //processdata fails, this will fail because packet is null.
                     Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
                 } catch (Exception e)
                 {
-                    System.Windows.Forms.MessageBox.Show("Died in the ass" + e);
                     Console.WriteLine("Fatal error in Commands.cs: " + e + "\n");
                     Console.WriteLine("HOOK MAY BE DETACHED\n");    
                 }
