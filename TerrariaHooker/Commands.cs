@@ -783,7 +783,10 @@ namespace TerrariaHooker
             for (int i = 0; i < Main.maxNetPlayers; i++)
             {
                 if (Main.player[i].name.ToLower() == name.ToLower())
-                    return i;
+                {
+                    if (Main.player[i].active)
+                        return i;
+                }
             }
             return -1;
         }
