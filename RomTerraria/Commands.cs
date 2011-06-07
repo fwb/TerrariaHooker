@@ -350,6 +350,9 @@ namespace RomTerraria
                     case (".landmark"):
                         cmdLandMark(commands, p);
                         break;
+                    case (".spawn"):
+                        cmdSpawnNPC(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -358,6 +361,64 @@ namespace RomTerraria
             }
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void usageCmdSpawn(int pid)
+        {
+            SendChatMsg("USAGE: .spawn <npc id> <player> [count]", pid, Color.GreenYellow);
+            return;
+        }
+
+        private static void cmdSpawnNPC(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            if (commands.Length < 3)
+            {
+                usageCmdSpawn(packetChatMsg.PlayerId);
+                return;
+            }
+                
+            int npcId;
+            int count = 1;
+            bool multi = false;
+
+            if (int.TryParse(commands[1], out npcId) == false)
+            {
+                usageCmdSpawn(packetChatMsg.PlayerId);
+                return;
+            }
+
+            if (int.TryParse(commands[commands.Length - 1], out count))
+                multi = true;
+
+            if (count > 50) count = 50;
+
+            string targetName;
+            if (multi) 
+                targetName = GetParamsAsString(commands, " ", 1, 1);
+            else
+                targetName = GetParamsAsString(commands, " ", 0, 1);
+
+            if (targetName == null)
+            {
+                usageCmdSpawn(packetChatMsg.PlayerId);
+                return;
+            }
+            var targetId = getPlayerIdFromName(targetName);
+            if (targetId != -1)
+            {
+                if (!multi)
+                {
+                    NPC.NewNPC((int) Main.player[targetId].position.X, (int) Main.player[targetId].position.Y, npcId);
+                } else
+                {
+                    for (int i=0;i<count;i++)
+                        NPC.NewNPC((int)Main.player[targetId].position.X, (int)Main.player[targetId].position.Y, npcId);
+                }
+                return;
+            }
+            SendChatMsg(String.Format("Player '{0}' not found", targetName),packetChatMsg.PlayerId,Color.Red);
+
+
         }
 
         private static void cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
@@ -624,8 +685,6 @@ namespace RomTerraria
 
             var t = (ServerSock[]) serverSock.GetValue(null);
             
-            //now that this can have up to 255 sockets, maybe it's best to just iterate up to max.
-            //nb: this might not even be necessary, if user[i] maps directly to socket[i] which i think it might.
             for (var i = 0; i < Main.maxNetPlayers;i++ )
             {
                 if (t[i].name == name)
@@ -709,14 +768,14 @@ namespace RomTerraria
         /// <param name="delimiter">The delimiter.</param>
         /// <param name="negOffset">Negative offset for name. Used if your commands have .command [name here] [additional parameters]</param>
         /// <returns></returns>
-        private static string GetParamsAsString(string[] commands, string delimiter = " ", int negOffset = 0)
+        private static string GetParamsAsString(string[] commands, string delimiter = " ", int negOffset = 0, int posOffset = 0)
         {
             if (commands.Length == 1)
                 return null;
 
             string param = null;
 
-            for (int i = 1; i < (commands.Length - negOffset); i++)
+            for (int i = (1 + posOffset); i < (commands.Length - negOffset); i++)
                 param = param + delimiter + commands[i];
 
             //if theres no name (e.g. negative offset negates space for name), return null.
