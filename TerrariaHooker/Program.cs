@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using Terraria;
 
-namespace RomTerraria
+namespace TerrariaHooker
 {
     static class Program
     {

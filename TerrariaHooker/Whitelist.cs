@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 
-namespace RomTerraria {
+namespace TerrariaHooker {
     class Whitelist {
         private static HashSet<string> wl;
 

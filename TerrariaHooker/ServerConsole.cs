@@ -2,11 +2,9 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using ConsoleRedirection;
 using Microsoft.Win32.SafeHandles;
-using Terraria;
 
-namespace RomTerraria {
+namespace TerrariaHooker {
 
     
     public partial class ServerConsole : Form {

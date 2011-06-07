@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using System.IO;
 using Terraria;
 
-namespace RomTerraria
+namespace TerrariaHooker
 {
     public partial class Launcher : Form
     {
         private Terraria.Main terraria = new Terraria.Main();
-        private RomTerraria.Properties.Settings settings = new Properties.Settings();
+        private TerrariaHooker.Properties.Settings settings = new Properties.Settings();
 
         public Launcher()
         {

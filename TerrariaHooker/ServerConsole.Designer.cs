@@ -1,4 +1,4 @@
-﻿namespace RomTerraria {
+﻿namespace TerrariaHooker {
     partial class ServerConsole {
         /// <summary>
         /// Required designer variable.

@@ -1,4 +1,4 @@
-﻿namespace RomTerraria
+﻿namespace TerrariaHooker
 {
     partial class Launcher
     {

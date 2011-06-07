@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using RomTerraria.AccountManagement;
 using Terraria;
 using System.Reflection;
+using TerrariaHooker.AccountManagement;
 
-namespace RomTerraria
+namespace TerrariaHooker
 {
     class Commands
     {

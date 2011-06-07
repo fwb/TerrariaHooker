@@ -1,4 +1,4 @@
-﻿namespace RomTerraria {
+﻿namespace TerrariaHooker {
     class Utils {
 
         public static string ParseEndPointAddr( string s ) {

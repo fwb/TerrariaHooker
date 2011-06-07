@@ -1,6 +1,6 @@
 using System;
 
-namespace RomTerraria.AccountManagement {
+namespace TerrariaHooker.AccountManagement {
 
     [Flags]
     public enum Rights {

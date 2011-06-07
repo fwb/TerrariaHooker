@@ -8,3 +8,5 @@ _ReSharper.*
 RomTerraria/*.csproj.user
 RomTerraria/*..orig
 RomTerraria/*.orig
+TerrariaHooker/*.orig
+TerrariaHooker/*.csproj.user

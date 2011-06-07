@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Net;
 using Terraria;
 
-namespace RomTerraria.AccountManagement {
+namespace TerrariaHooker.AccountManagement {
 
     class AccountManager {
         private static List<Account> accounts;

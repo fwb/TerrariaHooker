@@ -1,4 +1,4 @@
-namespace RomTerraria.AccountManagement {
+namespace TerrariaHooker.AccountManagement {
 
     class Ban {
         public string Reason { get; private set; }

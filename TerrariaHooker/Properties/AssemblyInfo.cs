@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RomTerraria")]
-[assembly: AssemblyDescription("Resolution changer and single-player-only trainer")]
+[assembly: AssemblyTitle("TerrariaHooker")]
+[assembly: AssemblyDescription("Terraria Dedicated Server Mods")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("RomSteady.net")]
-[assembly: AssemblyProduct("RomTerraria")]
-[assembly: AssemblyCopyright("Copyright © Michael Russell 2011")]
+[assembly: AssemblyCompany("malrix.net")]
+[assembly: AssemblyProduct("TerrariaHooker")]
+[assembly: AssemblyCopyright("Copyright © 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

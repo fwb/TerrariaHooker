@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace RomTerraria.AccountManagement {
+namespace TerrariaHooker.AccountManagement {
 
     class Account {
         public bool IsLoggedIn { get; set; }
