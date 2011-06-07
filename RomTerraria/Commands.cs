@@ -184,7 +184,7 @@ namespace RomTerraria
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
-               Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
+               //Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
             }
 #endif
             return packet;
@@ -345,6 +345,9 @@ namespace RomTerraria
                     case (".wl"):
                         cmdWhitelist( commands, p );
                         break;
+                    case (".landmark"):
+                        cmdLandMark(commands, p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -353,6 +356,34 @@ namespace RomTerraria
             }
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            var tag = GetParamsAsString(commands);
+            if (tag == null)
+            {
+                SendChatMsg("USAGE: .landmark <landmarkname>", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
+            }
+            foreach (var n in Main.sign)
+            {
+                int found = n.text.IndexOf("<" + tag + ">");
+                if (found !=  -1)
+                {
+                    float x = n.x * 16;
+                    float y = n.y * 16 - 20;
+                   
+                    Main.player[packetChatMsg.PlayerId].position.X = x;
+                    Main.player[packetChatMsg.PlayerId].position.Y = y;
+                    NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
+                    return;
+                } else
+                {
+                    SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
+                    return;
+                }
+            }
         }
 
         private static void SendAccessDeniedMsg( int pid, string cmd ) {

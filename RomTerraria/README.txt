@@ -29,6 +29,7 @@ Current Features:
 	.meteor - spawn a meteor randomly in the world
 	.star <player> - drop a star on player's head, doing 2k damage if it hits them
 	.teleport <player> <x:y> - teleport player to x,y coords in world
+	.teleport <x:y> - teleport self to x,y coords in the world
 	.teleportto <player> - teleport yourself to the player
 	.wl (whitelist) - whitelist management:
 		.wl (a)dd <ip> - add IP to whitelist and save to disk
