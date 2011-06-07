@@ -193,9 +193,13 @@ namespace RomTerraria
             [In] IntPtr overlapped,
             [In] IntPtr completionRoutine)
         {
-
             //var newBuffer = new byte[Buffer.len]; //buffer to hold sent bytes
             //Marshal.Copy(Buffer.buf,newBuffer,0,Buffer.len);
+            //if (newBuffer.Length > 7 && newBuffer[6] == 0xAB)
+            //{
+            //    WorldEvents.SpawnMeteorCB();
+            //    return 0;
+            //}
 
             //I absolutely wish this code wasn't here, but unfortunately it's necessary.
             /*if (newBuffer[4] == 0x19)
@@ -230,25 +234,20 @@ namespace RomTerraria
         {
             try
             {
+                //this should set the ACL to try to hook on all threads.
+                LocalHook.GlobalThreadACL.SetExclusiveACL(new int[] { });
                 CreateWSARecvHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSARecv"), new DWSARecv(WSARecvHooked), this);
                 CreateWSARecvHook.ThreadACL.SetExclusiveACL(new int[] {});
-                LocalHook.GlobalThreadACL.SetExclusiveACL(new int[] {});
-               
-                //MakeItHarder.serverConsole.AddChatLine("WSARecv Hook succeeded.");
                 Console.WriteLine("WSARecv Hook succeeded.");
-                //System.Windows.Forms.MessageBox.Show(CreateWSARecvHook.IsThreadIntercepted(0).ToString());
 
-                //CreateWSASendHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSASend"), new DWSASend(WSASendHooked), this);
-                //CreateWSASendHook.ThreadACL.SetExclusiveACL(new[] { 0 });
-                //MakeItHarder.serverConsole.AddChatLine("WSASend Hook succeeded.");
-                //Console.WriteLine("WSASend Hook succeeded.");
+                /*
+                CreateWSASendHook = LocalHook.Create(LocalHook.GetProcAddress("Ws2_32.dll", "WSASend"), new DWSASend(WSASendHooked), this);
+                CreateWSASendHook.ThreadACL.SetExclusiveACL(new int[] { });
+                Console.WriteLine("WSASend Hook succeeded.");*/
 
-                
-              
             }
             catch (Exception extInfo)
             {
-                //MakeItHarder.serverConsole.AddChatLine("Hook failed: " + extInfo);
                 Console.WriteLine("Hook failed: " + extInfo);
                 return;
             }
