@@ -9,7 +9,8 @@ namespace TerrariaHooker
     {
         TextBox _output = null;
         public StringBuilder sb = new StringBuilder();
-        public static string current; 
+        public static string current;
+        public static int tick = 0;
         
 
         public StdOutRedirect(TextBox output)
@@ -51,7 +52,16 @@ namespace TerrariaHooker
                                 t = Environment.NewLine + current;
                             } else //we're currently dotting one, and it's old.
                             {
-                                t = ".";
+                                if (tick % 2 == 0)
+                                {
+                                    t = ".";
+                                    tick++;
+                                }
+                                else
+                                {
+                                    tick++;
+                                    return;
+                                }
                             }
                         } else if (current != null)
                         {
