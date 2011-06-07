@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using ConsoleRedirection;
 using Microsoft.Win32.SafeHandles;
 using Terraria;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace RomTerraria
 {
@@ -44,7 +37,6 @@ namespace RomTerraria
         {
             //run new form in thread, otherwise the console window/main process
             //will be locked
-            
             Application.Run(new ServerConsole());
         }
 
@@ -65,7 +57,6 @@ namespace RomTerraria
                 STDIN_HANDLE1 = GetStdHandle(STD_INPUT_HANDLE);
                 STDIN_HANDLE = new SafeFileHandle(STDIN_HANDLE1, false);
 
-                
                 using (Main s = new Main())
                 {
 
@@ -73,11 +64,6 @@ namespace RomTerraria
                     var sf = new Thread(showServerConsole);
                     sf.Start();
 
-                    
-                    
-
-
-                    //
                     Netplay.serverPort = l.LaunchWorldPort;
                     s.SetNetPlayers(l.LaunchWorldPlayers);
                     Netplay.password = l.LaunchWorldPassword;
@@ -86,9 +72,7 @@ namespace RomTerraria
 
                     try
                     {
-
-                        s.DedServ();
-                        
+                        s.DedServ();  
                     }
                     catch (Exception ext)
                     {

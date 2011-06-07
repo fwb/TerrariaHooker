@@ -71,14 +71,13 @@ namespace RomTerraria {
 
 
         private TextWriter _writer = null;
-        private MakeItHarder mih;
         private delegate void AddChatLineCallback( string text );
         private delegate void SpawnMeteorCallback();
         public static Stream _out;
 
         
         public ServerConsole() {
-            //mih = m;
+
             InitializeComponent( );
             LoadLauncherSettings( );
             _writer = new StdOutRedirect(textBox1);
@@ -203,18 +202,6 @@ namespace RomTerraria {
 
         private void LoadNPCsClick( object sender, EventArgs e ) {
             LoadNPCInfo( );
-        }
-
-        private void EnableInvasionCheckedChanged( object sender, EventArgs e ) {
-            mih.InfiniteInvasion = enableInvasion.Checked;
-        }
-
-        private void EnableBloodMoonCheckedChanged( object sender, EventArgs e ) {
-            mih.InfiniteBloodMoon = enableBloodMoon.Checked;
-        }
-
-        private void EnableEyeSpawnCheckedChanged( object sender, EventArgs e ) {
-            mih.InfiniteEye = enableEyeSpawn.Checked;
         }
 
         private void SpawnMeteorButtonClick( object sender, EventArgs e )

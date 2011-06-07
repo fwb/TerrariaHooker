@@ -441,39 +441,7 @@
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Survival";
-            // 
-            // enableEyeSpawn
-            // 
-            this.enableEyeSpawn.AutoSize = true;
-            this.enableEyeSpawn.Location = new System.Drawing.Point(6, 66);
-            this.enableEyeSpawn.Name = "enableEyeSpawn";
-            this.enableEyeSpawn.Size = new System.Drawing.Size(142, 17);
-            this.enableEyeSpawn.TabIndex = 2;
-            this.enableEyeSpawn.Text = "Enable Daily Eye Spawn";
-            this.enableEyeSpawn.UseVisualStyleBackColor = true;
-            this.enableEyeSpawn.CheckedChanged += new System.EventHandler(this.EnableEyeSpawnCheckedChanged);
-            // 
-            // enableBloodMoon
-            // 
-            this.enableBloodMoon.AutoSize = true;
-            this.enableBloodMoon.Location = new System.Drawing.Point(6, 43);
-            this.enableBloodMoon.Name = "enableBloodMoon";
-            this.enableBloodMoon.Size = new System.Drawing.Size(151, 17);
-            this.enableBloodMoon.TabIndex = 1;
-            this.enableBloodMoon.Text = "Enable Infinte Blood Moon";
-            this.enableBloodMoon.UseVisualStyleBackColor = true;
-            this.enableBloodMoon.CheckedChanged += new System.EventHandler(this.EnableBloodMoonCheckedChanged);
-            // 
-            // enableInvasion
-            // 
-            this.enableInvasion.AutoSize = true;
-            this.enableInvasion.Location = new System.Drawing.Point(6, 19);
-            this.enableInvasion.Name = "enableInvasion";
-            this.enableInvasion.Size = new System.Drawing.Size(136, 17);
-            this.enableInvasion.TabIndex = 0;
-            this.enableInvasion.Text = "Enable Infinite Invasion";
-            this.enableInvasion.UseVisualStyleBackColor = true;
-            this.enableInvasion.CheckedChanged += new System.EventHandler(this.EnableInvasionCheckedChanged);
+
             // 
             // tabPage5
             // 

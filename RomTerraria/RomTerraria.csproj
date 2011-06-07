@@ -89,9 +89,6 @@
     <Compile Include="Launcher.Designer.cs">
       <DependentUpon>Launcher.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainOverride.cs" />
-    <Compile Include="MakeItHarder.cs" />
-    <Compile Include="MapOverlay.cs" />
     <Compile Include="MessageTypes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -103,13 +100,6 @@
     </Compile>
     <Compile Include="SockHook.cs" />
     <Compile Include="StdOutRedirect.cs" />
-    <Compile Include="TestbedControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TestbedControl.Designer.cs">
-      <DependentUpon>TestbedControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Trainer.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Whitelist.cs" />
     <Compile Include="WorldEvents.cs" />
@@ -127,9 +117,6 @@
     </Compile>
     <EmbeddedResource Include="ServerConsole.resx">
       <DependentUpon>ServerConsole.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TestbedControl.resx">
-      <DependentUpon>TestbedControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
