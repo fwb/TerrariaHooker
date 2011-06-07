@@ -25,7 +25,7 @@ namespace ConsoleRedirection
                 //using a stringbuilder here now, since STDOUT apparently sends data character-at-a-time
                 //so it was using an enormous amount of processor to append text to a textbox.
                 sb.Append(value);
-                if (value == (char)0x0A)
+                if (value == (char)0x0A || value == (char)0x3A)
                 {
                     //copy stringbuilder contents to local string (so the contents aren't lost
                     //if the invoke takes too long, or if multiple writes from multiple threads

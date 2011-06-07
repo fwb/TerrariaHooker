@@ -6,3 +6,5 @@ obj/*
 _ReSharper.*
 *.ReSharper.user
 RomTerraria/*.csproj.user
+RomTerraria/*..orig
+RomTerraria/*.orig
