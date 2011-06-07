@@ -23,19 +23,21 @@ namespace RomTerraria.AccountManagement {
             CreateAccount( "ass", "192.168.0.90", true );
             var b = FindAccount( "ass" );
             b.AddIP( IPAddress.Parse( "123.243.252.109" ) );
+
+            CreateAccount( "Zubu", "192.168.1.201", true );
+            var c = FindAccount( "Zubu" );
+            c.AddIP( IPAddress.Parse( "76.119.218.206" ) );
         }
         
         public static bool Login( int playerId, string username ) {
             var endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
-            var ipstr = endpoint;
-            for( int i = 0; i < endpoint.Length; i++ ) {
-                if( endpoint.Substring( i, 1 ) == ":" ) {
-                    ipstr = endpoint.Substring( 0, i );
-                }
-            }
+            var ipstr = Utils.ParseEndPointAddr( endpoint );
             var ip = IPAddress.Parse( ipstr );
             var account = FindAccount( username, ip );
             if( account != null ) {
+                if( activeAccounts.ContainsKey( playerId ) ) {
+                    Logout( playerId );
+                }
                 activeAccounts.Add( playerId, account );
                 return true;
             }

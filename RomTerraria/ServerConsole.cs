@@ -91,6 +91,11 @@ namespace RomTerraria {
             //LoadTerrariaAssembly( );
         }
 
+        protected override void OnLoad( EventArgs e ) {
+            base.OnLoad( e );
+            sockHook.InitializeHooks( );
+        }
+
         private void LoadLauncherSettings( ) {
             //enableInvasion.Checked = mih.InfiniteInvasion;
             //enableBloodMoon.Checked = mih.InfiniteBloodMoon;
@@ -269,6 +274,7 @@ namespace RomTerraria {
             if (e.KeyChar == (char)13)
             { // enter key pressed
                 button3_Click(sender, e);
+                e.Handled = true;
             }
         }
 

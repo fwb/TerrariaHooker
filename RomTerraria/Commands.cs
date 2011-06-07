@@ -15,6 +15,7 @@ namespace RomTerraria
                                                         0xA7 }; //dynamite
     
         private static bool itemBanEnabled;
+        private static bool whitelistEnabled;
 
         private static int[] justHostiled = new int[10];
         private static int numberHostiled;
@@ -70,7 +71,10 @@ namespace RomTerraria
                 case 0x04:
                     prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
                     // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting(data);  
+                    packet = HandleGreeting( data );
+                    if( whitelistEnabled ) {
+                        CheckWhitelist( data );
+                    }
                     break;
                 case 0x05:
                     prefix = "PLAYER UPDATE INVENTORY/EQUIP";
@@ -234,6 +238,22 @@ namespace RomTerraria
 
         }
 
+        private static void CheckWhitelist( byte[] data ) {
+            try {
+                var t = (ServerSock[])serverSock.GetValue( null );
+                var playerId = data[5];
+                var endpoint = t[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
+                var ip = Utils.ParseEndPointAddr( endpoint );
+                if( !Whitelist.IsAllowed( ip ) ) {
+                    Console.WriteLine( String.Format( "Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip ) );
+                    NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
+                    //t[playerId].kill = true;
+                }
+            } catch( Exception e ) {
+                Console.WriteLine( String.Format( "Exception during Whitelist processing: {0}", e.ToString( ) ) );
+            }
+        }
+
         private static Packet HandleGreeting( byte[] data ) {
             AccountManager.Logout( data[5] );
             return new Packet( data, data.Length );
@@ -296,19 +316,16 @@ namespace RomTerraria
                         cmdLogin(commands, p);
                         break;
                     case (".meteor"):
-                        cmdSpawnMeteor();
+                        cmdSpawnMeteor( commands, p );
                         break;
                     case (".broadcast"):
                         cmdBroadcast(commands, p);
                         break;
                     case (".kick"):
-                        if ((AccountManager.GetRights(p.PlayerId) & Rights.ADMIN) == Rights.ADMIN)
-                        {
-                            cmdKick(commands, p);
-                        }
+                        cmdKick( commands, p );
                         break;
                     case (".itemban"):
-                        cmdItemBanToggle(p);
+                        cmdItemBanToggle( commands, p);
                         break;
                     case (".ban"):
                         cmdBanUser(commands, p);
@@ -325,6 +342,9 @@ namespace RomTerraria
                     case (".teleportto"):
                         cmdTeleportTo(commands, p);
                         break;
+                    case (".wl"):
+                        cmdWhitelist( commands, p );
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -335,14 +355,27 @@ namespace RomTerraria
             return new Packet(p.Packet, p.Packet.Length);
         }
 
-        public static void cmdSpawnMeteor()
+        private static void SendAccessDeniedMsg( int pid, string cmd ) {
+            SendChatMsg( "Access denied. Please login.", pid, Color.GreenYellow );
+            Console.WriteLine( String.Format( "Player {0} attempted to use command {1}", pid, cmd ) );
+        }
+
+        public static void cmdSpawnMeteor( string[] commands, packet_ChatMsg packetChatMsg )
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             WorldEvents.SpawnMeteorCB();
             return;
         }
 
         private static void cmdTeleportTo(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             var name = GetParamsAsString(commands);
             if (name == null)
             {
@@ -362,6 +395,10 @@ namespace RomTerraria
 
         private static void cmdTeleport(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             Vector2 finalCoords = new Vector2(0f, 0f);
             var invalid = false;
 
@@ -416,6 +453,10 @@ namespace RomTerraria
 
         private static void cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             var name = GetParamsAsString(commands);
             if (name == null)
             {
@@ -442,6 +483,10 @@ namespace RomTerraria
 
         private static void cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             //NOTE: much more efficient to use string.Substring(x); to get the name from the command
             var name = GetParamsAsString(commands);
             if (name == null)
@@ -461,6 +506,10 @@ namespace RomTerraria
 
         private static void cmdBanUser(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             var name = GetParamsAsString(commands);
             if (name == null)
             {
@@ -477,11 +526,15 @@ namespace RomTerraria
         }
 
 
-        private static void cmdItemBanToggle(packet_ChatMsg p)
+        private static void cmdItemBanToggle( string[] commands, packet_ChatMsg packetChatMsg )
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             itemBanEnabled = !itemBanEnabled;
             string state = itemBanEnabled ? "enabled." : "disabled.";
-            SendChatMsg("Item ban " + state, p.PlayerId, Color.Green);
+            SendChatMsg( "Item ban " + state, packetChatMsg.PlayerId, Color.Green );
         }
 
         /// <summary>
@@ -491,6 +544,10 @@ namespace RomTerraria
         /// <param name="packetChatMsg">Data class for ChatMsg</param>
         private static void cmdKick(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             var name = GetParamsAsString(commands);
             if (name == null)
             {
@@ -521,6 +578,56 @@ namespace RomTerraria
                 }
             }*/
 
+        }
+
+        private static void cmdWhitelist( string[] commands, packet_ChatMsg packetChatMsg ) {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
+            if( commands.Length < 2 ) {
+                cmdWhitelistUsage( packetChatMsg.PlayerId );
+            } else {
+                switch( commands[1].ToLower( ) ) {
+                    case ("a"):
+                    case ("add"):
+                        if( commands.Length < 3 ) {
+                            cmdWhitelistUsage( packetChatMsg.PlayerId );
+                        }
+                        else {
+                            Whitelist.AddEntry( commands[2] );
+                        }
+
+                        break;
+                    case ("d"):
+                    case ("del"):
+                        if( commands.Length < 3 ) {
+                            cmdWhitelistUsage( packetChatMsg.PlayerId );
+                        }
+                        else {
+                            Whitelist.RemoveEntry( commands[2] );
+                        }
+                        break;
+                    case ("r"):
+                    case ("refresh"):
+                        Whitelist.Refresh( );
+                        break;
+                    case ("on"):
+                        whitelistEnabled = true;
+                        break;
+                    case ("off"):
+                        whitelistEnabled = false;
+                        break;
+                    default:
+                        cmdWhitelistUsage( packetChatMsg.PlayerId );
+                        break;
+                }
+            }
+        }
+
+        private static void cmdWhitelistUsage( int pid ) {
+            SendChatMsg( "USAGE: .wl (a)dd | (d)el | (r)efresh | on | off", pid,
+                         Color.GreenYellow );
         }
 
         /// <summary>
@@ -598,12 +705,16 @@ namespace RomTerraria
         /// </summary>
         /// <param name="commands">The array of space-delimited words</param>
         /// <param name="p">Data class for ChatMsg</param>
-        private static void cmdBroadcast(string[] commands, packet_ChatMsg p)
+        private static void cmdBroadcast( string[] commands, packet_ChatMsg packetChatMsg )
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
             var msg = GetParamsAsString(commands);
             if (msg == null)
             {
-                SendChatMsg("USAGE: .broadcast <message>", p.PlayerId, Color.GreenYellow);
+                SendChatMsg( "USAGE: .broadcast <message>", packetChatMsg.PlayerId, Color.GreenYellow );
                 return;
             }
 
