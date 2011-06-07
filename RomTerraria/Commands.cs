@@ -363,7 +363,42 @@ namespace RomTerraria
             var tag = GetParamsAsString(commands);
             if (tag == null)
             {
-                SendChatMsg("USAGE: .landmark <landmarkname>", packetChatMsg.PlayerId, Color.GreenYellow);
+                string[] locations = new string[20];
+                int nLocs = 0;
+                foreach (var sign in Main.sign)
+                {
+                    if (sign == null)
+                        continue;
+
+                    int rLoc;
+                    int lLoc = sign.text.IndexOf("<");
+                    if (lLoc != -1)
+                    {
+                        rLoc = sign.text.IndexOf(">");
+                        if (rLoc != -1)
+                        {
+                            locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1);
+                            nLocs++;
+                        }
+
+                    }
+                }
+                string o = null;
+                if (nLocs > 0)
+                {
+                    foreach (string l in locations)
+                    {
+                        if (l == null)
+                            break;
+                        o += l + ", ";
+                    }
+
+                    SendChatMsg("Available landmarks: "+ o.Substring(0,o.Length-2),packetChatMsg.PlayerId, Color.GreenYellow);
+                    return;
+                }
+
+                //fallthru, no landmarks set (nLocs = 0)
+                SendChatMsg("No landmarks set.", packetChatMsg.PlayerId, Color.GreenYellow);
                 return;
             }
             foreach (var n in Main.sign)
@@ -371,6 +406,7 @@ namespace RomTerraria
                 int found = n.text.IndexOf("<" + tag + ">");
                 if (found !=  -1)
                 {
+                    //get sign coords, teleport user using 0x0D
                     float x = n.x * 16;
                     float y = n.y * 16 - 20;
                    
@@ -378,11 +414,9 @@ namespace RomTerraria
                     Main.player[packetChatMsg.PlayerId].position.Y = y;
                     NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
                     return;
-                } else
-                {
-                    SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
-                    return;
                 }
+                SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
+                return;
             }
         }
 
