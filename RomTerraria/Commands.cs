@@ -448,7 +448,7 @@ namespace RomTerraria
                 return;
             }
 
-            SendChatMsg( "USAGE: .login <username> <password>", p.PlayerId, Color.GreenYellow );
+            SendChatMsg( "USAGE: .login <username>", p.PlayerId, Color.GreenYellow );
         }
 
         private static void cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
@@ -595,6 +595,7 @@ namespace RomTerraria
                             cmdWhitelistUsage( packetChatMsg.PlayerId );
                         }
                         else {
+                            SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
                             Whitelist.AddEntry( commands[2] );
                         }
 
@@ -605,18 +606,22 @@ namespace RomTerraria
                             cmdWhitelistUsage( packetChatMsg.PlayerId );
                         }
                         else {
+                            SendChatMsg( String.Format( "Removing {0} from whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
                             Whitelist.RemoveEntry( commands[2] );
                         }
                         break;
                     case ("r"):
                     case ("refresh"):
+                        SendChatMsg( "Loading whitelist from file.", packetChatMsg.PlayerId, Color.GreenYellow );
                         Whitelist.Refresh( );
                         break;
                     case ("on"):
                         whitelistEnabled = true;
+                        SendChatMsg( "Server whitelist is on.", packetChatMsg.PlayerId, Color.GreenYellow );
                         break;
                     case ("off"):
                         whitelistEnabled = false;
+                        SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
                         break;
                     default:
                         cmdWhitelistUsage( packetChatMsg.PlayerId );
