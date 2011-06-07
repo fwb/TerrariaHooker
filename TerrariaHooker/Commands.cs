@@ -538,8 +538,6 @@ namespace TerrariaHooker
             //
            
             //get the name, without the coords because well, they're not part of the name.
-            //i dont like using a lambda here.
-            //var name = GetParamsAsString(Array.FindAll(commands, val => val != coords).ToArray());
             var name = GetParamsAsString(commands," ", 1);
 
             if (name == null && invalid) //if the name is bad, but the vector is fine, we can continue

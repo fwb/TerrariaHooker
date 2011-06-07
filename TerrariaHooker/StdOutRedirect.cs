@@ -9,6 +9,8 @@ namespace TerrariaHooker
     {
         TextBox _output = null;
         public StringBuilder sb = new StringBuilder();
+        public static string current; 
+        
 
         public StdOutRedirect(TextBox output)
         {
@@ -19,23 +21,73 @@ namespace TerrariaHooker
         {
             try
             {
-                base.Write(value);
+                //base.Write(value);
                 //using a stringbuilder here now, since STDOUT apparently sends data character-at-a-time
                 //so it was using an enormous amount of processor to append text to a textbox.
                 sb.Append(value);
-                if (value == (char)0x0A || value == (char)0x3A)
+                if (value == (char)0x0A)
                 {
                     //copy stringbuilder contents to local string (so the contents aren't lost
                     //if the invoke takes too long, or if multiple writes from multiple threads
                     //are processed).
                     string t = sb.ToString();
+                    var n = t.Trim(); //don't want newlines in our shit
+
+                    //<x>ing <object>: xx% = 3
+                    if (n.Length > 2)
+                    {
+                        //get last character
+                        var k = n.Substring(n.Length - 1);
+                        if (k == "%")
+                        {
+                            //if we're not already dotting up a data reporting msg, start
+                            if (current == null)
+                            {
+                                current = n.Split(' ')[0];
+                                t = current;
+                            } else if (current != n.Split(' ')[0]) //if the current is a new one, restart + leading newline
+                            {
+                                current = n.Split(' ')[0];
+                                t = Environment.NewLine + current;
+                            } else //we're currently dotting one, and it's old.
+                            {
+                                t = ".";
+                            }
+                        } else if (current != null)
+                        {
+                            current = null;
+                            t = Environment.NewLine + t;
+                        }
+                    }
+
                     MethodInvoker action = delegate { _output.AppendText(t); };
                     _output.BeginInvoke(action);
 
                     //empty stringbuilder
                     sb.Clear();
                 }
-                
+
+                //handle lines ending with a semicolon instead of a newline, for input.
+                if (value == (char)0x3A)
+                {
+                    string p = sb.ToString();
+                    var r = p.Split(' ');
+
+                    //if the lines are data related, pass so it can be handled when the percentage and newline is reached
+                    if (r[0] == "Resetting" || r[0] == "Settling" || r[0] == "Loading" || r[0] == "Saving")
+                        return;
+
+                    //reset current
+                    current = null;
+
+                    MethodInvoker action = delegate { _output.AppendText(p); };
+                    _output.BeginInvoke(action);
+
+                    //empty stringbuilder
+                    sb.Clear();
+
+                }
+
             }
             catch (Exception ext)
             {
