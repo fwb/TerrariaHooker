@@ -314,25 +314,25 @@ namespace TerrariaHooker
                 switch (commands[0])
                 {
                     case (".login"):
-                        cmdLogin(commands, p);
+                        if (!cmdLogin(commands, p)) cmdUsage("USAGE: .login <username>",p.PlayerId);
                         break;
                     case (".meteor"):
-                        cmdSpawnMeteor( commands, p );
+                        cmdSpawnMeteor( commands, p ); //usage is .meteor, can't return false because it doesn't care about extra args
                         break;
                     case (".broadcast"):
-                        cmdBroadcast(commands, p);
+                        if (!cmdBroadcast(commands, p)) cmdUsage("USAGE: .broadcast <message>",p.PlayerId);
                         break;
                     case (".kick"):
-                        cmdKick( commands, p );
+                        if (!cmdKick(commands, p)) cmdUsage("USAGE: .kick <player>",p.PlayerId);
                         break;
                     case (".itemban"):
-                        cmdItemBanToggle( commands, p);
+                        cmdItemBanToggle( commands, p); //usage is .itemban, cares not for args
                         break;
                     case (".ban"):
                         if (!cmdBanUser(commands, p)) cmdUsage("USAGE: .ban <player>",p.PlayerId);
                         break;
                     case (".kickban"):
-                        cmdKickBan(commands, p);
+                        if (!cmdKickBan(commands, p)) cmdUsage("USAGE: .kickban <player>",p.PlayerId);
                         break;
                     case (".star"):
                         if (!cmdLaunchStar(commands, p)) cmdUsage("USAGE: .star <player>",p.PlayerId);
@@ -344,7 +344,7 @@ namespace TerrariaHooker
                         if (!cmdTeleportTo(commands, p)) cmdUsage("USAGE: .teleportto <player>",p.PlayerId);
                         break;
                     case (".wl"):
-                        cmdWhitelist( commands, p );
+                        if (!cmdWhitelist(commands, p)) cmdUsage("USAGE: .wl (a)dd | (d)el | (r)efresh | on | off", p.PlayerId);
                         break;
                     case (".landmark"):
                         if(!cmdLandMark(commands, p)) cmdUsage("USAGE: .landmark <name>", p.PlayerId);
@@ -556,16 +556,16 @@ namespace TerrariaHooker
 
         }
 
-        private static void cmdLogin( string[] commands, packet_ChatMsg p )
+        private static bool cmdLogin( string[] commands, packet_ChatMsg p )
         {
             var name = GetParamsAsString(commands);
             if (name != null && AccountManager.Login(p.PlayerId, name))
             {
                 SendChatMsg("Login successful.", p.PlayerId, Color.ForestGreen);
-                return;
+                return true;
             }
 
-            SendChatMsg( "USAGE: .login <username>", p.PlayerId, Color.GreenYellow );
+            return false;
         }
 
         private static bool cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
@@ -597,19 +597,16 @@ namespace TerrariaHooker
 
         }
 
-        private static void cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdKickBan(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             //NOTE: much more efficient to use string.Substring(x); to get the name from the command
             var name = GetParamsAsString(commands);
             if (name == null)
-            {
-                SendChatMsg("USAGE: .kickban <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
 
             var id = getPlayerIdFromName(name);
             if (id != -1)
@@ -617,7 +614,9 @@ namespace TerrariaHooker
                 kickUser(id);
                 banUser(id);
                 SendChatMsg("Player " + name + " kicked and banned.", packetChatMsg.PlayerId, Color.Red);
+                return true;
             }
+            return true;
         }
 
         private static bool cmdBanUser(string[] commands, packet_ChatMsg packetChatMsg)
@@ -640,15 +639,16 @@ namespace TerrariaHooker
         }
 
 
-        private static void cmdItemBanToggle( string[] commands, packet_ChatMsg packetChatMsg )
+        private static bool cmdItemBanToggle( string[] commands, packet_ChatMsg packetChatMsg )
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             itemBanEnabled = !itemBanEnabled;
             string state = itemBanEnabled ? "enabled." : "disabled.";
             SendChatMsg( "Item ban " + state, packetChatMsg.PlayerId, Color.Green );
+            return true;
         }
 
         /// <summary>
@@ -656,18 +656,16 @@ namespace TerrariaHooker
         /// </summary>
         /// <param name="commands">The commands array</param>
         /// <param name="packetChatMsg">Data class for ChatMsg</param>
-        private static void cmdKick(string[] commands, packet_ChatMsg packetChatMsg)
+        private static bool cmdKick(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             var name = GetParamsAsString(commands);
             if (name == null)
-            {
-                SendChatMsg("USAGE: .kick <player>", packetChatMsg.PlayerId, Color.GreenYellow);
-                return;
-            }
+                return false;
+
 
             var t = (ServerSock[]) serverSock.GetValue(null);
             
@@ -677,74 +675,60 @@ namespace TerrariaHooker
                 {
                     kickUser(i);
                     SendChatMsg("Player " + name + " kicked.", packetChatMsg.PlayerId, Color.Red);
-                    return;
+                    return true;
                 }
             }
-
-            /*foreach (ServerSock b in t)
-            {
-                if (b.name == name)
-                {
-                    b.kill = true;
-                    return;
-                }
-            }*/
+            return true;
 
         }
 
-        private static void cmdWhitelist( string[] commands, packet_ChatMsg packetChatMsg ) {
+        private static bool cmdWhitelist( string[] commands, packet_ChatMsg packetChatMsg ) {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
-            if( commands.Length < 2 ) {
-                cmdWhitelistUsage( packetChatMsg.PlayerId );
-            } else {
-                switch( commands[1].ToLower( ) ) {
-                    case ("a"):
-                    case ("add"):
-                        if( commands.Length < 3 ) {
-                            cmdWhitelistUsage( packetChatMsg.PlayerId );
-                        }
-                        else {
-                            SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
-                            Whitelist.AddEntry( commands[2] );
-                        }
-
-                        break;
-                    case ("d"):
-                    case ("del"):
-                        if( commands.Length < 3 ) {
-                            cmdWhitelistUsage( packetChatMsg.PlayerId );
-                        }
-                        else {
-                            SendChatMsg( String.Format( "Removing {0} from whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
-                            Whitelist.RemoveEntry( commands[2] );
-                        }
-                        break;
-                    case ("r"):
-                    case ("refresh"):
-                        SendChatMsg( "Loading whitelist from file.", packetChatMsg.PlayerId, Color.GreenYellow );
-                        Whitelist.Refresh( );
-                        break;
-                    case ("on"):
-                        whitelistEnabled = true;
-                        SendChatMsg( "Server whitelist is on.", packetChatMsg.PlayerId, Color.GreenYellow );
-                        break;
-                    case ("off"):
-                        whitelistEnabled = false;
-                        SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
-                        break;
-                    default:
-                        cmdWhitelistUsage( packetChatMsg.PlayerId );
-                        break;
-                }
+            if( commands.Length < 2 )
+            {
+                return false;
             }
-        }
+            switch( commands[1].ToLower( ) ) {
+                case ("a"):
+                case ("add"):
+                    if( commands.Length < 3 )
+                    {
+                        return false;
+                    }
+                    SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
+                    Whitelist.AddEntry( commands[2] );
 
-        private static void cmdWhitelistUsage( int pid ) {
-            SendChatMsg( "USAGE: .wl (a)dd | (d)el | (r)efresh | on | off", pid,
-                         Color.GreenYellow );
+                    break;
+                case ("d"):
+                case ("del"):
+                    if( commands.Length < 3 )
+                    {
+                        return false;
+                    }
+                    SendChatMsg( String.Format( "Removing {0} from whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
+                    Whitelist.RemoveEntry( commands[2] );
+                    break;
+                case ("r"):
+                case ("refresh"):
+                    SendChatMsg( "Loading whitelist from file.", packetChatMsg.PlayerId, Color.GreenYellow );
+                    Whitelist.Refresh( );
+                    break;
+                case ("on"):
+                    whitelistEnabled = true;
+                    SendChatMsg( "Server whitelist is on.", packetChatMsg.PlayerId, Color.GreenYellow );
+                    break;
+                case ("off"):
+                    whitelistEnabled = false;
+                    SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
+                    break;
+                default:
+                    return false;
+                        
+            }
+            return true;
         }
 
         /// <summary>
@@ -813,7 +797,7 @@ namespace TerrariaHooker
         /// <param name="p">Data class for ChatMsg</param>
         private static void cmdUnknown(string[] commands, packet_ChatMsg p)
         {
-            SendChatMsg("ERROR: Unknown command " + commands[0], p.PlayerId, Color.GreenYellow);
+            SendChatMsg("ERROR: Unknown command " + commands[0], p.PlayerId, Color.Red);
             return;
         }
 
@@ -822,20 +806,18 @@ namespace TerrariaHooker
         /// </summary>
         /// <param name="commands">The array of space-delimited words</param>
         /// <param name="p">Data class for ChatMsg</param>
-        private static void cmdBroadcast( string[] commands, packet_ChatMsg packetChatMsg )
+        private static bool cmdBroadcast( string[] commands, packet_ChatMsg packetChatMsg )
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return;
+                return true;
             }
             var msg = GetParamsAsString(commands);
             if (msg == null)
-            {
-                SendChatMsg( "USAGE: .broadcast <message>", packetChatMsg.PlayerId, Color.GreenYellow );
-                return;
-            }
+                return false;
 
             SendChatMsg(msg, -1, Color.Orange);
+            return true;
         }
     }
 
