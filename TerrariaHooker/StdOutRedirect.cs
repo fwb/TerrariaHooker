@@ -60,6 +60,7 @@ namespace TerrariaHooker
                                 else
                                 {
                                     tick++;
+                                    sb.Clear();
                                     return;
                                 }
                             }
@@ -75,13 +76,14 @@ namespace TerrariaHooker
 
                     //empty stringbuilder
                     sb.Clear();
+                    return;
                 }
 
                 //handle lines ending with a semicolon instead of a newline, for input.
                 if (value == (char)0x3A)
                 {
                     string p = sb.ToString();
-                    var r = p.Split(' ');
+                    var r = p.Trim().Split(' ');
 
                     //if the lines are data related, pass so it can be handled when the percentage and newline is reached
                     if (r[0] == "Resetting" || r[0] == "Settling" || r[0] == "Loading" || r[0] == "Saving")
@@ -95,6 +97,7 @@ namespace TerrariaHooker
 
                     //empty stringbuilder
                     sb.Clear();
+                    return;
 
                 }
 

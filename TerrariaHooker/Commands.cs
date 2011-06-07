@@ -23,6 +23,8 @@ namespace TerrariaHooker
         private static FieldInfo serverSock;
         private static TextWriter w = new StreamWriter(ServerConsole._out);
 
+        internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
+
 
         static Commands()
         {
@@ -376,14 +378,16 @@ namespace TerrariaHooker
             int count = 1;
             bool multi = false;
 
+            //first argument must be an integer
             if (int.TryParse(commands[1], out npcId) == false)
                 return false;
 
+            //final argument can be an integer, but is not required
             if (int.TryParse(commands[commands.Length - 1], out count))
                 multi = true;
 
             //don't spawn retard amounts
-            if (count > 50) count = 50;
+            if (count > Commands.MAX_SPAWNS) count = Commands.MAX_SPAWNS;
 
             string targetName = GetParamsAsString(commands, " ", multi ? 1 : 0, 1);
 
@@ -412,6 +416,7 @@ namespace TerrariaHooker
         private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
         {
             var tag = GetParamsAsString(commands);
+            //generate list of landmarks
             if (tag == null)
             {
                 string[] locations = new string[20];
@@ -422,7 +427,7 @@ namespace TerrariaHooker
                         continue;
 
                     int rLoc;
-                    int lLoc = sign.text.IndexOf("<");
+                    var lLoc = sign.text.IndexOf("<");
                     if (lLoc != -1)
                     {
                         rLoc = sign.text.IndexOf(">");
@@ -431,7 +436,6 @@ namespace TerrariaHooker
                             locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1);
                             nLocs++;
                         }
-
                     }
                 }
                 string o = null;
@@ -451,8 +455,11 @@ namespace TerrariaHooker
                 //fallthru, no landmarks set (nLocs = 0)
                 SendChatMsg("No landmarks set.", packetChatMsg.PlayerId, Color.GreenYellow);
                 return true;
-            }
+            } //
 
+
+            //this will return true on the first instance of the requested
+            //tag on a sign.
             foreach (var n in Main.sign)
             {
                 int found = n.text.IndexOf("<" + tag + ">");
@@ -498,7 +505,6 @@ namespace TerrariaHooker
             if (name == null)
                 return false;
 
-
             var id = getPlayerIdFromName(name);
             if (id != -1)
             {
@@ -540,11 +546,16 @@ namespace TerrariaHooker
             //get the name, without the coords because well, they're not part of the name.
             var name = GetParamsAsString(commands," ", 1);
 
-            if (name == null && invalid) //if the name is bad, but the vector is fine, we can continue
+            if (name == null && invalid) 
                 return false;
 
             //if our name was null, but the vector was valid, our playerid is self:
             int targetId = name == null ? packetChatMsg.PlayerId : getPlayerIdFromName(name);
+            if (targetId == -1)
+            {
+                SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
+                return true;
+            }
 
             Main.player[targetId].position.X = finalCoords.X;
             Main.player[targetId].position.Y = finalCoords.Y;
@@ -577,6 +588,11 @@ namespace TerrariaHooker
                 return false;
 
             var id = getPlayerIdFromName(name);
+            if (id == -1)
+            {
+                SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
+                return true;
+            }
 
             //if the player is already hostile, don't do anything
             if (!Main.player[id].hostile)
@@ -685,27 +701,20 @@ namespace TerrariaHooker
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
                 return true;
             }
-            if( commands.Length < 2 )
-            {
+            if (commands.Length < 2)
                 return false;
-            }
             switch( commands[1].ToLower( ) ) {
                 case ("a"):
                 case ("add"):
-                    if( commands.Length < 3 )
-                    {
+                    if (commands.Length < 3)
                         return false;
-                    }
                     SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
                     Whitelist.AddEntry( commands[2] );
-
                     break;
                 case ("d"):
                 case ("del"):
-                    if( commands.Length < 3 )
-                    {
+                    if (commands.Length < 3)
                         return false;
-                    }
                     SendChatMsg( String.Format( "Removing {0} from whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
                     Whitelist.RemoveEntry( commands[2] );
                     break;
@@ -734,7 +743,8 @@ namespace TerrariaHooker
         /// </summary>
         /// <param name="commands">The commands.</param>
         /// <param name="delimiter">The delimiter.</param>
-        /// <param name="negOffset">Negative offset for name. Used if your commands have .command [name here] [additional parameters]</param>
+        /// <param name="negOffset">Negative offset for name. Use to omit array entries from end of commands</param>
+        /// <param name="posOffset">Positive offset for name. Use to omit array entries from beginning of command.</param>
         /// <returns></returns>
         private static string GetParamsAsString(string[] commands, string delimiter = " ", int negOffset = 0, int posOffset = 0)
         {
@@ -752,6 +762,7 @@ namespace TerrariaHooker
 
         private static void banUser(int id)
         {
+            //built-in terraria ban method
             Netplay.AddBan(id);
             return;
         }
@@ -768,9 +779,7 @@ namespace TerrariaHooker
             for (int i = 0; i < Main.maxNetPlayers; i++)
             {
                 if (Main.player[i].name.ToLower() == name.ToLower())
-                {
                     return i;
-                }
             }
             return -1;
         }
