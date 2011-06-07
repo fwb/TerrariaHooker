@@ -121,10 +121,10 @@ namespace TerrariaHooker
 
             if (result != 0)
             {
-                //MakeItHarder.serverConsole.AddChatLine("Socket Error!");
-                System.Windows.Forms.MessageBox.Show("Died in the ass");
                 Console.WriteLine("Socket Error!\n");
-                
+#if DEBUG
+                Console.WriteLine("WSARecv (original) returned errorno: " + result);
+#endif
                 return result;
             }
 
@@ -144,8 +144,10 @@ namespace TerrariaHooker
                     Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
                 } catch (Exception e)
                 {
-                    Console.WriteLine("Fatal error in Commands.cs: " + e + "\n");
-                    Console.WriteLine("HOOK MAY BE DETACHED\n");    
+                    Console.WriteLine("Serious error in Commands.cs: " + e + "\n");
+#if DEBUG
+                    Console.WriteLine("HOOK MAY BE DETACHED\n");
+#endif
                 }
 
             }
@@ -193,13 +195,7 @@ namespace TerrariaHooker
         {
             //var newBuffer = new byte[Buffer.len]; //buffer to hold sent bytes
             //Marshal.Copy(Buffer.buf,newBuffer,0,Buffer.len);
-            //if (newBuffer.Length > 7 && newBuffer[6] == 0xAB)
-            //{
-            //    WorldEvents.SpawnMeteorCB();
-            //    return 0;
-            //}
 
-            //I absolutely wish this code wasn't here, but unfortunately it's necessary.
             /*if (newBuffer[4] == 0x19)
             {
                 var n = Commands.ProcessData(newBuffer, 1);

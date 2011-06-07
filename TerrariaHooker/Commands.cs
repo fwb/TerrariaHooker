@@ -16,8 +16,11 @@ namespace TerrariaHooker
         private static bool itemBanEnabled;
         private static bool whitelistEnabled;
 
+        //.star <player> related variables
         private static int[] justHostiled = new int[10];
-        private static int numberHostiled;
+        private static int _numberHostiled;
+        //
+
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
@@ -180,15 +183,15 @@ namespace TerrariaHooker
                     break;
             }
 
-#if DEBUG
-            if( direction == 0 ) {
+#if DEBUG   
+            /*if( direction == 0 ) {
                 var sBuffer = new StringBuilder( );
                 foreach( byte t in data ) {
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
-               //Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
-            }
+               Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
+            }*/
 #endif
             return packet;
 
@@ -203,12 +206,12 @@ namespace TerrariaHooker
 
             if (Main.player[data[5]].hostile)
             {
-                for (var i = 0; i < numberHostiled; i++)
+                for (var i = 0; i < _numberHostiled; i++)
                 {
                     if (justHostiled[i] == data[5])
                     {
                         justHostiled[i] = 0x00;
-                        numberHostiled--;
+                        _numberHostiled--;
                         Main.player[data[5]].hostile = false;
                     }
                 }
@@ -375,7 +378,7 @@ namespace TerrariaHooker
                 return false;
                 
             int npcId;
-            int count = 1;
+            int count = 0;
             bool multi = false;
 
             //first argument must be an integer
@@ -407,7 +410,7 @@ namespace TerrariaHooker
                 }
                 return true;
             }
-            SendChatMsg(String.Format("Player '{0}' not found", targetName),packetChatMsg.PlayerId,Color.Red);
+            
             return true;
 
 
@@ -419,18 +422,17 @@ namespace TerrariaHooker
             //generate list of landmarks
             if (tag == null)
             {
-                string[] locations = new string[20];
+                var locations = new string[20];
                 int nLocs = 0;
                 foreach (var sign in Main.sign)
                 {
                     if (sign == null)
                         continue;
 
-                    int rLoc;
                     var lLoc = sign.text.IndexOf("<");
                     if (lLoc != -1)
                     {
-                        rLoc = sign.text.IndexOf(">");
+                        int rLoc = sign.text.IndexOf(">");
                         if (rLoc != -1)
                         {
                             locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1);
@@ -524,7 +526,7 @@ namespace TerrariaHooker
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
                 return true;
             }
-            Vector2 finalCoords = new Vector2(0f, 0f);
+            var finalCoords = new Vector2(0f, 0f);
             var invalid = false;
 
             //check if the last word in the message is an x:y coord pair
@@ -560,7 +562,7 @@ namespace TerrariaHooker
             Main.player[targetId].position.X = finalCoords.X;
             Main.player[targetId].position.Y = finalCoords.Y;
 
-            NetMessage.SendData(0x0D, -1, -1, "", targetId, 0f, 0f, 0f);
+            NetMessage.SendData(0x0D, -1, -1, "", targetId);
             return true;
 
         }
@@ -598,8 +600,8 @@ namespace TerrariaHooker
             if (!Main.player[id].hostile)
             {
                 Main.player[id].hostile = true;
-                justHostiled[numberHostiled] = id;
-                numberHostiled++;
+                justHostiled[_numberHostiled] = id;
+                _numberHostiled++;
             }
 
             Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
@@ -630,6 +632,7 @@ namespace TerrariaHooker
                 SendChatMsg("Player " + name + " kicked and banned.", packetChatMsg.PlayerId, Color.Red);
                 return true;
             }
+            SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
             return true;
         }
 
@@ -649,6 +652,7 @@ namespace TerrariaHooker
                     SendChatMsg("Banned user: " + name, packetChatMsg.PlayerId, Color.Red);
                     return true;
             }
+            SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
             return true;
         }
 
@@ -812,7 +816,6 @@ namespace TerrariaHooker
         /// Broadcast Command Handler
         /// </summary>
         /// <param name="commands">The array of space-delimited words</param>
-        /// <param name="p">Data class for ChatMsg</param>
         private static bool cmdBroadcast( string[] commands, packet_ChatMsg packetChatMsg )
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {

@@ -9,7 +9,6 @@ romsteady@msn.com
 
 Bugs/Work In Progress:
 - Whitelist is off by default. Remember to login and use ".wl on" to enable. A setting will be added to ServerConsole in the future.
-- "Cheats" tab on launcher is not functional and needs to be removed
 - Account system needs to load/save from/to file
 - Teleport commands are not well tested
 - Console, Clients, Events tabs in ServerConsole do not work or may CRASH THE SERVER
