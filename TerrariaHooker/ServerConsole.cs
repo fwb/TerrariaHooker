@@ -12,6 +12,9 @@ namespace TerrariaHooker {
     public partial class ServerConsole : Form {
 
         public static SockHook sockHook;
+        private static int selectedPlayer = -1;
+        private static Properties.Settings settings = new Properties.Settings();
+
 
         private delegate void NCallback();
 
@@ -87,6 +90,10 @@ namespace TerrariaHooker {
             Console.SetOut(_writer);
             sockHook = new SockHook();
 
+            check_wlEnabled.Checked = settings.EnableWhitelist;
+            check_anonLoginEnabled.Checked = settings.EnableAnonLogin;
+
+
             //LoadTerrariaAssembly( );
         }
 
@@ -136,13 +143,9 @@ namespace TerrariaHooker {
         }
 
         private void SpawnNearPlayer( int playerNum, int npcType, bool useNearSpawn ) {
-            if( useNearSpawn ) {
-                Terraria.NPC.SpawnOnPlayer( playerSelectSlider.Value, npcType );
-            } else {
-                //Calculate our own spawn location
-                var position = Terraria.Main.player[playerNum].position;
-                Terraria.NPC.NewNPC( (int)position.X, (int)position.Y, npcType );
-            }
+            //Calculate our own spawn location
+            var position = Main.player[playerNum].position;
+            NPC.NewNPC( (int)position.X, (int)position.Y, npcType );
         }
 
         //private void SendBroadcast( string msg ) {
@@ -155,29 +158,30 @@ namespace TerrariaHooker {
         //    }
         //}
 
-        private void PlayerSelectSliderScroll( object sender, EventArgs e ) {
-            var playerNum = playerSelectSlider.Value;
-            string playerName;
-            if( Terraria.Main.player[playerNum].active ) {
-                playerName = Terraria.Main.player[playerNum].name;
-            } else {
-                playerName = "(Inactive)";
-            }
-            playerSelectLabel.Text = playerName;
-        }
 
         private void SpawnButtonClick( object sender, EventArgs e ) {
             //MessageBox.Show( String.Format( "Index [{0}], PlayerNum [{1}]", mobPicker.SelectedIndex,
             //                                playerSelectSlider.Value ) );
             //if( npcPicker.SelectedIndex > 0 ) {
-            if( npcPicker.SelectedItem != null ) {
+            if( npcPicker.SelectedItem != null && selectedPlayer != -1) {
                 var npc = npcPicker.SelectedItem as NPCInfo;
-                SpawnNearPlayer( playerSelectSlider.Value, npc.Type, useNearSpawn.Checked );
+                SpawnNearPlayer( selectedPlayer, npc.Type, false);
             }
         }
 
-        private void CloseButtonClick( object sender, EventArgs e ) {
-            Hide( );
+        private void CloseButtonClick( object sender, EventArgs e )
+        {
+            settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
+            settings.EnableWhitelist = Commands.whitelistEnabled;
+            settings.Save();
+
+            //save and quit. redirects console output to usual stdout first.
+            var n = new StreamWriter(_out);
+            Console.SetOut(n);
+            Close();
+            //send exit command.
+            sendLineToConsole("exit");
+            //this.Close();
         }
 
         private void LoadNPCsClick( object sender, EventArgs e ) {
@@ -221,8 +225,22 @@ namespace TerrariaHooker {
             }
             textBox1.AppendText(consoleInput.Text + Environment.NewLine);
             //hooray!
-            char[] c = consoleInput.Text.ToCharArray();
-            var n = new INPUT_RECORD[c.Length+1];
+            sendLineToConsole(consoleInput.Text);
+            //UpdateForm();
+
+        }
+
+        private void UpdateForm()
+        {
+            //throw any shit in here that needs updating after console commands are executed
+            check_wlEnabled.Checked = Commands.whitelistEnabled;
+            check_anonLoginEnabled.Checked = Commands.allowUnwhiteLogin;
+        }
+
+        private void sendLineToConsole(string text)
+        {
+            char[] c = text.ToCharArray();
+            var n = new INPUT_RECORD[c.Length + 1];
             int index = 0;
             foreach (char i in c)
             {
@@ -240,14 +258,13 @@ namespace TerrariaHooker {
             n[index].KeyEvent.dwControlKeyState = 0;
             n[index].KeyEvent.wRepeatCount = 1;
             n[index].KeyEvent.wVirtualKeyCode = 0x0D;
-            n[index].KeyEvent.UnicodeChar = (char) 0x0D;
+            n[index].KeyEvent.UnicodeChar = (char)0x0D;
             n[index].KeyEvent.wVirtualScanCode = (ushort)MapVirtualKey(0x0D, 0x00);
 
             uint events;
             //WriteConsoleInput(Program.STDIN_HANDLE, n, (uint) c.Length + 1, out events);
             WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length + 1, out events);
             consoleInput.Clear();
-            
         }
 
 
@@ -274,7 +291,17 @@ namespace TerrariaHooker {
 
         private void playerList_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (playerList.FocusedItem == null)
+            {
+                selectedPlayer = -1;
+                label2.Text = "Selected player: none";
+                return;
+            }
+            int id;
+            if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
+                return;
+            selectedPlayer = id;
+            label2.Text = "Selected player: " + playerList.FocusedItem.SubItems[1].Text;
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -329,7 +356,30 @@ namespace TerrariaHooker {
             LoadPlayerInfo();
         }
 
-        
+
+        private void check_wlEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            Commands.whitelistEnabled = check_wlEnabled.Checked;
+        }
+
+        private void check_anonLoginEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            Commands.allowUnwhiteLogin = check_anonLoginEnabled.Checked;
+        }
+        private void tabControl1_SelectedIndexchanged(object sender, EventArgs e)
+        {
+            switch (((TabControl) sender).SelectedIndex)
+            {
+                case 4:
+                    check_wlEnabled.Checked = Commands.whitelistEnabled;
+                    check_anonLoginEnabled.Checked = Commands.allowUnwhiteLogin;
+                    break;
+            }
+
+        }
+
+
+
     }
 
 }

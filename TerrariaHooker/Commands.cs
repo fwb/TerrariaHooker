@@ -19,18 +19,14 @@ namespace TerrariaHooker
         private static bool itemRiskEnabled = true;
         public static bool whitelistEnabled;
         public static bool allowUnwhiteLogin;
+        public static bool[] whitelisted = new bool[255];
 
         //.star <player> related variables
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
 
-        public static bool[] whitelisted = new bool[255];
-        //i might invert this, so the privileges are a list of unavailable privs when unwhitelisted. yes.
         private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS;
         
-
-        //
-
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
@@ -479,18 +475,16 @@ namespace TerrariaHooker
                 }
                 return true;
             }
-            
             return true;
-
-
         }
 
         private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
         {
-            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+            //for now, landmark will be usable by all players. seems non-destructive enough.
+            /*if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
                 return true;
-            }
+            }*/
             var tag = GetParamsAsString(commands);
             //generate list of landmarks
             if (tag == null)

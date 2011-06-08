@@ -29,6 +29,10 @@
             this.button3 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button8 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.playerList = new System.Windows.Forms.ListView();
             this.col_ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -36,7 +40,7 @@
             this.col_Whitelist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RefreshPlayers = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.useNearSpawn = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.disableSpawns = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -45,9 +49,6 @@
             this.npcPicker = new System.Windows.Forms.ListBox();
             this.spawnButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.playerSelectLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.playerSelectSlider = new System.Windows.Forms.TrackBar();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.SpawnMeteorButton = new System.Windows.Forms.Button();
@@ -62,21 +63,22 @@
             this.enableEyeSpawn = new System.Windows.Forms.CheckBox();
             this.enableBloodMoon = new System.Windows.Forms.CheckBox();
             this.enableInvasion = new System.Windows.Forms.CheckBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.check_wlEnabled = new System.Windows.Forms.CheckBox();
+            this.check_anonLoginEnabled = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.playerSelectSlider)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -88,11 +90,13 @@
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(489, 362);
+            this.tabControl1.Size = new System.Drawing.Size(489, 365);
             this.tabControl1.TabIndex = 6;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexchanged);
             // 
             // tabPage5
             // 
@@ -101,9 +105,9 @@
             this.tabPage5.Controls.Add(this.textBox1);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(481, 336);
+            this.tabPage5.Size = new System.Drawing.Size(481, 339);
             this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Testbed";
+            this.tabPage5.Text = "Console";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // consoleInput
@@ -114,7 +118,7 @@
             this.consoleInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.consoleInput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.consoleInput.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.consoleInput.Location = new System.Drawing.Point(3, 312);
+            this.consoleInput.Location = new System.Drawing.Point(3, 315);
             this.consoleInput.Name = "consoleInput";
             this.consoleInput.Size = new System.Drawing.Size(474, 23);
             this.consoleInput.TabIndex = 2;
@@ -146,7 +150,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(474, 309);
+            this.textBox1.Size = new System.Drawing.Size(474, 312);
             this.textBox1.TabIndex = 0;
             // 
             // tabPage4
@@ -159,10 +163,54 @@
             this.tabPage4.Controls.Add(this.RefreshPlayers);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(481, 336);
+            this.tabPage4.Size = new System.Drawing.Size(481, 339);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Clients";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // button8
+            // 
+            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button8.Location = new System.Drawing.Point(410, 313);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(68, 23);
+            this.button8.TabIndex = 5;
+            this.button8.Text = "Remove";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // button7
+            // 
+            this.button7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button7.Location = new System.Drawing.Point(342, 313);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(62, 23);
+            this.button7.TabIndex = 4;
+            this.button7.Text = "Whitelist";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // button6
+            // 
+            this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button6.Location = new System.Drawing.Point(280, 313);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(47, 23);
+            this.button6.TabIndex = 3;
+            this.button6.Text = "Ban";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button5
+            // 
+            this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button5.Location = new System.Drawing.Point(227, 313);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(47, 23);
+            this.button5.TabIndex = 2;
+            this.button5.Text = "Kick";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // playerList
             // 
@@ -175,7 +223,7 @@
             this.playerList.GridLines = true;
             this.playerList.Location = new System.Drawing.Point(3, 3);
             this.playerList.Name = "playerList";
-            this.playerList.Size = new System.Drawing.Size(475, 301);
+            this.playerList.Size = new System.Drawing.Size(475, 304);
             this.playerList.TabIndex = 1;
             this.playerList.UseCompatibleStateImageBehavior = false;
             this.playerList.View = System.Windows.Forms.View.Details;
@@ -203,7 +251,8 @@
             // 
             // RefreshPlayers
             // 
-            this.RefreshPlayers.Location = new System.Drawing.Point(3, 310);
+            this.RefreshPlayers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RefreshPlayers.Location = new System.Drawing.Point(3, 313);
             this.RefreshPlayers.Name = "RefreshPlayers";
             this.RefreshPlayers.Size = new System.Drawing.Size(75, 23);
             this.RefreshPlayers.TabIndex = 0;
@@ -213,7 +262,7 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.useNearSpawn);
+            this.tabPage2.Controls.Add(this.label2);
             this.tabPage2.Controls.Add(this.disableSpawns);
             this.tabPage2.Controls.Add(this.button2);
             this.tabPage2.Controls.Add(this.groupBox1);
@@ -222,31 +271,29 @@
             this.tabPage2.Controls.Add(this.npcPicker);
             this.tabPage2.Controls.Add(this.spawnButton);
             this.tabPage2.Controls.Add(this.label3);
-            this.tabPage2.Controls.Add(this.playerSelectLabel);
-            this.tabPage2.Controls.Add(this.label1);
-            this.tabPage2.Controls.Add(this.playerSelectSlider);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(481, 336);
+            this.tabPage2.Size = new System.Drawing.Size(481, 339);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "NPCs";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // useNearSpawn
+            // label2
             // 
-            this.useNearSpawn.AutoSize = true;
-            this.useNearSpawn.Location = new System.Drawing.Point(291, 43);
-            this.useNearSpawn.Name = "useNearSpawn";
-            this.useNearSpawn.Size = new System.Drawing.Size(154, 17);
-            this.useNearSpawn.TabIndex = 13;
-            this.useNearSpawn.Text = "Use Built-in Spawn Locator";
-            this.useNearSpawn.UseVisualStyleBackColor = true;
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(6, 11);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(160, 16);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "Selected player: none";
             // 
             // disableSpawns
             // 
             this.disableSpawns.AutoSize = true;
-            this.disableSpawns.Location = new System.Drawing.Point(291, 19);
+            this.disableSpawns.Enabled = false;
+            this.disableSpawns.Location = new System.Drawing.Point(305, 12);
             this.disableSpawns.Name = "disableSpawns";
             this.disableSpawns.Size = new System.Drawing.Size(102, 17);
             this.disableSpawns.TabIndex = 12;
@@ -293,9 +340,9 @@
             // npcPicker
             // 
             this.npcPicker.FormattingEnabled = true;
-            this.npcPicker.Location = new System.Drawing.Point(6, 88);
+            this.npcPicker.Location = new System.Drawing.Point(6, 49);
             this.npcPicker.Name = "npcPicker";
-            this.npcPicker.Size = new System.Drawing.Size(275, 212);
+            this.npcPicker.Size = new System.Drawing.Size(275, 251);
             this.npcPicker.TabIndex = 6;
             // 
             // spawnButton
@@ -311,41 +358,11 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 71);
+            this.label3.Location = new System.Drawing.Point(6, 32);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Choose a Mob:";
-            // 
-            // playerSelectLabel
-            // 
-            this.playerSelectLabel.AutoSize = true;
-            this.playerSelectLabel.Location = new System.Drawing.Point(130, 51);
-            this.playerSelectLabel.Name = "playerSelectLabel";
-            this.playerSelectLabel.Size = new System.Drawing.Size(51, 13);
-            this.playerSelectLabel.TabIndex = 2;
-            this.playerSelectLabel.Text = "(Inactive)";
-            this.playerSelectLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Choose a Victim:";
-            // 
-            // playerSelectSlider
-            // 
-            this.playerSelectSlider.LargeChange = 1;
-            this.playerSelectSlider.Location = new System.Drawing.Point(6, 19);
-            this.playerSelectSlider.Maximum = 7;
-            this.playerSelectSlider.Name = "playerSelectSlider";
-            this.playerSelectSlider.Size = new System.Drawing.Size(278, 42);
-            this.playerSelectSlider.TabIndex = 0;
-            this.playerSelectSlider.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-            this.playerSelectSlider.Scroll += new System.EventHandler(this.PlayerSelectSliderScroll);
             // 
             // tabPage3
             // 
@@ -353,7 +370,7 @@
             this.tabPage3.Controls.Add(this.groupBox2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(481, 336);
+            this.tabPage3.Size = new System.Drawing.Size(481, 339);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Events";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -477,77 +494,77 @@
             this.enableInvasion.Size = new System.Drawing.Size(104, 24);
             this.enableInvasion.TabIndex = 2;
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.groupBox4);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(481, 339);
+            this.tabPage1.TabIndex = 5;
+            this.tabPage1.Text = "Options";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.check_wlEnabled);
+            this.groupBox4.Controls.Add(this.check_anonLoginEnabled);
+            this.groupBox4.Location = new System.Drawing.Point(13, 13);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(220, 76);
+            this.groupBox4.TabIndex = 2;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Whitelist";
+            // 
+            // check_wlEnabled
+            // 
+            this.check_wlEnabled.AutoSize = true;
+            this.check_wlEnabled.Location = new System.Drawing.Point(10, 19);
+            this.check_wlEnabled.Name = "check_wlEnabled";
+            this.check_wlEnabled.Size = new System.Drawing.Size(102, 17);
+            this.check_wlEnabled.TabIndex = 0;
+            this.check_wlEnabled.Text = "Enable Whitelist";
+            this.check_wlEnabled.UseVisualStyleBackColor = true;
+            this.check_wlEnabled.CheckedChanged += new System.EventHandler(this.check_wlEnabled_CheckedChanged);
+            // 
+            // check_anonLoginEnabled
+            // 
+            this.check_anonLoginEnabled.AutoSize = true;
+            this.check_anonLoginEnabled.Location = new System.Drawing.Point(10, 42);
+            this.check_anonLoginEnabled.Name = "check_anonLoginEnabled";
+            this.check_anonLoginEnabled.Size = new System.Drawing.Size(199, 17);
+            this.check_anonLoginEnabled.TabIndex = 1;
+            this.check_anonLoginEnabled.Text = "Enable Anonymous (Restricted) login";
+            this.check_anonLoginEnabled.UseVisualStyleBackColor = true;
+            this.check_anonLoginEnabled.CheckedChanged += new System.EventHandler(this.check_anonLoginEnabled_CheckedChanged);
+            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(426, 380);
+            this.button1.Location = new System.Drawing.Point(416, 383);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(86, 23);
             this.button1.TabIndex = 7;
-            this.button1.Text = "Hide";
+            this.button1.Text = "Save and Quit";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.CloseButtonClick);
             // 
             // button4
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button4.Location = new System.Drawing.Point(311, 380);
+            this.button4.Location = new System.Drawing.Point(302, 383);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(109, 23);
+            this.button4.Size = new System.Drawing.Size(108, 23);
             this.button4.TabIndex = 8;
             this.button4.Text = "ReLoad Commands";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // button5
-            // 
-            this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button5.Location = new System.Drawing.Point(192, 310);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(47, 23);
-            this.button5.TabIndex = 2;
-            this.button5.Text = "Kick";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
-            // button6
-            // 
-            this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button6.Location = new System.Drawing.Point(245, 310);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(47, 23);
-            this.button6.TabIndex = 3;
-            this.button6.Text = "Ban";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // button7
-            // 
-            this.button7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button7.Location = new System.Drawing.Point(342, 310);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(62, 23);
-            this.button7.TabIndex = 4;
-            this.button7.Text = "Whitelist";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // button8
-            // 
-            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button8.Location = new System.Drawing.Point(410, 310);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(68, 23);
-            this.button8.TabIndex = 5;
-            this.button8.Text = "Remove";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
             // ServerConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(514, 414);
+            this.ClientSize = new System.Drawing.Size(514, 413);
+            this.ControlBox = false;
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
@@ -559,11 +576,13 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.playerSelectSlider)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -573,9 +592,6 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label playerSelectLabel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TrackBar playerSelectSlider;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button spawnButton;
         private System.Windows.Forms.ListBox npcPicker;
@@ -584,7 +600,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox disableSpawns;
-        private System.Windows.Forms.CheckBox useNearSpawn;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox enableEyeSpawn;
@@ -616,5 +631,10 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox check_wlEnabled;
+        private System.Windows.Forms.CheckBox check_anonLoginEnabled;
     }
 }
