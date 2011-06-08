@@ -357,6 +357,7 @@ namespace TerrariaHooker
 
             if (p.Text[0] == 0x2E) // match dot
             {
+                //check if nocommands for anons is set, if playerid is not console id, and playerid is whitelisted
                 if (anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !whitelisted[p.PlayerId])
                 {
                     SendChatMsg("Commands disabled until Whitelisted", p.PlayerId, Color.Salmon);
@@ -459,7 +460,7 @@ namespace TerrariaHooker
                 multi = true;
 
             //don't spawn retard amounts
-            if (count > Commands.MAX_SPAWNS) count = Commands.MAX_SPAWNS;
+            if (count > MAX_SPAWNS) count = MAX_SPAWNS;
 
             string targetName = GetParamsAsString(commands, " ", multi ? 1 : 0, 1);
 

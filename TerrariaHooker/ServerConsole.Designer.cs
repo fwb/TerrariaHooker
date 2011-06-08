@@ -475,24 +475,25 @@
             // 
             // enableEyeSpawn
             // 
-            this.enableEyeSpawn.Location = new System.Drawing.Point(0, 0);
+            this.enableEyeSpawn.Location = new System.Drawing.Point(6, 62);
             this.enableEyeSpawn.Name = "enableEyeSpawn";
             this.enableEyeSpawn.Size = new System.Drawing.Size(104, 24);
             this.enableEyeSpawn.TabIndex = 0;
             // 
             // enableBloodMoon
             // 
-            this.enableBloodMoon.Location = new System.Drawing.Point(0, 0);
+            this.enableBloodMoon.Location = new System.Drawing.Point(6, 37);
             this.enableBloodMoon.Name = "enableBloodMoon";
             this.enableBloodMoon.Size = new System.Drawing.Size(104, 24);
             this.enableBloodMoon.TabIndex = 1;
             // 
             // enableInvasion
             // 
-            this.enableInvasion.Location = new System.Drawing.Point(0, 0);
+            this.enableInvasion.Location = new System.Drawing.Point(6, 12);
             this.enableInvasion.Name = "enableInvasion";
             this.enableInvasion.Size = new System.Drawing.Size(104, 24);
             this.enableInvasion.TabIndex = 2;
+            this.enableInvasion.CheckedChanged += new System.EventHandler(this.enableInvasion_CheckedChanged);
             // 
             // tabPage1
             // 
@@ -510,7 +511,7 @@
             this.groupBox4.Controls.Add(this.check_anonLoginEnabled);
             this.groupBox4.Location = new System.Drawing.Point(13, 13);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(220, 76);
+            this.groupBox4.Size = new System.Drawing.Size(234, 76);
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Whitelist";

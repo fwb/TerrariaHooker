@@ -93,8 +93,6 @@ namespace TerrariaHooker {
             check_wlEnabled.Checked = settings.EnableWhitelist;
             check_anonLoginEnabled.Checked = settings.EnableAnonLogin;
 
-
-            //LoadTerrariaAssembly( );
         }
 
         protected override void OnLoad( EventArgs e ) {
@@ -125,7 +123,7 @@ namespace TerrariaHooker {
 
         private void LoadNPCInfo( ) {
             npcPicker.Items.Clear( );
-            var npc = new Terraria.NPC( );
+            var npc = new NPC( );
             for( var i=1; i<=45; i++ ) {
                 try {
                     npc.SetDefaults( i );
@@ -228,13 +226,6 @@ namespace TerrariaHooker {
             sendLineToConsole(consoleInput.Text);
             //UpdateForm();
 
-        }
-
-        private void UpdateForm()
-        {
-            //throw any shit in here that needs updating after console commands are executed
-            check_wlEnabled.Checked = Commands.whitelistEnabled;
-            check_anonLoginEnabled.Checked = Commands.allowUnwhiteLogin;
         }
 
         private void sendLineToConsole(string text)
@@ -377,8 +368,6 @@ namespace TerrariaHooker {
             }
 
         }
-
-
 
     }
 
