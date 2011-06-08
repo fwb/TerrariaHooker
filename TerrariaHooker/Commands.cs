@@ -798,7 +798,7 @@ namespace TerrariaHooker
                         SendChatMsg("Player not found.", packetChatMsg.PlayerId, Color.Red);
                         return true;
                     }
-
+                    
                     var t = (ServerSock[])serverSock.GetValue(null);
                     var endpoint = t[targetId].tcpClient.Client.RemoteEndPoint.ToString( );
                     var ip = Utils.ParseEndPointAddr( endpoint );

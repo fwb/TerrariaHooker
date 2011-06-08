@@ -33,6 +33,7 @@
             this.col_ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col_Whitelist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RefreshPlayers = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.useNearSpawn = new System.Windows.Forms.CheckBox();
@@ -64,7 +65,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button4 = new System.Windows.Forms.Button();
-            this.col_Whitelist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
@@ -147,6 +151,10 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.button8);
+            this.tabPage4.Controls.Add(this.button7);
+            this.tabPage4.Controls.Add(this.button6);
+            this.tabPage4.Controls.Add(this.button5);
             this.tabPage4.Controls.Add(this.playerList);
             this.tabPage4.Controls.Add(this.RefreshPlayers);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
@@ -164,6 +172,7 @@
             this.col_IP,
             this.col_Whitelist});
             this.playerList.FullRowSelect = true;
+            this.playerList.GridLines = true;
             this.playerList.Location = new System.Drawing.Point(3, 3);
             this.playerList.Name = "playerList";
             this.playerList.Size = new System.Drawing.Size(475, 301);
@@ -180,16 +189,21 @@
             // col_Name
             // 
             this.col_Name.Text = "Name";
-            this.col_Name.Width = 149;
+            this.col_Name.Width = 166;
             // 
             // col_IP
             // 
             this.col_IP.Text = "IP";
-            this.col_IP.Width = 160;
+            this.col_IP.Width = 188;
+            // 
+            // col_Whitelist
+            // 
+            this.col_Whitelist.Text = "Whitelisted";
+            this.col_Whitelist.Width = 120;
             // 
             // RefreshPlayers
             // 
-            this.RefreshPlayers.Location = new System.Drawing.Point(211, 310);
+            this.RefreshPlayers.Location = new System.Drawing.Point(3, 310);
             this.RefreshPlayers.Name = "RefreshPlayers";
             this.RefreshPlayers.Size = new System.Drawing.Size(75, 23);
             this.RefreshPlayers.TabIndex = 0;
@@ -485,10 +499,49 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // col_Whitelist
+            // button5
             // 
-            this.col_Whitelist.Text = "Whitelisted";
-            this.col_Whitelist.Width = 120;
+            this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button5.Location = new System.Drawing.Point(192, 310);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(47, 23);
+            this.button5.TabIndex = 2;
+            this.button5.Text = "Kick";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button6
+            // 
+            this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button6.Location = new System.Drawing.Point(245, 310);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(47, 23);
+            this.button6.TabIndex = 3;
+            this.button6.Text = "Ban";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button7
+            // 
+            this.button7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button7.Location = new System.Drawing.Point(342, 310);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(62, 23);
+            this.button7.TabIndex = 4;
+            this.button7.Text = "Whitelist";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // button8
+            // 
+            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button8.Location = new System.Drawing.Point(410, 310);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(68, 23);
+            this.button8.TabIndex = 5;
+            this.button8.Text = "Remove";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // ServerConsole
             // 
@@ -559,5 +612,9 @@
         private System.Windows.Forms.TextBox consoleInput;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.ColumnHeader col_Whitelist;
+        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button8;
     }
 }

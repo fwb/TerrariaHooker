@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
+using Terraria;
 
 namespace TerrariaHooker {
 
@@ -274,6 +275,58 @@ namespace TerrariaHooker {
         private void playerList_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (playerList.FocusedItem == null)
+                return;
+            int id;
+            if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
+                return;
+
+            NetMessage.SendData(2, id, -1, "Kicked from server.", 0, 0f, 0f, 0f);
+            LoadPlayerInfo();
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if (playerList.FocusedItem == null)
+                return;
+            int id;
+            if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
+                return;
+
+            Netplay.AddBan(id);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (playerList.FocusedItem == null)
+                return;
+            int id;
+            if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
+                return;
+
+            var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
+            Whitelist.AddEntry(ip);
+            Commands.whitelisted[id] = true;
+            LoadPlayerInfo();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (playerList.FocusedItem == null)
+                return;
+            int id;
+            if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
+                return;
+
+            var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
+            Whitelist.RemoveEntry(ip);
+            Commands.whitelisted[id] = false;
+            LoadPlayerInfo();
         }
 
         
