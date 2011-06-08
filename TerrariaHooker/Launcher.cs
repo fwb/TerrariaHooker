@@ -35,6 +35,7 @@ namespace TerrariaHooker
             }
 
         }
+
         public int LaunchWorldPlayers
         {
             get { int players = 8;

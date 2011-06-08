@@ -102,10 +102,15 @@ namespace TerrariaHooker {
 
         private void LoadPlayerInfo( ) {
             playerList.Items.Clear( );
-            for( var i = 0; i < 8; i++ ) {
+            for( var i = 0; i < Terraria.Main.maxNetPlayers; i++ ) {
                 var p = Terraria.Main.player[i];
-                if( p.active ) {
-                    playerList.Items.Add( new PlayerInfo( i, p.name ) );
+                if( p.active )
+                {
+                    playerList.Items.Add(new ListViewItem(new string[] {
+                                                                        i.ToString(),
+                                                                        p.name,
+                                                                        Terraria.Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
+                                                                        Commands.whitelisted[i].ToString(),}) );
                 }
             }
         }
@@ -262,6 +267,11 @@ namespace TerrariaHooker {
         }
 
         private void consoleInput_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void playerList_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
