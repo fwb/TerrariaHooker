@@ -16,13 +16,15 @@ namespace TerrariaHooker
 
         private static bool itemRiskEnabled = true;
         private static bool whitelistEnabled;
+        private static bool allowUnwhiteLogin;
 
         //.star <player> related variables
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
 
         private static bool[] whitelisted = new bool[255];
-        private static Actions anonPrivs = Actions.DEFAULT;
+        //i might invert this, so the privileges are a list of unavailable privs when unwhitelisted. yes.
+        private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS;
         
 
         //
@@ -213,7 +215,7 @@ namespace TerrariaHooker
             #region NEW WHITELIST CODE
             if (whitelistEnabled && !whitelisted[data[5]])
             {
-                if (!anonPrivs.Has(Actions.BREAKBLOCK))
+                if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
                     SendChatMsg("You cannot destroy blocks until whitelisted.", data[5], Color.Purple);
                     return CreateDummyPacket(data);
@@ -257,7 +259,7 @@ namespace TerrariaHooker
                 #region NEW WHITELIST CODE
                 if (whitelistEnabled && !whitelisted[p.PlayerId])
                 {
-                    if (!anonPrivs.Has(Actions.USEITEMS))
+                    if (anonPrivs.Has(Actions.NOUSEITEMS))
                     {
                         SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
                         return CreateDummyPacket(data);
@@ -293,7 +295,8 @@ namespace TerrariaHooker
                 {
                     Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
                     whitelisted[playerId] = false;
-                    //NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
+                    if (!allowUnwhiteLogin)
+                        NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
                     //t[playerId].kill = true;
                 }
                 else
@@ -821,6 +824,11 @@ namespace TerrariaHooker
                 case ("off"):
                     whitelistEnabled = false;
                     SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
+                    break;
+                case ("allowlogin"):
+                    allowUnwhiteLogin = !allowUnwhiteLogin;
+                    string state = allowUnwhiteLogin ? "enabled." : "disabled.";
+                    SendChatMsg( "Allow un-whitelisted users login: " + state, packetChatMsg.PlayerId, Color.Green );
                     break;
                 default:
                     return false;

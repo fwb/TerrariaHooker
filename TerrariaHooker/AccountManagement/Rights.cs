@@ -16,12 +16,11 @@ namespace TerrariaHooker.AccountManagement {
     public enum Actions
     {
         NONE = 0,
-        BREAKBLOCK = 1,
-        USEITEMS = 2,
-        USECHEST = 4,
-        ALL = BREAKBLOCK | USEITEMS | USECHEST,
-        DEFAULT = NONE,
-
+        NOBREAKBLOCK = 1,
+        NOUSEITEMS = 2,
+        NOUSECHEST = 4,
+        NOCHAT = 8,
+        ALL = NOBREAKBLOCK | NOUSEITEMS | NOUSECHEST | NOCHAT,
     }
 
     public static class EnumerationExtensions
