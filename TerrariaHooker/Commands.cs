@@ -237,7 +237,7 @@ namespace TerrariaHooker
             //on them using .star.);
             var p = new packet_PlayerDied(data);
 
-            if (Main.player[data[5]].hostile)
+            if (Main.player[p.PlayerId].hostile)
             {
                 for (var i = 0; i < _numberHostiled; i++)
                 {
@@ -245,7 +245,7 @@ namespace TerrariaHooker
                     {
                         justHostiled[i] = 0x00;
                         _numberHostiled--;
-                        Main.player[data[5]].hostile = false;
+                        Main.player[p.PlayerId].hostile = false;
                     }
                 }
             }
