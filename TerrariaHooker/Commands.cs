@@ -10,10 +10,10 @@ namespace TerrariaHooker
 {
     class Commands
     {
-        public static byte[] bannedItems = new byte[] { 0xCF,   //lava bucket
+        public static byte[] riskItems = new byte[] { 0xCF,   //lava bucket
                                                         0xA7 }; //dynamite
-    
-        private static bool itemBanEnabled;
+
+        private static bool itemRiskEnabled = true;
         private static bool whitelistEnabled;
 
         //.star <player> related variables
@@ -222,20 +222,20 @@ namespace TerrariaHooker
         private static Packet HandlePlayerState(byte[] data)
         {
             var packet = new Packet(data, data.Length);
-            if (!itemBanEnabled) return packet;
+            if (!itemRiskEnabled) return packet;
 
             var p = new packet_PlayerState(data);
             if (p.UsingItem)
             {
-                foreach (byte i in bannedItems)
+                foreach (byte i in riskItems)
                 {
                     var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
                     if (id == i)
                     {
-                        packet = CreateDummyPacket(data);
+                        //packet = CreateDummyPacket(data);
                         var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
                         //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
-                        Console.WriteLine("Player: {0} tried to use {1}\n", Main.player[p.PlayerId].name, itemName);
+                        Console.WriteLine("Player: {0} used {1}", Main.player[p.PlayerId].name, itemName);
 
                     }
                 }
@@ -333,7 +333,7 @@ namespace TerrariaHooker
                     case (".kick"):
                         if (!cmdKick(commands, p)) cmdUsage("USAGE: .kick <player>",p.PlayerId);
                         break;
-                    case (".itemban"):
+                    case (".itemrisk"):
                         cmdItemBanToggle( commands, p); //usage is .itemban, cares not for args
                         break;
                     case (".ban"):
@@ -684,9 +684,9 @@ namespace TerrariaHooker
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
                 return true;
             }
-            itemBanEnabled = !itemBanEnabled;
-            string state = itemBanEnabled ? "enabled." : "disabled.";
-            SendChatMsg( "Item ban " + state, packetChatMsg.PlayerId, Color.Green );
+            itemRiskEnabled = !itemRiskEnabled;
+            string state = itemRiskEnabled ? "enabled." : "disabled.";
+            SendChatMsg( "Risky item warning " + state, packetChatMsg.PlayerId, Color.Green );
             return true;
         }
 
