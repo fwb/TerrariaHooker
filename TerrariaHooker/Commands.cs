@@ -204,7 +204,7 @@ namespace TerrariaHooker
             //on them using .star.);
             var p = new packet_PlayerDied(data);
 
-            if (Main.player[data[5]].hostile)
+            if (Main.player[p.PlayerId].hostile)
             {
                 for (var i = 0; i < _numberHostiled; i++)
                 {
@@ -212,7 +212,7 @@ namespace TerrariaHooker
                     {
                         justHostiled[i] = 0x00;
                         _numberHostiled--;
-                        Main.player[data[5]].hostile = false;
+                        Main.player[p.PlayerId].hostile = false;
                     }
                 }
             }
@@ -306,11 +306,9 @@ namespace TerrariaHooker
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
             //act on packet fields, generate new data etc.
-            var match = false;
+    
             if (p.Text[0] == 0x2E) // match backslash
             {
-                match = true;
-
                 //split is probably no slower than substring, if the size of the strings
                 //we are pulling from user-text is variable.
                 var commands = p.Text.Split(' ');
