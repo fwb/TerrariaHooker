@@ -12,6 +12,18 @@ namespace TerrariaHooker.AccountManagement {
         DEFAULT = USEITEMS | EVENTS,
     }
 
+    [Flags]
+    public enum Actions
+    {
+        NONE = 0,
+        BREAKBLOCK = 1,
+        USEITEMS = 2,
+        USECHEST = 4,
+        ALL = BREAKBLOCK | USEITEMS | USECHEST,
+        DEFAULT = NONE,
+
+    }
+
     public static class EnumerationExtensions
     {
         #region Extension Methods

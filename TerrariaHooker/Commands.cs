@@ -8,6 +8,7 @@ using TerrariaHooker.AccountManagement;
 
 namespace TerrariaHooker
 {
+
     class Commands
     {
         public static byte[] riskItems = new byte[] { 0xCF,   //lava bucket
@@ -19,12 +20,18 @@ namespace TerrariaHooker
         //.star <player> related variables
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
+
+        private static bool[] whitelisted = new bool[255];
+        private static Actions anonPrivs = Actions.DEFAULT;
+        
+
         //
 
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
         private static TextWriter w = new StreamWriter(ServerConsole._out);
+
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
 
@@ -93,7 +100,9 @@ namespace TerrariaHooker
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                          
+                    if (whitelistEnabled && !whitelisted[data[5]])
+                        SendChatMsg("You are not whitelisted, some actions are restricted.", data[5], Color.Peru);
+      
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
@@ -104,6 +113,7 @@ namespace TerrariaHooker
                     break;
                 case 0x11:
                     prefix = "PLAYER DESTROY BLOCK";
+                    packet = HandleDestroyBlock(data);
                     break;
                 case 0x13:
                     prefix = "PLAYER USE DOOR";
@@ -197,6 +207,23 @@ namespace TerrariaHooker
 
         }
 
+        private static Packet HandleDestroyBlock(byte[] data)
+        {
+            var packet = new Packet(data, data.Length);
+            #region NEW WHITELIST CODE
+            if (whitelistEnabled && !whitelisted[data[5]])
+            {
+                if (!anonPrivs.Has(Actions.BREAKBLOCK))
+                {
+                    SendChatMsg("You cannot destroy blocks until whitelisted.", data[5], Color.Purple);
+                    return CreateDummyPacket(data);
+                }
+            }
+            #endregion
+
+            return packet;
+        }
+
         //basic death handler.
         private static Packet handleDeath(byte[] data)
         {
@@ -227,19 +254,31 @@ namespace TerrariaHooker
             var p = new packet_PlayerState(data);
             if (p.UsingItem)
             {
-                foreach (byte i in riskItems)
+                #region NEW WHITELIST CODE
+                if (whitelistEnabled && !whitelisted[p.PlayerId])
                 {
-                    var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
-                    if (id == i)
+                    if (!anonPrivs.Has(Actions.USEITEMS))
                     {
-                        //packet = CreateDummyPacket(data);
-                        var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
-                        //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
-                        Console.WriteLine("Player: {0} used {1}", Main.player[p.PlayerId].name, itemName);
-
+                        SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
+                        return CreateDummyPacket(data);
                     }
                 }
+                #endregion
+
+                foreach (byte i in riskItems)
+                    {
+                        var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
+                        if (id == i)
+                        {
+                            //packet = CreateDummyPacket(data);
+                            var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
+                            //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
+                            Console.WriteLine("RISK: Player '{0}' used {1}", Main.player[p.PlayerId].name, itemName);
+
+                        }
+                    }
             }
+        
             return packet;
 
         }
@@ -250,10 +289,16 @@ namespace TerrariaHooker
                 var playerId = data[5];
                 var endpoint = t[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
                 var ip = Utils.ParseEndPointAddr( endpoint );
-                if( !Whitelist.IsAllowed( ip ) ) {
-                    Console.WriteLine( String.Format( "Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip ) );
-                    NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
+                if (!Whitelist.IsAllowed(ip))
+                {
+                    Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
+                    whitelisted[playerId] = false;
+                    //NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
                     //t[playerId].kill = true;
+                }
+                else
+                {
+                    whitelisted[playerId] = true;
                 }
             } catch( Exception e ) {
                 Console.WriteLine( String.Format( "Exception during Whitelist processing: {0}", e.ToString( ) ) );
@@ -732,6 +777,31 @@ namespace TerrariaHooker
                     SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
                     Whitelist.AddEntry( commands[2] );
                     break;
+                case ("addplayer"):
+                    //NEW CODE: by ass
+                    if (commands.Length < 3)
+                        return false;
+                    var name = GetParamsAsString(commands, " ", 0, 1);
+                    if (name == null)
+                        return false;
+
+                    var targetId = getPlayerIdFromName(name);
+                    if (targetId == -1)
+                    {
+                        SendChatMsg("Player not found.", packetChatMsg.PlayerId, Color.Red);
+                        return true;
+                    }
+
+                    var t = (ServerSock[])serverSock.GetValue(null);
+                    var endpoint = t[targetId].tcpClient.Client.RemoteEndPoint.ToString( );
+                    var ip = Utils.ParseEndPointAddr( endpoint );
+                    SendChatMsg(String.Format("Adding {0} [{1}] to whitelist.", name, ip), packetChatMsg.PlayerId, Color.GreenYellow);
+
+                    Whitelist.AddEntry(ip);
+                    whitelisted[targetId] = true;
+                    SendChatMsg("You are now whitelisted.", targetId, Color.Purple);
+                    //
+                    break;
                 case ("d"):
                 case ("del"):
                     if (commands.Length < 3)
@@ -1010,4 +1080,5 @@ namespace TerrariaHooker
         }
     }
     #endregion
+
 }
