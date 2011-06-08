@@ -10,3 +10,4 @@ RomTerraria/*..orig
 RomTerraria/*.orig
 TerrariaHooker/*.orig
 TerrariaHooker/*.csproj.user
+*.bak
