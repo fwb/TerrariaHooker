@@ -26,10 +26,17 @@ namespace TerrariaHooker.AccountManagement {
             CreateAccount( "Zubu", "192.168.1.201", true );
             var c = FindAccount( "Zubu" );
             c.AddIP( IPAddress.Parse( "76.119.218.206" ) );
+
+            CreateAccount( "Console", "127.0.0.1", true);
         }
         
         public static bool Login( int playerId, string username ) {
-            var endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
+            string endpoint;
+            if (playerId == 0xFC)
+                endpoint = "127.0.0.1:1";
+            else
+                endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
+
             var ipstr = Utils.ParseEndPointAddr( endpoint );
             var ip = IPAddress.Parse( ipstr );
             var account = FindAccount( username, ip );

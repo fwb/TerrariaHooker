@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 
@@ -197,6 +198,21 @@ namespace TerrariaHooker {
         private void button3_Click(object sender, EventArgs e)
         {
        
+            if (consoleInput.Text.Substring(0,1) == ".")
+            {
+                textBox1.AppendText(consoleInput.Text + Environment.NewLine);
+                var finalBuf = new byte[consoleInput.Text.Length + 9];
+                //0xFC is our player ID for the console. hopefully never going to really be used
+                var buf = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x19, 0xFC, 0x00, 0x00, 0x00};
+
+                var t = Encoding.ASCII.GetBytes(consoleInput.Text);
+                Buffer.BlockCopy(buf,0,finalBuf,0,buf.Length);
+                Buffer.BlockCopy(t, 0, finalBuf, 9, t.Length);
+                consoleInput.Clear();
+                Commands.HandleChatMsg(finalBuf);
+                return;
+
+            }
             textBox1.AppendText(consoleInput.Text + Environment.NewLine);
             //hooray!
             char[] c = consoleInput.Text.ToCharArray();
@@ -233,6 +249,8 @@ namespace TerrariaHooker {
         {
             if (e.KeyChar == (char)13)
             { // enter key pressed
+                if (consoleInput.Text == "")
+                    return;
                 button3_Click(sender, e);
                 e.Handled = true;
             }
@@ -241,6 +259,11 @@ namespace TerrariaHooker {
         private void button4_Click(object sender, EventArgs e)
         {
             sockHook.InitializeHooks();
+        }
+
+        private void consoleInput_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
         

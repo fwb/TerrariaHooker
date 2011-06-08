@@ -23,147 +23,148 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent( ) {
-            this.tabControl1 = new System.Windows.Forms.TabControl( );
-            this.tabPage5 = new System.Windows.Forms.TabPage( );
-            this.consoleInput = new System.Windows.Forms.TextBox( );
-            this.button3 = new System.Windows.Forms.Button( );
-            this.textBox1 = new System.Windows.Forms.TextBox( );
-            this.tabPage4 = new System.Windows.Forms.TabPage( );
-            this.playerList = new System.Windows.Forms.ListView( );
-            this.Player = ( (System.Windows.Forms.ColumnHeader)( new System.Windows.Forms.ColumnHeader( ) ) );
-            this.IP = ( (System.Windows.Forms.ColumnHeader)( new System.Windows.Forms.ColumnHeader( ) ) );
-            this.Actions = ( (System.Windows.Forms.ColumnHeader)( new System.Windows.Forms.ColumnHeader( ) ) );
-            this.RefreshPlayers = new System.Windows.Forms.Button( );
-            this.tabPage2 = new System.Windows.Forms.TabPage( );
-            this.useNearSpawn = new System.Windows.Forms.CheckBox( );
-            this.disableSpawns = new System.Windows.Forms.CheckBox( );
-            this.button2 = new System.Windows.Forms.Button( );
-            this.groupBox1 = new System.Windows.Forms.GroupBox( );
-            this.label4 = new System.Windows.Forms.Label( );
-            this.loadNPCs = new System.Windows.Forms.Button( );
-            this.npcPicker = new System.Windows.Forms.ListBox( );
-            this.spawnButton = new System.Windows.Forms.Button( );
-            this.label3 = new System.Windows.Forms.Label( );
-            this.playerSelectLabel = new System.Windows.Forms.Label( );
-            this.label1 = new System.Windows.Forms.Label( );
-            this.playerSelectSlider = new System.Windows.Forms.TrackBar( );
-            this.tabPage3 = new System.Windows.Forms.TabPage( );
-            this.groupBox3 = new System.Windows.Forms.GroupBox( );
-            this.SpawnMeteorButton = new System.Windows.Forms.Button( );
-            this.label5 = new System.Windows.Forms.Label( );
-            this.meteorGetPosition = new System.Windows.Forms.Button( );
-            this.customMeteorSpawn = new System.Windows.Forms.CheckBox( );
-            this.meteorPlayerList = new System.Windows.Forms.ComboBox( );
-            this.meteorSpawnX = new System.Windows.Forms.TextBox( );
-            this.label6 = new System.Windows.Forms.Label( );
-            this.meteorSpawnY = new System.Windows.Forms.TextBox( );
-            this.groupBox2 = new System.Windows.Forms.GroupBox( );
-            this.enableEyeSpawn = new System.Windows.Forms.CheckBox( );
-            this.enableBloodMoon = new System.Windows.Forms.CheckBox( );
-            this.enableInvasion = new System.Windows.Forms.CheckBox( );
-            this.button1 = new System.Windows.Forms.Button( );
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog( );
-            this.button4 = new System.Windows.Forms.Button( );
-            this.tabControl1.SuspendLayout( );
-            this.tabPage5.SuspendLayout( );
-            this.tabPage4.SuspendLayout( );
-            this.tabPage2.SuspendLayout( );
-            ( (System.ComponentModel.ISupportInitialize)( this.playerSelectSlider ) ).BeginInit( );
-            this.tabPage3.SuspendLayout( );
-            this.groupBox3.SuspendLayout( );
-            this.groupBox2.SuspendLayout( );
-            this.SuspendLayout( );
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.consoleInput = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.playerList = new System.Windows.Forms.ListView();
+            this.Player = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Actions = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.RefreshPlayers = new System.Windows.Forms.Button();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.useNearSpawn = new System.Windows.Forms.CheckBox();
+            this.disableSpawns = new System.Windows.Forms.CheckBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.loadNPCs = new System.Windows.Forms.Button();
+            this.npcPicker = new System.Windows.Forms.ListBox();
+            this.spawnButton = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.playerSelectLabel = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.playerSelectSlider = new System.Windows.Forms.TrackBar();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.SpawnMeteorButton = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.meteorGetPosition = new System.Windows.Forms.Button();
+            this.customMeteorSpawn = new System.Windows.Forms.CheckBox();
+            this.meteorPlayerList = new System.Windows.Forms.ComboBox();
+            this.meteorSpawnX = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.meteorSpawnY = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.enableEyeSpawn = new System.Windows.Forms.CheckBox();
+            this.enableBloodMoon = new System.Windows.Forms.CheckBox();
+            this.enableInvasion = new System.Windows.Forms.CheckBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.button4 = new System.Windows.Forms.Button();
+            this.tabControl1.SuspendLayout();
+            this.tabPage5.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.playerSelectSlider)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
-                        | System.Windows.Forms.AnchorStyles.Left )
-                        | System.Windows.Forms.AnchorStyles.Right ) ) );
-            this.tabControl1.Controls.Add( this.tabPage5 );
-            this.tabControl1.Controls.Add( this.tabPage4 );
-            this.tabControl1.Controls.Add( this.tabPage2 );
-            this.tabControl1.Controls.Add( this.tabPage3 );
-            this.tabControl1.Location = new System.Drawing.Point( 12, 12 );
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size( 489, 362 );
+            this.tabControl1.Size = new System.Drawing.Size(489, 362);
             this.tabControl1.TabIndex = 6;
             // 
             // tabPage5
             // 
-            this.tabPage5.Controls.Add( this.consoleInput );
-            this.tabPage5.Controls.Add( this.button3 );
-            this.tabPage5.Controls.Add( this.textBox1 );
-            this.tabPage5.Location = new System.Drawing.Point( 4, 22 );
+            this.tabPage5.Controls.Add(this.consoleInput);
+            this.tabPage5.Controls.Add(this.button3);
+            this.tabPage5.Controls.Add(this.textBox1);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size( 481, 336 );
+            this.tabPage5.Size = new System.Drawing.Size(481, 336);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Testbed";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // consoleInput
             // 
-            this.consoleInput.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left )
-                        | System.Windows.Forms.AnchorStyles.Right ) ) );
+            this.consoleInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.consoleInput.BackColor = System.Drawing.Color.Black;
             this.consoleInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.consoleInput.Font = new System.Drawing.Font( "Consolas", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( (byte)( 0 ) ) );
-            this.consoleInput.ForeColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 224 ) ) ) ), ( (int)( ( (byte)( 224 ) ) ) ), ( (int)( ( (byte)( 224 ) ) ) ) );
-            this.consoleInput.Location = new System.Drawing.Point( 3, 312 );
+            this.consoleInput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.consoleInput.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.consoleInput.Location = new System.Drawing.Point(3, 312);
             this.consoleInput.Name = "consoleInput";
-            this.consoleInput.Size = new System.Drawing.Size( 474, 23 );
+            this.consoleInput.Size = new System.Drawing.Size(474, 23);
             this.consoleInput.TabIndex = 2;
-            this.consoleInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler( this.consoleInputKeyPress );
+            this.consoleInput.TextChanged += new System.EventHandler(this.consoleInput_TextChanged);
+            this.consoleInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.consoleInputKeyPress);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point( 25, 22 );
+            this.button3.Location = new System.Drawing.Point(25, 22);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size( 71, 21 );
+            this.button3.Size = new System.Drawing.Size(71, 21);
             this.button3.TabIndex = 1;
             this.button3.Text = "Send";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Visible = false;
-            this.button3.Click += new System.EventHandler( this.button3_Click );
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // textBox1
             // 
-            this.textBox1.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
-                        | System.Windows.Forms.AnchorStyles.Left )
-                        | System.Windows.Forms.AnchorStyles.Right ) ) );
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.BackColor = System.Drawing.Color.Black;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Font = new System.Drawing.Font( "Consolas", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( (byte)( 0 ) ) );
-            this.textBox1.ForeColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 224 ) ) ) ), ( (int)( ( (byte)( 224 ) ) ) ), ( (int)( ( (byte)( 224 ) ) ) ) );
-            this.textBox1.Location = new System.Drawing.Point( 3, 3 );
+            this.textBox1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.textBox1.Location = new System.Drawing.Point(3, 3);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size( 474, 309 );
+            this.textBox1.Size = new System.Drawing.Size(474, 309);
             this.textBox1.TabIndex = 0;
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add( this.playerList );
-            this.tabPage4.Controls.Add( this.RefreshPlayers );
-            this.tabPage4.Location = new System.Drawing.Point( 4, 22 );
+            this.tabPage4.Controls.Add(this.playerList);
+            this.tabPage4.Controls.Add(this.RefreshPlayers);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size( 481, 336 );
+            this.tabPage4.Size = new System.Drawing.Size(481, 336);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Clients";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // playerList
             // 
-            this.playerList.Columns.AddRange( new System.Windows.Forms.ColumnHeader[] {
+            this.playerList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Player,
             this.IP,
-            this.Actions} );
+            this.Actions});
             this.playerList.FullRowSelect = true;
-            this.playerList.Location = new System.Drawing.Point( 3, 3 );
+            this.playerList.Location = new System.Drawing.Point(3, 3);
             this.playerList.Name = "playerList";
-            this.playerList.Size = new System.Drawing.Size( 475, 301 );
+            this.playerList.Size = new System.Drawing.Size(475, 301);
             this.playerList.TabIndex = 1;
             this.playerList.UseCompatibleStateImageBehavior = false;
             this.playerList.View = System.Windows.Forms.View.Details;
@@ -185,32 +186,32 @@
             // 
             // RefreshPlayers
             // 
-            this.RefreshPlayers.Location = new System.Drawing.Point( 211, 310 );
+            this.RefreshPlayers.Location = new System.Drawing.Point(211, 310);
             this.RefreshPlayers.Name = "RefreshPlayers";
-            this.RefreshPlayers.Size = new System.Drawing.Size( 75, 23 );
+            this.RefreshPlayers.Size = new System.Drawing.Size(75, 23);
             this.RefreshPlayers.TabIndex = 0;
             this.RefreshPlayers.Text = "Refresh";
             this.RefreshPlayers.UseVisualStyleBackColor = true;
-            this.RefreshPlayers.Click += new System.EventHandler( this.RefreshPlayersClick );
+            this.RefreshPlayers.Click += new System.EventHandler(this.RefreshPlayersClick);
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add( this.useNearSpawn );
-            this.tabPage2.Controls.Add( this.disableSpawns );
-            this.tabPage2.Controls.Add( this.button2 );
-            this.tabPage2.Controls.Add( this.groupBox1 );
-            this.tabPage2.Controls.Add( this.label4 );
-            this.tabPage2.Controls.Add( this.loadNPCs );
-            this.tabPage2.Controls.Add( this.npcPicker );
-            this.tabPage2.Controls.Add( this.spawnButton );
-            this.tabPage2.Controls.Add( this.label3 );
-            this.tabPage2.Controls.Add( this.playerSelectLabel );
-            this.tabPage2.Controls.Add( this.label1 );
-            this.tabPage2.Controls.Add( this.playerSelectSlider );
-            this.tabPage2.Location = new System.Drawing.Point( 4, 22 );
+            this.tabPage2.Controls.Add(this.useNearSpawn);
+            this.tabPage2.Controls.Add(this.disableSpawns);
+            this.tabPage2.Controls.Add(this.button2);
+            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Controls.Add(this.label4);
+            this.tabPage2.Controls.Add(this.loadNPCs);
+            this.tabPage2.Controls.Add(this.npcPicker);
+            this.tabPage2.Controls.Add(this.spawnButton);
+            this.tabPage2.Controls.Add(this.label3);
+            this.tabPage2.Controls.Add(this.playerSelectLabel);
+            this.tabPage2.Controls.Add(this.label1);
+            this.tabPage2.Controls.Add(this.playerSelectSlider);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding( 3 );
-            this.tabPage2.Size = new System.Drawing.Size( 481, 336 );
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(481, 336);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "NPCs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -218,9 +219,9 @@
             // useNearSpawn
             // 
             this.useNearSpawn.AutoSize = true;
-            this.useNearSpawn.Location = new System.Drawing.Point( 291, 43 );
+            this.useNearSpawn.Location = new System.Drawing.Point(291, 43);
             this.useNearSpawn.Name = "useNearSpawn";
-            this.useNearSpawn.Size = new System.Drawing.Size( 154, 17 );
+            this.useNearSpawn.Size = new System.Drawing.Size(154, 17);
             this.useNearSpawn.TabIndex = 13;
             this.useNearSpawn.Text = "Use Built-in Spawn Locator";
             this.useNearSpawn.UseVisualStyleBackColor = true;
@@ -228,27 +229,27 @@
             // disableSpawns
             // 
             this.disableSpawns.AutoSize = true;
-            this.disableSpawns.Location = new System.Drawing.Point( 291, 19 );
+            this.disableSpawns.Location = new System.Drawing.Point(291, 19);
             this.disableSpawns.Name = "disableSpawns";
-            this.disableSpawns.Size = new System.Drawing.Size( 102, 17 );
+            this.disableSpawns.Size = new System.Drawing.Size(102, 17);
             this.disableSpawns.TabIndex = 12;
             this.disableSpawns.Text = "Disable Spawns";
             this.disableSpawns.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point( 399, 306 );
+            this.button2.Location = new System.Drawing.Point(399, 306);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size( 75, 23 );
+            this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 11;
             this.button2.Text = "Save";
             this.button2.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point( 287, 88 );
+            this.groupBox1.Location = new System.Drawing.Point(287, 88);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size( 188, 212 );
+            this.groupBox1.Size = new System.Drawing.Size(188, 212);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "groupBox1";
@@ -256,55 +257,55 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point( 302, 70 );
+            this.label4.Location = new System.Drawing.Point(302, 70);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size( 58, 13 );
+            this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 9;
             this.label4.Text = "Customize:";
             // 
             // loadNPCs
             // 
-            this.loadNPCs.Location = new System.Drawing.Point( 6, 307 );
+            this.loadNPCs.Location = new System.Drawing.Point(6, 307);
             this.loadNPCs.Name = "loadNPCs";
-            this.loadNPCs.Size = new System.Drawing.Size( 75, 23 );
+            this.loadNPCs.Size = new System.Drawing.Size(75, 23);
             this.loadNPCs.TabIndex = 8;
             this.loadNPCs.Text = "Load NPCs";
             this.loadNPCs.UseVisualStyleBackColor = true;
-            this.loadNPCs.Click += new System.EventHandler( this.LoadNPCsClick );
+            this.loadNPCs.Click += new System.EventHandler(this.LoadNPCsClick);
             // 
             // npcPicker
             // 
             this.npcPicker.FormattingEnabled = true;
-            this.npcPicker.Location = new System.Drawing.Point( 6, 88 );
+            this.npcPicker.Location = new System.Drawing.Point(6, 88);
             this.npcPicker.Name = "npcPicker";
-            this.npcPicker.Size = new System.Drawing.Size( 275, 212 );
+            this.npcPicker.Size = new System.Drawing.Size(275, 212);
             this.npcPicker.TabIndex = 6;
             // 
             // spawnButton
             // 
-            this.spawnButton.Location = new System.Drawing.Point( 206, 307 );
+            this.spawnButton.Location = new System.Drawing.Point(206, 307);
             this.spawnButton.Name = "spawnButton";
-            this.spawnButton.Size = new System.Drawing.Size( 75, 23 );
+            this.spawnButton.Size = new System.Drawing.Size(75, 23);
             this.spawnButton.TabIndex = 5;
             this.spawnButton.Text = "Spawn!";
             this.spawnButton.UseVisualStyleBackColor = true;
-            this.spawnButton.Click += new System.EventHandler( this.SpawnButtonClick );
+            this.spawnButton.Click += new System.EventHandler(this.SpawnButtonClick);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point( 6, 71 );
+            this.label3.Location = new System.Drawing.Point(6, 71);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size( 79, 13 );
+            this.label3.Size = new System.Drawing.Size(79, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Choose a Mob:";
             // 
             // playerSelectLabel
             // 
             this.playerSelectLabel.AutoSize = true;
-            this.playerSelectLabel.Location = new System.Drawing.Point( 130, 51 );
+            this.playerSelectLabel.Location = new System.Drawing.Point(130, 51);
             this.playerSelectLabel.Name = "playerSelectLabel";
-            this.playerSelectLabel.Size = new System.Drawing.Size( 51, 13 );
+            this.playerSelectLabel.Size = new System.Drawing.Size(51, 13);
             this.playerSelectLabel.TabIndex = 2;
             this.playerSelectLabel.Text = "(Inactive)";
             this.playerSelectLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -312,75 +313,75 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point( 6, 3 );
+            this.label1.Location = new System.Drawing.Point(6, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size( 86, 13 );
+            this.label1.Size = new System.Drawing.Size(86, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Choose a Victim:";
             // 
             // playerSelectSlider
             // 
             this.playerSelectSlider.LargeChange = 1;
-            this.playerSelectSlider.Location = new System.Drawing.Point( 6, 19 );
+            this.playerSelectSlider.Location = new System.Drawing.Point(6, 19);
             this.playerSelectSlider.Maximum = 7;
             this.playerSelectSlider.Name = "playerSelectSlider";
-            this.playerSelectSlider.Size = new System.Drawing.Size( 278, 45 );
+            this.playerSelectSlider.Size = new System.Drawing.Size(278, 42);
             this.playerSelectSlider.TabIndex = 0;
             this.playerSelectSlider.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-            this.playerSelectSlider.Scroll += new System.EventHandler( this.PlayerSelectSliderScroll );
+            this.playerSelectSlider.Scroll += new System.EventHandler(this.PlayerSelectSliderScroll);
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add( this.groupBox3 );
-            this.tabPage3.Controls.Add( this.groupBox2 );
-            this.tabPage3.Location = new System.Drawing.Point( 4, 22 );
+            this.tabPage3.Controls.Add(this.groupBox3);
+            this.tabPage3.Controls.Add(this.groupBox2);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size( 481, 336 );
+            this.tabPage3.Size = new System.Drawing.Size(481, 336);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Events";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add( this.SpawnMeteorButton );
-            this.groupBox3.Controls.Add( this.label5 );
-            this.groupBox3.Controls.Add( this.meteorGetPosition );
-            this.groupBox3.Controls.Add( this.customMeteorSpawn );
-            this.groupBox3.Controls.Add( this.meteorPlayerList );
-            this.groupBox3.Controls.Add( this.meteorSpawnX );
-            this.groupBox3.Controls.Add( this.label6 );
-            this.groupBox3.Controls.Add( this.meteorSpawnY );
-            this.groupBox3.Location = new System.Drawing.Point( 230, 3 );
+            this.groupBox3.Controls.Add(this.SpawnMeteorButton);
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.meteorGetPosition);
+            this.groupBox3.Controls.Add(this.customMeteorSpawn);
+            this.groupBox3.Controls.Add(this.meteorPlayerList);
+            this.groupBox3.Controls.Add(this.meteorSpawnX);
+            this.groupBox3.Controls.Add(this.label6);
+            this.groupBox3.Controls.Add(this.meteorSpawnY);
+            this.groupBox3.Location = new System.Drawing.Point(230, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size( 248, 132 );
+            this.groupBox3.Size = new System.Drawing.Size(248, 132);
             this.groupBox3.TabIndex = 17;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Meteors";
             // 
             // SpawnMeteorButton
             // 
-            this.SpawnMeteorButton.Location = new System.Drawing.Point( 76, 97 );
+            this.SpawnMeteorButton.Location = new System.Drawing.Point(76, 97);
             this.SpawnMeteorButton.Name = "SpawnMeteorButton";
-            this.SpawnMeteorButton.Size = new System.Drawing.Size( 96, 23 );
+            this.SpawnMeteorButton.Size = new System.Drawing.Size(96, 23);
             this.SpawnMeteorButton.TabIndex = 9;
             this.SpawnMeteorButton.Text = "Spawn Meteor";
             this.SpawnMeteorButton.UseVisualStyleBackColor = true;
-            this.SpawnMeteorButton.Click += new System.EventHandler( this.SpawnMeteorButtonClick );
+            this.SpawnMeteorButton.Click += new System.EventHandler(this.SpawnMeteorButtonClick);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point( 33, 47 );
+            this.label5.Location = new System.Drawing.Point(33, 47);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size( 14, 13 );
+            this.label5.Size = new System.Drawing.Size(14, 13);
             this.label5.TabIndex = 12;
             this.label5.Text = "X";
             // 
             // meteorGetPosition
             // 
-            this.meteorGetPosition.Location = new System.Drawing.Point( 143, 68 );
+            this.meteorGetPosition.Location = new System.Drawing.Point(143, 68);
             this.meteorGetPosition.Name = "meteorGetPosition";
-            this.meteorGetPosition.Size = new System.Drawing.Size( 75, 23 );
+            this.meteorGetPosition.Size = new System.Drawing.Size(75, 23);
             this.meteorGetPosition.TabIndex = 16;
             this.meteorGetPosition.Text = "Get Position";
             this.meteorGetPosition.UseVisualStyleBackColor = true;
@@ -388,9 +389,9 @@
             // customMeteorSpawn
             // 
             this.customMeteorSpawn.AutoSize = true;
-            this.customMeteorSpawn.Location = new System.Drawing.Point( 36, 19 );
+            this.customMeteorSpawn.Location = new System.Drawing.Point(36, 19);
             this.customMeteorSpawn.Name = "customMeteorSpawn";
-            this.customMeteorSpawn.Size = new System.Drawing.Size( 182, 17 );
+            this.customMeteorSpawn.Size = new System.Drawing.Size(182, 17);
             this.customMeteorSpawn.TabIndex = 10;
             this.customMeteorSpawn.Text = "Use Custom Meteor Spawn Point";
             this.customMeteorSpawn.UseVisualStyleBackColor = true;
@@ -398,111 +399,111 @@
             // meteorPlayerList
             // 
             this.meteorPlayerList.FormattingEnabled = true;
-            this.meteorPlayerList.Location = new System.Drawing.Point( 36, 70 );
+            this.meteorPlayerList.Location = new System.Drawing.Point(36, 70);
             this.meteorPlayerList.Name = "meteorPlayerList";
-            this.meteorPlayerList.Size = new System.Drawing.Size( 96, 21 );
+            this.meteorPlayerList.Size = new System.Drawing.Size(96, 21);
             this.meteorPlayerList.TabIndex = 15;
             // 
             // meteorSpawnX
             // 
-            this.meteorSpawnX.Location = new System.Drawing.Point( 53, 44 );
+            this.meteorSpawnX.Location = new System.Drawing.Point(53, 44);
             this.meteorSpawnX.Name = "meteorSpawnX";
-            this.meteorSpawnX.Size = new System.Drawing.Size( 60, 20 );
+            this.meteorSpawnX.Size = new System.Drawing.Size(60, 20);
             this.meteorSpawnX.TabIndex = 11;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point( 138, 44 );
+            this.label6.Location = new System.Drawing.Point(138, 44);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size( 14, 13 );
+            this.label6.Size = new System.Drawing.Size(14, 13);
             this.label6.TabIndex = 14;
             this.label6.Text = "Y";
             // 
             // meteorSpawnY
             // 
-            this.meteorSpawnY.Location = new System.Drawing.Point( 158, 41 );
+            this.meteorSpawnY.Location = new System.Drawing.Point(158, 41);
             this.meteorSpawnY.Name = "meteorSpawnY";
-            this.meteorSpawnY.Size = new System.Drawing.Size( 60, 20 );
+            this.meteorSpawnY.Size = new System.Drawing.Size(60, 20);
             this.meteorSpawnY.TabIndex = 13;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add( this.enableEyeSpawn );
-            this.groupBox2.Controls.Add( this.enableBloodMoon );
-            this.groupBox2.Controls.Add( this.enableInvasion );
-            this.groupBox2.Location = new System.Drawing.Point( 3, 3 );
+            this.groupBox2.Controls.Add(this.enableEyeSpawn);
+            this.groupBox2.Controls.Add(this.enableBloodMoon);
+            this.groupBox2.Controls.Add(this.enableInvasion);
+            this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size( 159, 92 );
+            this.groupBox2.Size = new System.Drawing.Size(159, 92);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Survival";
             // 
             // enableEyeSpawn
             // 
-            this.enableEyeSpawn.Location = new System.Drawing.Point( 0, 0 );
+            this.enableEyeSpawn.Location = new System.Drawing.Point(0, 0);
             this.enableEyeSpawn.Name = "enableEyeSpawn";
-            this.enableEyeSpawn.Size = new System.Drawing.Size( 104, 24 );
+            this.enableEyeSpawn.Size = new System.Drawing.Size(104, 24);
             this.enableEyeSpawn.TabIndex = 0;
             // 
             // enableBloodMoon
             // 
-            this.enableBloodMoon.Location = new System.Drawing.Point( 0, 0 );
+            this.enableBloodMoon.Location = new System.Drawing.Point(0, 0);
             this.enableBloodMoon.Name = "enableBloodMoon";
-            this.enableBloodMoon.Size = new System.Drawing.Size( 104, 24 );
+            this.enableBloodMoon.Size = new System.Drawing.Size(104, 24);
             this.enableBloodMoon.TabIndex = 1;
             // 
             // enableInvasion
             // 
-            this.enableInvasion.Location = new System.Drawing.Point( 0, 0 );
+            this.enableInvasion.Location = new System.Drawing.Point(0, 0);
             this.enableInvasion.Name = "enableInvasion";
-            this.enableInvasion.Size = new System.Drawing.Size( 104, 24 );
+            this.enableInvasion.Size = new System.Drawing.Size(104, 24);
             this.enableInvasion.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
-            this.button1.Location = new System.Drawing.Point( 426, 380 );
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(426, 380);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size( 75, 23 );
+            this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 7;
             this.button1.Text = "Hide";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler( this.CloseButtonClick );
+            this.button1.Click += new System.EventHandler(this.CloseButtonClick);
             // 
             // button4
             // 
-            this.button4.Anchor = ( (System.Windows.Forms.AnchorStyles)( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
-            this.button4.Location = new System.Drawing.Point( 318, 380 );
+            this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button4.Location = new System.Drawing.Point(318, 380);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size( 102, 23 );
+            this.button4.Size = new System.Drawing.Size(102, 23);
             this.button4.TabIndex = 8;
             this.button4.Text = "Load Commands";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler( this.button4_Click );
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // ServerConsole
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size( 514, 414 );
-            this.Controls.Add( this.button4 );
-            this.Controls.Add( this.button1 );
-            this.Controls.Add( this.tabControl1 );
+            this.ClientSize = new System.Drawing.Size(514, 414);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.tabControl1);
             this.Name = "ServerConsole";
             this.Text = "TerrariaHooker";
-            this.tabControl1.ResumeLayout( false );
-            this.tabPage5.ResumeLayout( false );
-            this.tabPage5.PerformLayout( );
-            this.tabPage4.ResumeLayout( false );
-            this.tabPage2.ResumeLayout( false );
-            this.tabPage2.PerformLayout( );
-            ( (System.ComponentModel.ISupportInitialize)( this.playerSelectSlider ) ).EndInit( );
-            this.tabPage3.ResumeLayout( false );
-            this.groupBox3.ResumeLayout( false );
-            this.groupBox3.PerformLayout( );
-            this.groupBox2.ResumeLayout( false );
-            this.ResumeLayout( false );
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
+            this.tabPage5.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.playerSelectSlider)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.ResumeLayout(false);
 
         }
 

@@ -301,7 +301,7 @@ namespace TerrariaHooker
 
         }
 
-        private static Packet HandleChatMsg(byte[] data)
+        public static Packet HandleChatMsg(byte[] data)
         {
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
@@ -816,7 +816,11 @@ namespace TerrariaHooker
         /// <param name="color">The color, as a Color type.</param>
         private static void SendChatMsg(string msg, int playerId, Color color)
         {
-            NetMessage.SendData(25, playerId, -1, msg, 255, color.R, color.G, color.B);
+            if (playerId == 0xFC)
+                Console.WriteLine(msg);
+            else 
+                NetMessage.SendData(25, playerId, -1, msg, 255, color.R, color.G, color.B);
+
             return;
         }
 
