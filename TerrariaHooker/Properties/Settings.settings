@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RomTerraria.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TerrariaHooker.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="RefreshTimer" Type="System.Int32" Scope="User">
@@ -13,6 +13,12 @@
     </Setting>
     <Setting Name="LoadWorldMaxNetPlayers" Type="System.String" Scope="User">
       <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="EnableWhitelist" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnableAnonLogin" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

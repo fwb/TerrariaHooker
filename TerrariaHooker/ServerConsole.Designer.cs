@@ -474,11 +474,11 @@
             // button4
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button4.Location = new System.Drawing.Point(318, 380);
+            this.button4.Location = new System.Drawing.Point(311, 380);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(102, 23);
+            this.button4.Size = new System.Drawing.Size(109, 23);
             this.button4.TabIndex = 8;
-            this.button4.Text = "Load Commands";
+            this.button4.Text = "ReLoad Commands";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 

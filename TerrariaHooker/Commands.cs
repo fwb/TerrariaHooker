@@ -11,12 +11,14 @@ namespace TerrariaHooker
 
     class Commands
     {
+        private static Properties.Settings settings = new Properties.Settings();
+        
         public static byte[] riskItems = new byte[] { 0xCF,   //lava bucket
                                                         0xA7 }; //dynamite
 
         private static bool itemRiskEnabled = true;
-        private static bool whitelistEnabled;
-        private static bool allowUnwhiteLogin;
+        public static bool whitelistEnabled;
+        public static bool allowUnwhiteLogin;
 
         //.star <player> related variables
         private static int[] justHostiled = new int[10];
@@ -40,7 +42,6 @@ namespace TerrariaHooker
 
         static Commands()
         {
-
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
             {
@@ -55,6 +56,9 @@ namespace TerrariaHooker
                     serverSock = f;
                 }
             }
+
+            whitelistEnabled = settings.EnableWhitelist;
+            allowUnwhiteLogin = settings.EnableAnonLogin;
         }
 
         /// <summary>
@@ -820,6 +824,8 @@ namespace TerrariaHooker
                 case ("on"):
                     whitelistEnabled = true;
                     SendChatMsg( "Server whitelist is on.", packetChatMsg.PlayerId, Color.GreenYellow );
+                    settings.EnableWhitelist = whitelistEnabled;
+                    settings.Save();
                     break;
                 case ("off"):
                     whitelistEnabled = false;
@@ -829,6 +835,8 @@ namespace TerrariaHooker
                     allowUnwhiteLogin = !allowUnwhiteLogin;
                     string state = allowUnwhiteLogin ? "enabled." : "disabled.";
                     SendChatMsg( "Allow un-whitelisted users login: " + state, packetChatMsg.PlayerId, Color.Green );
+                    settings.EnableAnonLogin = allowUnwhiteLogin;
+                    settings.Save();
                     break;
                 default:
                     return false;

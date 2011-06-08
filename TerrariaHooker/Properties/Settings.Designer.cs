@@ -70,5 +70,29 @@ namespace TerrariaHooker.Properties {
                 this["LoadWorldMaxNetPlayers"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableWhitelist {
+            get {
+                return ((bool)(this["EnableWhitelist"]));
+            }
+            set {
+                this["EnableWhitelist"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableAnonLogin {
+            get {
+                return ((bool)(this["EnableAnonLogin"]));
+            }
+            set {
+                this["EnableAnonLogin"] = value;
+            }
+        }
     }
 }

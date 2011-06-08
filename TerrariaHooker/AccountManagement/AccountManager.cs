@@ -27,7 +27,7 @@ namespace TerrariaHooker.AccountManagement {
             var c = FindAccount( "Zubu" );
             c.AddIP( IPAddress.Parse( "76.119.218.206" ) );
 
-            CreateAccount( "Console", "127.0.0.1", true);
+            CreateAccount( "console", "127.0.0.1", true);
         }
         
         public static bool Login( int playerId, string username ) {
