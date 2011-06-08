@@ -648,9 +648,9 @@ namespace TerrariaHooker
             var id = getPlayerIdFromName(name);
             if (id != -1)
             {
-                kickUser(id);
                 banUser(id);
-                SendChatMsg("Player " + name + " kicked and banned.", packetChatMsg.PlayerId, Color.Red);
+                kickUser(id);
+                SendChatMsg("Player " + name + " kicked and banned.", packetChatMsg.PlayerId, Color.Green);
                 return true;
             }
             SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
@@ -705,18 +705,14 @@ namespace TerrariaHooker
             if (name == null)
                 return false;
 
-
-            var t = (ServerSock[]) serverSock.GetValue(null);
-            
-            for (var i = 0; i < Main.maxNetPlayers;i++ )
+            var targetid = getPlayerIdFromName(name);
+            if (targetid != -1)
             {
-                if (t[i].name == name)
-                {
-                    kickUser(i);
-                    SendChatMsg("Player " + name + " kicked.", packetChatMsg.PlayerId, Color.Red);
-                    return true;
-                }
+                kickUser(targetid);
+                SendChatMsg("Player " + name + " kicked.", packetChatMsg.PlayerId, Color.Green);
+                return true;
             }
+            SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
             return true;
 
         }
@@ -794,8 +790,7 @@ namespace TerrariaHooker
 
         private static void kickUser(int id)
         {
-            var t = (ServerSock[])serverSock.GetValue(null);
-            t[id].kill = true;
+            NetMessage.SendData(2, id, -1, "Kicked from server.", 0, 0f, 0f, 0f);
             return;
         }
 
