@@ -25,7 +25,7 @@ namespace TerrariaHooker
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
 
-        private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS;
+        private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
         
         private static Assembly terrariaAssembly;
         private static Type netplay;
@@ -354,10 +354,14 @@ namespace TerrariaHooker
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
             //act on packet fields, generate new data etc.
-            var match = false;
+
             if (p.Text[0] == 0x2E) // match dot
             {
-                match = true;
+                if (anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !whitelisted[p.PlayerId])
+                {
+                    SendChatMsg("Commands disabled until Whitelisted", p.PlayerId, Color.Salmon);
+                    return CreateDummyPacket(data);
+                }
 
                 //split is probably no slower than substring, if the size of the strings
                 //we are pulling from user-text is variable.

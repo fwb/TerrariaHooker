@@ -20,7 +20,8 @@ namespace TerrariaHooker.AccountManagement {
         NOUSEITEMS = 2,
         NOUSECHEST = 4,
         NOCHAT = 8,
-        ALL = NOBREAKBLOCK | NOUSEITEMS | NOUSECHEST | NOCHAT,
+        NOCOMMANDS = 16,
+        ALL = NOBREAKBLOCK | NOUSEITEMS | NOUSECHEST | NOCHAT | NOCOMMANDS,
     }
 
     public static class EnumerationExtensions
