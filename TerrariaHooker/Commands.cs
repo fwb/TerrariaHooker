@@ -204,7 +204,7 @@ namespace TerrariaHooker
             //on them using .star.);
             var p = new packet_PlayerDied(data);
 
-            if (Main.player[p.PlayerId].hostile)
+            if (Main.player[data[5]].hostile)
             {
                 for (var i = 0; i < _numberHostiled; i++)
                 {
@@ -212,7 +212,7 @@ namespace TerrariaHooker
                     {
                         justHostiled[i] = 0x00;
                         _numberHostiled--;
-                        Main.player[p.PlayerId].hostile = false;
+                        Main.player[data[5]].hostile = false;
                     }
                 }
             }
@@ -306,9 +306,11 @@ namespace TerrariaHooker
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
             //act on packet fields, generate new data etc.
-    
-            if (p.Text[0] == 0x2E) // match backslash
+            var match = false;
+            if (p.Text[0] == 0x2E) // match dot
             {
+                match = true;
+
                 //split is probably no slower than substring, if the size of the strings
                 //we are pulling from user-text is variable.
                 var commands = p.Text.Split(' ');
@@ -316,6 +318,9 @@ namespace TerrariaHooker
 
                 switch (commands[0])
                 {
+                    case( ".help" ):
+                        cmdHelp( commands, p );
+                        break;
                     case (".login"):
                         if (!cmdLogin(commands, p)) cmdUsage("USAGE: .login <username>",p.PlayerId);
                         break;
@@ -365,6 +370,16 @@ namespace TerrariaHooker
             return new Packet(p.Packet, p.Packet.Length);
         }
 
+        private static void cmdHelp( string[] commands, packet_ChatMsg packetChatMsg ) {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return;
+            }
+            SendChatMsg( String.Format( "Available Commands: .wl, .broadcast, .ban, .kick, .kickban, .itemban," ),
+                         packetChatMsg.PlayerId, Color.GreenYellow );
+            SendChatMsg( String.Format( ".meteor, .star, .spawn, .landmark, .teleport, .teleportto " ), packetChatMsg.PlayerId, Color.GreenYellow );
+        }
+
         private static void cmdUsage(string usage, int pid)
         {
             SendChatMsg(usage, pid, Color.GreenYellow);
@@ -372,6 +387,10 @@ namespace TerrariaHooker
 
         private static bool cmdSpawnNPC(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return true;
+            }
             if (commands.Length < 3)
                 return false;
                 
@@ -416,6 +435,10 @@ namespace TerrariaHooker
 
         private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
+                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
+                return true;
+            }
             var tag = GetParamsAsString(commands);
             //generate list of landmarks
             if (tag == null)

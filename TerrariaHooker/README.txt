@@ -1,11 +1,9 @@
-﻿fbTerraria - Originally based on code from RomTerraria (http://romsteady.blogspot.com/2011/05/terraria-trainerresolution-launcher.html). Most of this code is no longer being used.
+﻿TerrariaHooker - Terraria Dedicated Server Mods
 
 Code by:
 fb@malrix.net
 amckhome@tpg.com.au
-romsteady@msn.com
-
-2011 June 06
+romsteady@msn.com - http://romsteady.blogspot.com/2011/05/terraria-trainerresolution-launcher.html
 
 Bugs/Work In Progress:
 - Whitelist is off by default. Remember to login and use ".wl on" to enable. A setting will be added to ServerConsole in the future.
@@ -14,6 +12,15 @@ Bugs/Work In Progress:
 - Console, Clients, Events tabs in ServerConsole do not work or may CRASH THE SERVER
 - "Victim" slider on NPC tab only lists first 8 players
 - "Use Built-in Spawn Locator" on NPC tab may CRASH THE SERVER
+
+2011 June 07
+
+New Features:
+- Client commands
+	.spawn <npcid> <player> [count]
+	.landmark [landmarkname] - teleport to sign containing "landmarkname" text
+
+2011 June 06
 
 Current Features:
 - Account System

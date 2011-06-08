@@ -69,7 +69,7 @@ namespace TerrariaHooker {
 
 
         private TextWriter _writer = null;
-        private delegate void AddChatLineCallback( string text );
+        //private delegate void AddChatLineCallback( string text );
         private delegate void SpawnMeteorCallback();
         public static Stream _out;
 
@@ -128,16 +128,6 @@ namespace TerrariaHooker {
             npcPicker.SelectedIndex = 0;
         }
 
-        // delegates, wtf? -- amckhome@tpg.com.au
-        public void AddChatLine( string msg ) {
-            if( ConsoleText.InvokeRequired ) {
-                var d = new AddChatLineCallback(AddChatLine);
-                BeginInvoke( d, new object[] { msg } );
-            } else {
-                ConsoleText.AppendText( Environment.NewLine + msg );
-            }
-        }
-
         private void SpawnNearPlayer( int playerNum, int npcType, bool useNearSpawn ) {
             if( useNearSpawn ) {
                 Terraria.NPC.SpawnOnPlayer( playerSelectSlider.Value, npcType );
@@ -148,31 +138,16 @@ namespace TerrariaHooker {
             }
         }
 
-        private void SendBroadcast( string msg ) {
-            for( var i = 0; i < 8; i++ ) {
-                if( Terraria.Main.player[i].active ) {
-                    // last 3 args are RGB color values
-                    Terraria.NetMessage.SendData( (int)MessageTypes.BROADCAST,
-                                                  i, -1, msg, 8, 204f, 153f, 0f );
-                }
-            }
-        }
+        //private void SendBroadcast( string msg ) {
+        //    for( var i = 0; i < 8; i++ ) {
+        //        if( Terraria.Main.player[i].active ) {
+        //            // last 3 args are RGB color values
+        //            Terraria.NetMessage.SendData( (int)MessageTypes.BROADCAST,
+        //                                          i, -1, msg, 8, 204f, 153f, 0f );
+        //        }
+        //    }
+        //}
 
-        private void SendMessageClick( object sender, EventArgs e ) {
-            if( msgText.Text != null ) {
-                ConsoleText.AppendText( Environment.NewLine + msgText.Text );
-                SendBroadcast( msgText.Text );
-                msgText.Clear( );
-            }
-        }
-
-        private void MsgTextKeyPress( object sender, KeyPressEventArgs e ) {
-            if( e.KeyChar == (char)13 ) { // enter key pressed
-                SendMessageClick( sender, e );
-            }
-        }
-
-        
         private void PlayerSelectSliderScroll( object sender, EventArgs e ) {
             var playerNum = playerSelectSlider.Value;
             string playerName;
