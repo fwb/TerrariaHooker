@@ -24,7 +24,7 @@ namespace TerrariaHooker
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
 
-        private static bool[] whitelisted = new bool[255];
+        public static bool[] whitelisted = new bool[255];
         //i might invert this, so the privileges are a list of unavailable privs when unwhitelisted. yes.
         private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS;
         

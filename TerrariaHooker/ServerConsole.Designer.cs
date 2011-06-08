@@ -30,9 +30,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.playerList = new System.Windows.Forms.ListView();
-            this.Player = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Actions = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col_ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col_IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RefreshPlayers = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.useNearSpawn = new System.Windows.Forms.CheckBox();
@@ -64,6 +64,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button4 = new System.Windows.Forms.Button();
+            this.col_Whitelist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
@@ -158,9 +159,10 @@
             // playerList
             // 
             this.playerList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.Player,
-            this.IP,
-            this.Actions});
+            this.col_ID,
+            this.col_Name,
+            this.col_IP,
+            this.col_Whitelist});
             this.playerList.FullRowSelect = true;
             this.playerList.Location = new System.Drawing.Point(3, 3);
             this.playerList.Name = "playerList";
@@ -168,21 +170,22 @@
             this.playerList.TabIndex = 1;
             this.playerList.UseCompatibleStateImageBehavior = false;
             this.playerList.View = System.Windows.Forms.View.Details;
+            this.playerList.SelectedIndexChanged += new System.EventHandler(this.playerList_SelectedIndexChanged);
             // 
-            // Player
+            // col_ID
             // 
-            this.Player.Text = "Player";
-            this.Player.Width = 134;
+            this.col_ID.Text = "ID";
+            this.col_ID.Width = 42;
             // 
-            // IP
+            // col_Name
             // 
-            this.IP.Text = "IP";
-            this.IP.Width = 149;
+            this.col_Name.Text = "Name";
+            this.col_Name.Width = 149;
             // 
-            // Actions
+            // col_IP
             // 
-            this.Actions.Text = "Actions";
-            this.Actions.Width = 187;
+            this.col_IP.Text = "IP";
+            this.col_IP.Width = 160;
             // 
             // RefreshPlayers
             // 
@@ -482,6 +485,11 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // col_Whitelist
+            // 
+            this.col_Whitelist.Text = "Whitelisted";
+            this.col_Whitelist.Width = 120;
+            // 
             // ServerConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -542,13 +550,14 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox meteorSpawnY;
         private System.Windows.Forms.ListView playerList;
-        private System.Windows.Forms.ColumnHeader Player;
-        private System.Windows.Forms.ColumnHeader IP;
-        private System.Windows.Forms.ColumnHeader Actions;
+        private System.Windows.Forms.ColumnHeader col_ID;
+        private System.Windows.Forms.ColumnHeader col_Name;
+        private System.Windows.Forms.ColumnHeader col_IP;
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox consoleInput;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.ColumnHeader col_Whitelist;
     }
 }
