@@ -5,8 +5,8 @@ using System.Net;
 
 namespace TerrariaHooker {
     class Whitelist {
+        public static bool IsActive { get; set; }
         private static HashSet<string> wl;
-
 
         static Whitelist( ) {
             wl = new HashSet<string>( );
@@ -44,13 +44,18 @@ namespace TerrariaHooker {
                 using( var fs = new FileStream( @"whitelist.txt", FileMode.OpenOrCreate,
                                                 FileAccess.Read, FileShare.ReadWrite ) ) {
                     using( var sr = new StreamReader( fs ) ) {
-                        var line = sr.ReadLine( );
-                        if( line != null ) {
-                            try {
-                                IPAddress.Parse( line );
-                                wl.Add( line );
-                            } catch( Exception e ) {
-                                Console.WriteLine( String.Format( "Exception caught in Whitelist.LoadFromDisk( ): {0}", e.ToString(  ) ) );
+                        while( !sr.EndOfStream ) {
+                            var line = sr.ReadLine( );
+                            if( line != null ) {
+                                try {
+                                    IPAddress.Parse( line );
+                                    wl.Add( line );
+                                }
+                                catch( Exception e ) {
+                                    Console.WriteLine(
+                                        String.Format( "Exception caught in Whitelist.LoadFromDisk( ): {0}",
+                                                       e.ToString( ) ) );
+                                }
                             }
                         }
                     }

@@ -6,16 +6,20 @@ amckhome@tpg.com.au
 romsteady@msn.com - http://romsteady.blogspot.com/2011/05/terraria-trainerresolution-launcher.html
 
 Bugs/Work In Progress:
-- Whitelist is off by default. Remember to login and use ".wl on" to enable. A setting will be added to ServerConsole in the future.
+- DO NOT run server with > 251 players. Not that you'd want to try this anyway. We've reserved a few connections for internal use.
 - Account system needs to load/save from/to file
-- Teleport commands are not well tested
-- Console, Clients, Events tabs in ServerConsole do not work or may CRASH THE SERVER
-- "Victim" slider on NPC tab only lists first 8 players
-- "Use Built-in Spawn Locator" on NPC tab may CRASH THE SERVER
+
+2011 June 08
+- Everybody can use the .landmark command, so start placing signs!
+- Most commands are available from the console, just ".login console" to get started
+- Whitelist on/off and allowlogin settings are now maintained across server restarts
+- .wl allowlogin allows clients to login when whitelist is active, but they can't use items until they are added
+- .wl addplayer adds a logged in player to the whitelist, when allowlogin is active
+- ServerConsole Options tab lets you toggle whitelist and allowlogin settings
+- Choose a player in the Clients tab to kick/ban/manage whitelist settings
+- With a player selected in the Clients tab, use the NPC tab to spawn mobs
 
 2011 June 07
-
-New Features:
 - Client commands
 	.spawn <npcid> <player> [count]
 	.landmark [landmarkname] - teleport to sign containing "landmarkname" text

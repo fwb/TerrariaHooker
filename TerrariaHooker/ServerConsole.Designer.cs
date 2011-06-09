@@ -493,7 +493,7 @@
             this.enableInvasion.Name = "enableInvasion";
             this.enableInvasion.Size = new System.Drawing.Size(104, 24);
             this.enableInvasion.TabIndex = 2;
-            this.enableInvasion.CheckedChanged += new System.EventHandler(this.enableInvasion_CheckedChanged);
+            //this.enableInvasion.CheckedChanged += new System.EventHandler(this.enableInvasion_CheckedChanged);
             // 
             // tabPage1
             // 

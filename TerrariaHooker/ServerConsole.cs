@@ -170,7 +170,7 @@ namespace TerrariaHooker {
         private void CloseButtonClick( object sender, EventArgs e )
         {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
-            settings.EnableWhitelist = Commands.whitelistEnabled;
+            settings.EnableWhitelist = Whitelist.IsActive;
             settings.Save();
 
             //save and quit. redirects console output to usual stdout first.
@@ -350,7 +350,7 @@ namespace TerrariaHooker {
 
         private void check_wlEnabled_CheckedChanged(object sender, EventArgs e)
         {
-            Commands.whitelistEnabled = check_wlEnabled.Checked;
+            Whitelist.IsActive = check_wlEnabled.Checked;
         }
 
         private void check_anonLoginEnabled_CheckedChanged(object sender, EventArgs e)
@@ -362,7 +362,7 @@ namespace TerrariaHooker {
             switch (((TabControl) sender).SelectedIndex)
             {
                 case 4:
-                    check_wlEnabled.Checked = Commands.whitelistEnabled;
+                    check_wlEnabled.Checked = Whitelist.IsActive;
                     check_anonLoginEnabled.Checked = Commands.allowUnwhiteLogin;
                     break;
             }
