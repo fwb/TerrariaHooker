@@ -536,6 +536,9 @@ namespace TerrariaHooker
             //tag on a sign.
             foreach (var n in Main.sign)
             {
+                if (n == null)
+                    continue;
+
                 int found = n.text.IndexOf("<" + tag + ">");
                 if (found !=  -1)
                 {
@@ -548,9 +551,8 @@ namespace TerrariaHooker
                     NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
                     return true;
                 }
-                SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
-                return true;
             }
+            SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
             return true;
         }
 
