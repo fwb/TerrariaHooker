@@ -372,6 +372,42 @@ namespace TerrariaHooker {
 
         }
 
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+           
+                check_SpawnDisallowBreak.Enabled = check_ProtectSpawn.Checked;
+                check_SpawnDisallowPlace.Enabled = check_ProtectSpawn.Checked;
+                check_SpawnDisallowUse.Enabled = check_ProtectSpawn.Checked;
+
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            int width;
+            int height;
+
+            if (int.TryParse(text_protectWidth.Text, out width) == false)
+            {
+                MessageBox.Show("Width and Height must be positive numbers");
+                return;
+            }
+
+            if (int.TryParse(text_protectHeight.Text, out height) == false)
+            {
+                MessageBox.Show("Width and Height must be positive numbers");
+                return;
+            }
+
+            Commands.SetProtectWidth = width;
+            Commands.SetProtectHeight = height;
+
+            Commands.protectSpawn = check_ProtectSpawn.Checked;
+            Commands.spawnAllowBreak = check_SpawnDisallowBreak.Checked;
+            Commands.spawnAllowUse = check_SpawnDisallowUse.Checked;
+            Commands.spawnAllowUse = check_SpawnDisallowPlace.Checked;
+
+        }
+
     }
 
 }

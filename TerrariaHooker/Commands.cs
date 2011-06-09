@@ -26,6 +26,14 @@ namespace TerrariaHooker
         private static int[] justHostiled = new int[10];
         private static int _numberHostiled;
 
+        public static bool protectSpawn;
+        public static bool spawnAllowUse;
+        public static bool spawnAllowBreak;
+        public static bool spawnAllowPlace;
+
+        //fucked up shit
+        private static int LASTID = 0;
+
         private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
         
         private static Assembly terrariaAssembly;
@@ -39,8 +47,18 @@ namespace TerrariaHooker
         internal const int MAX_LANDMARK_LENGTH = 20;
 
         //10x10 box around spawn
-        internal const int SPAWN_PROTECT_WIDTH = 5;
-        internal const int SPAWN_PROTECT_HEIGHT = 5;
+        internal static int SPAWN_PROTECT_WIDTH = 5;
+        internal static int SPAWN_PROTECT_HEIGHT = 5;
+
+        public static int SetProtectWidth
+        {
+            set { SPAWN_PROTECT_WIDTH = value;  }
+        }
+
+        public static int SetProtectHeight
+        {
+            set { SPAWN_PROTECT_HEIGHT = value; }
+        }
 
         static Commands()
         {
@@ -132,6 +150,9 @@ namespace TerrariaHooker
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
+                    //when a compound packet starting with an 0x0D occurs, some included payloads
+                    //e.g. 0x11. have no playerid associated. so we need to cache the last ID.
+                    LASTID = data[5]; 
                     packet = HandlePlayerState(nData);
                     
                     break;
@@ -257,23 +278,31 @@ namespace TerrariaHooker
         private static Packet HandleBlockChange(byte[] data)
         {
             var p = new packet_BlockChange(data);
+            p.PlayerId = LASTID;
+            LASTID = 0xFE;
 
             var packet = new Packet(data, data.Length);
 
-            /*//create a rect around the spawn, check if the point being acted on is part of the spawn rect.
-            if (p.Type == 0 || p.Type == 4)
+            //create a rect around the spawn, check if the point being acted on is part of the spawn rect.
+            if (protectSpawn)
             {
-                Vector2 d = new Vector2(p.Position.X,p.Position.Y);
-                Rectangle rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16), 
-                                               Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16), 
-                                               SPAWN_PROTECT_WIDTH * 2 * 16, 
+                bool isIn = false;
+                Vector2 d = new Vector2(p.Position.X, p.Position.Y);
+                Rectangle rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16),
+                                               Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16),
+                                               SPAWN_PROTECT_WIDTH * 2* 16,
                                                SPAWN_PROTECT_HEIGHT * 2 * 16);
 
                 if ((d.X > rect.Left && d.X < rect.Right) && (d.Y > rect.Top && d.Y < rect.Bottom))
-                    Console.WriteLine("Destroyed block is in spawn rect");
-            
+                    isIn = true;
 
-            }*/
+                //destroying blocks
+                if ((p.ActionType == 0 || p.ActionType == 4 || p.ActionType == 1) && (isIn))
+                {
+                    SendChatMsg("You can not make block changes here.", p.PlayerId, Color.Red);
+                    return CreateDummyPacket(data);
+                }
+            }
 
             #region NEW WHITELIST CODE
             if (Whitelist.IsActive && !whitelisted[p.PlayerId])
@@ -1076,7 +1105,7 @@ namespace TerrariaHooker
     public class packet_BlockChange : packet_Base
     {
         internal Vector2 Position;
-        internal int Type;
+        internal int ActionType;
 
         internal packet_BlockChange(byte[] data)
             : base(data)
@@ -1084,7 +1113,7 @@ namespace TerrariaHooker
             PlayerId = data[5];
             Position.X = BitConverter.ToInt32(data, 6);
             Position.Y = BitConverter.ToInt32(data, 10);
-            Type = data[11];
+            ActionType = data[11];
             /* 0 = Destroy Tile
              * 1 = Place Tile
              * 2 = Kill Wall

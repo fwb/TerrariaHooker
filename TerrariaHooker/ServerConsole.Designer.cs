@@ -67,6 +67,16 @@
             this.button1 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button4 = new System.Windows.Forms.Button();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.check_ProtectSpawn = new System.Windows.Forms.CheckBox();
+            this.check_SpawnDisallowBreak = new System.Windows.Forms.CheckBox();
+            this.check_SpawnDisallowPlace = new System.Windows.Forms.CheckBox();
+            this.check_SpawnDisallowUse = new System.Windows.Forms.CheckBox();
+            this.button9 = new System.Windows.Forms.Button();
+            this.text_protectWidth = new System.Windows.Forms.TextBox();
+            this.text_protectHeight = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
@@ -75,6 +85,7 @@
             this.groupBox3.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -101,7 +112,7 @@
             this.tabPage5.Controls.Add(this.textBox1);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(648, 339);
+            this.tabPage5.Size = new System.Drawing.Size(483, 339);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Console";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -146,7 +157,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(641, 312);
+            this.textBox1.Size = new System.Drawing.Size(477, 312);
             this.textBox1.TabIndex = 0;
             // 
             // tabPage4
@@ -270,7 +281,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(481, 339);
+            this.tabPage2.Size = new System.Drawing.Size(483, 339);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "NPCs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -366,7 +377,7 @@
             this.tabPage3.Controls.Add(this.groupBox2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(481, 339);
+            this.tabPage3.Size = new System.Drawing.Size(483, 339);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Events";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -468,10 +479,11 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.groupBox5);
             this.tabPage1.Controls.Add(this.groupBox4);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(481, 339);
+            this.tabPage1.Size = new System.Drawing.Size(483, 339);
             this.tabPage1.TabIndex = 5;
             this.tabPage1.Text = "Options";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -490,7 +502,7 @@
             // check_wlEnabled
             // 
             this.check_wlEnabled.AutoSize = true;
-            this.check_wlEnabled.Location = new System.Drawing.Point(10, 19);
+            this.check_wlEnabled.Location = new System.Drawing.Point(6, 19);
             this.check_wlEnabled.Name = "check_wlEnabled";
             this.check_wlEnabled.Size = new System.Drawing.Size(102, 17);
             this.check_wlEnabled.TabIndex = 0;
@@ -501,7 +513,7 @@
             // check_anonLoginEnabled
             // 
             this.check_anonLoginEnabled.AutoSize = true;
-            this.check_anonLoginEnabled.Location = new System.Drawing.Point(10, 42);
+            this.check_anonLoginEnabled.Location = new System.Drawing.Point(6, 42);
             this.check_anonLoginEnabled.Name = "check_anonLoginEnabled";
             this.check_anonLoginEnabled.Size = new System.Drawing.Size(199, 17);
             this.check_anonLoginEnabled.TabIndex = 1;
@@ -531,6 +543,118 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label1);
+            this.groupBox5.Controls.Add(this.button9);
+            this.groupBox5.Controls.Add(this.label7);
+            this.groupBox5.Controls.Add(this.text_protectHeight);
+            this.groupBox5.Controls.Add(this.text_protectWidth);
+            this.groupBox5.Controls.Add(this.check_SpawnDisallowUse);
+            this.groupBox5.Controls.Add(this.check_ProtectSpawn);
+            this.groupBox5.Controls.Add(this.check_SpawnDisallowPlace);
+            this.groupBox5.Controls.Add(this.check_SpawnDisallowBreak);
+            this.groupBox5.Location = new System.Drawing.Point(253, 13);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(217, 195);
+            this.groupBox5.TabIndex = 3;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Spawn";
+            // 
+            // check_ProtectSpawn
+            // 
+            this.check_ProtectSpawn.AutoSize = true;
+            this.check_ProtectSpawn.Location = new System.Drawing.Point(6, 19);
+            this.check_ProtectSpawn.Name = "check_ProtectSpawn";
+            this.check_ProtectSpawn.Size = new System.Drawing.Size(96, 17);
+            this.check_ProtectSpawn.TabIndex = 4;
+            this.check_ProtectSpawn.Text = "Protect Spawn";
+            this.check_ProtectSpawn.UseVisualStyleBackColor = true;
+            this.check_ProtectSpawn.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // check_SpawnDisallowBreak
+            // 
+            this.check_SpawnDisallowBreak.AutoSize = true;
+            this.check_SpawnDisallowBreak.Enabled = false;
+            this.check_SpawnDisallowBreak.Location = new System.Drawing.Point(6, 42);
+            this.check_SpawnDisallowBreak.Name = "check_SpawnDisallowBreak";
+            this.check_SpawnDisallowBreak.Size = new System.Drawing.Size(143, 17);
+            this.check_SpawnDisallowBreak.TabIndex = 5;
+            this.check_SpawnDisallowBreak.Text = "Disallow breaking blocks";
+            this.check_SpawnDisallowBreak.UseVisualStyleBackColor = true;
+            this.check_SpawnDisallowBreak.Visible = false;
+            // 
+            // check_SpawnDisallowPlace
+            // 
+            this.check_SpawnDisallowPlace.AutoSize = true;
+            this.check_SpawnDisallowPlace.Enabled = false;
+            this.check_SpawnDisallowPlace.Location = new System.Drawing.Point(6, 65);
+            this.check_SpawnDisallowPlace.Name = "check_SpawnDisallowPlace";
+            this.check_SpawnDisallowPlace.Size = new System.Drawing.Size(136, 17);
+            this.check_SpawnDisallowPlace.TabIndex = 6;
+            this.check_SpawnDisallowPlace.Text = "Disallow placing blocks";
+            this.check_SpawnDisallowPlace.UseVisualStyleBackColor = true;
+            this.check_SpawnDisallowPlace.Visible = false;
+            // 
+            // check_SpawnDisallowUse
+            // 
+            this.check_SpawnDisallowUse.AutoSize = true;
+            this.check_SpawnDisallowUse.Enabled = false;
+            this.check_SpawnDisallowUse.Location = new System.Drawing.Point(6, 88);
+            this.check_SpawnDisallowUse.Name = "check_SpawnDisallowUse";
+            this.check_SpawnDisallowUse.Size = new System.Drawing.Size(120, 17);
+            this.check_SpawnDisallowUse.TabIndex = 7;
+            this.check_SpawnDisallowUse.Text = "Disallow using items";
+            this.check_SpawnDisallowUse.UseVisualStyleBackColor = true;
+            this.check_SpawnDisallowUse.Visible = false;
+            // 
+            // button9
+            // 
+            this.button9.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.button9.Location = new System.Drawing.Point(6, 166);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(204, 23);
+            this.button9.TabIndex = 8;
+            this.button9.Text = "Apply";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // text_protectWidth
+            // 
+            this.text_protectWidth.Location = new System.Drawing.Point(6, 138);
+            this.text_protectWidth.Name = "text_protectWidth";
+            this.text_protectWidth.Size = new System.Drawing.Size(96, 20);
+            this.text_protectWidth.TabIndex = 4;
+            this.text_protectWidth.Text = "10";
+            // 
+            // text_protectHeight
+            // 
+            this.text_protectHeight.Location = new System.Drawing.Point(112, 138);
+            this.text_protectHeight.Name = "text_protectHeight";
+            this.text_protectHeight.Size = new System.Drawing.Size(98, 20);
+            this.text_protectHeight.TabIndex = 9;
+            this.text_protectHeight.Text = "10";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 118);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(59, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Box Width:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(109, 118);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(62, 13);
+            this.label7.TabIndex = 10;
+            this.label7.Text = "Box Height:";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // ServerConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -554,6 +678,8 @@
             this.tabPage1.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -604,5 +730,15 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox check_wlEnabled;
         private System.Windows.Forms.CheckBox check_anonLoginEnabled;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.CheckBox check_SpawnDisallowUse;
+        private System.Windows.Forms.CheckBox check_ProtectSpawn;
+        private System.Windows.Forms.CheckBox check_SpawnDisallowPlace;
+        private System.Windows.Forms.CheckBox check_SpawnDisallowBreak;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox text_protectHeight;
+        private System.Windows.Forms.TextBox text_protectWidth;
     }
 }
