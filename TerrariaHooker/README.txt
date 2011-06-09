@@ -22,7 +22,7 @@ Bugs/Work In Progress:
 2011 June 07
 - Client commands
 	.spawn <npcid> <player> [count]
-	.landmark [landmarkname] - teleport to sign containing "landmarkname" text
+	.landmark [landmarkname] - teleport to sign containing "<landmarkname>" text ie: "Welcome to the <Jungle>"
 
 2011 June 06
 
