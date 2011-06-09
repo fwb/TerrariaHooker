@@ -36,7 +36,7 @@ namespace TerrariaHooker
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
-        internal const int MAX_LANDMARK_LENGTH = 10;
+        internal const int MAX_LANDMARK_LENGTH = 20;
 
         static Commands()
         {
