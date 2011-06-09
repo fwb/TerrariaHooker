@@ -32,7 +32,7 @@ namespace TerrariaHooker
         public static bool spawnAllowPlace;
 
         //fucked up shit
-        private static int LASTID = 0;
+        //private static int LASTID = 0;
 
         private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
         
@@ -153,7 +153,7 @@ namespace TerrariaHooker
                     prefix = "PLAYER STATE CHANGE";
                     //when a compound packet starting with an 0x0D occurs, some included payloads
                     //e.g. 0x11. have no playerid associated. so we need to cache the last ID.
-                    LASTID = data[5]; 
+                    //LASTID = data[5]; 
                     packet = HandlePlayerState(nData);
                     
                     break;
@@ -279,8 +279,8 @@ namespace TerrariaHooker
         private static Packet HandleBlockChange(byte[] data)
         {
             var p = new packet_BlockChange(data);
-            p.PlayerId = LASTID;
-            LASTID = 0xFE;
+            //p.PlayerId = LASTID;
+            //LASTID = 0xFE;
 
             var packet = new Packet(data, data.Length);
             #region PROTECT SPAWN
