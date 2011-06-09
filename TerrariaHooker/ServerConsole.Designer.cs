@@ -60,9 +60,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.meteorSpawnY = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.enableEyeSpawn = new System.Windows.Forms.CheckBox();
-            this.enableBloodMoon = new System.Windows.Forms.CheckBox();
-            this.enableInvasion = new System.Windows.Forms.CheckBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.check_wlEnabled = new System.Windows.Forms.CheckBox();
@@ -76,7 +73,6 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
@@ -463,37 +459,12 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.enableEyeSpawn);
-            this.groupBox2.Controls.Add(this.enableBloodMoon);
-            this.groupBox2.Controls.Add(this.enableInvasion);
             this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(159, 92);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Survival";
-            // 
-            // enableEyeSpawn
-            // 
-            this.enableEyeSpawn.Location = new System.Drawing.Point(6, 62);
-            this.enableEyeSpawn.Name = "enableEyeSpawn";
-            this.enableEyeSpawn.Size = new System.Drawing.Size(104, 24);
-            this.enableEyeSpawn.TabIndex = 0;
-            // 
-            // enableBloodMoon
-            // 
-            this.enableBloodMoon.Location = new System.Drawing.Point(6, 37);
-            this.enableBloodMoon.Name = "enableBloodMoon";
-            this.enableBloodMoon.Size = new System.Drawing.Size(104, 24);
-            this.enableBloodMoon.TabIndex = 1;
-            // 
-            // enableInvasion
-            // 
-            this.enableInvasion.Location = new System.Drawing.Point(6, 12);
-            this.enableInvasion.Name = "enableInvasion";
-            this.enableInvasion.Size = new System.Drawing.Size(104, 24);
-            this.enableInvasion.TabIndex = 2;
-            //this.enableInvasion.CheckedChanged += new System.EventHandler(this.enableInvasion_CheckedChanged);
             // 
             // tabPage1
             // 
@@ -580,7 +551,6 @@
             this.tabPage3.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
@@ -603,9 +573,6 @@
         private System.Windows.Forms.CheckBox disableSpawns;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.CheckBox enableEyeSpawn;
-        private System.Windows.Forms.CheckBox enableBloodMoon;
-        private System.Windows.Forms.CheckBox enableInvasion;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.Button RefreshPlayers;
         private System.Windows.Forms.Button SpawnMeteorButton;
