@@ -34,7 +34,7 @@ namespace TerrariaHooker
 
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
-
+        internal const int MAX_LINE_LENGTH = 30;
 
         static Commands()
         {
@@ -940,6 +940,13 @@ namespace TerrariaHooker
 
             SendChatMsg(msg, -1, Color.Orange);
             return true;
+        }
+
+        private static void SendDataSafe( int msgId, int playerId, int j, string msg, int k, byte r, byte g, byte b ) {
+            var msgList = Utils.GetLines( msg, MAX_LINE_LENGTH );
+            foreach( var m in msgList ) {
+                NetMessage.SendData( msgId, playerId, j, m, k, r, g, b );
+            }
         }
     }
 
