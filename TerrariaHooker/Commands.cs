@@ -477,6 +477,9 @@ namespace TerrariaHooker
                     case (".spawn"):
                         if(!cmdSpawnNPC(commands, p)) cmdUsage("USAGE: .spawn <npcid> <player> [count]",p.PlayerId);
                         break;
+                    case (".coords"):
+                        cmdCoords(p);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -485,6 +488,13 @@ namespace TerrariaHooker
             }
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static void cmdCoords(packet_ChatMsg packetChatMsg)
+        {
+            string o = String.Format("Coords: [X:{0} Y:{1}]", (int)Main.player[packetChatMsg.PlayerId].position.X / 16,
+                                     (int)Main.player[packetChatMsg.PlayerId].position.Y / 16);
+            SendChatMsg(o,packetChatMsg.PlayerId,Color.Green);
         }
 
         private static void cmdHelp( string[] commands, packet_ChatMsg packetChatMsg ) {
@@ -691,8 +701,8 @@ namespace TerrariaHooker
                 return true;
             }
 
-            Main.player[targetId].position.X = finalCoords.X;
-            Main.player[targetId].position.Y = finalCoords.Y;
+            Main.player[targetId].position.X = finalCoords.X * 16;
+            Main.player[targetId].position.Y = finalCoords.Y * 16;
 
             NetMessage.SendData(0x0D, -1, -1, "", targetId);
             return true;
