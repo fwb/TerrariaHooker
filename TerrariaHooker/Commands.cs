@@ -69,22 +69,25 @@ namespace TerrariaHooker
         /// <returns>A packet structure, complete with Data and Data Length</returns>
         public static Packet ProcessData(byte[] data, int direction, int offset = 0)
         {
+
             byte type;
             try { type = data[offset+4]; } 
             catch { return new Packet(data, data.Length); }
-
-                    
+ 
             int length = data[offset] + 4;
             var nData = new byte[length]; //buffer containing just the packet we're working om
 
+            //there's some cases where so much data is pushed to the server it exceeds the buffer length
+            //(1024) and splits into multiples, leaving one partial packet at the end of the buffer and additional
+            //broken data in the next buffer. I don't think it's worth creating edge-cases for this as it's still
+            //being recieved by the server, just
             try
             {
                 Buffer.BlockCopy(data, offset, nData, 0, length);
             } catch
             {
-                //if the blockcopy failed (because the packet had an invalid header
-                //just return the original packet, we don't want to process it.
-                return new Packet(data, data.Length);
+                //OutputPacket(data, "BLOCKCOPY ERROR");
+                return new Packet(data,data.Length);
             }
 
             var packet = new Packet(nData, nData.Length);
@@ -277,11 +280,8 @@ namespace TerrariaHooker
             if (!itemRiskEnabled) return packet;
 
             var p = new packet_PlayerState(data);
-            
-                //much, much more aggressive. no longer checks if the user is using an item since apparently that doesn't
-                //much matter past the server doing some weird shit like telling other users they're swinging an axe.
-               
-               if (p.UsingItem)
+
+            if (p.UsingItem)
                {
                    #region NEW WHITELIST CODE
                    if (Whitelist.IsActive && !whitelisted[p.PlayerId])
