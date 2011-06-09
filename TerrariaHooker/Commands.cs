@@ -196,14 +196,14 @@ namespace TerrariaHooker
             }
 
 #if DEBUG   
-            /*if( direction == 0 ) {
+            if( direction == 0 ) {
                 var sBuffer = new StringBuilder( );
                 foreach( byte t in data ) {
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
                Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
-            }*/
+            }
 #endif
             return packet;
 
@@ -217,7 +217,7 @@ namespace TerrariaHooker
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
-                    SendChatMsg("You cannot destroy blocks until whitelisted.", data[5], Color.Purple);
+                    //SendChatMsg("You cannot destroy blocks until whitelisted.", data[5], Color.Purple);
                     return CreateDummyPacket(data);
                 }
             }
@@ -254,19 +254,21 @@ namespace TerrariaHooker
             if (!itemRiskEnabled) return packet;
 
             var p = new packet_PlayerState(data);
-            if (p.UsingItem)
-            {
+            
+                //much, much more aggressive. no longer checks if the user is using an item since apparently that doesn't
+                //much matter past the server doing some weird shit like telling other users they're swinging an axe.
                 #region NEW WHITELIST CODE
                 if (Whitelist.IsActive && !whitelisted[p.PlayerId])
                 {
                     if (anonPrivs.Has(Actions.NOUSEITEMS))
                     {
-                        SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
+                        //SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
                         return CreateDummyPacket(data);
                     }
                 }
                 #endregion
-
+               if (p.UsingItem)
+               {
                 foreach (byte i in riskItems)
                     {
                         var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
@@ -279,7 +281,7 @@ namespace TerrariaHooker
 
                         }
                     }
-            }
+               }
         
             return packet;
 
