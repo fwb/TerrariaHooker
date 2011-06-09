@@ -90,6 +90,7 @@ namespace TerrariaHooker
                 return new Packet(data,data.Length);
             }
 
+            //packet is JUST the current packet.
             var packet = new Packet(nData, nData.Length);
             string prefix;
 
@@ -218,20 +219,24 @@ namespace TerrariaHooker
             //write the returned packet back into the original data buffer. packet can either be
             //the original data,  modified original data, or a dummy packet created.
             Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
+
+            //now, fpacket is a clone of the updated packet
+            Packet fpacket = new Packet(data, data.Length);
+
             #if DEBUG
             OutputPacket(nData, prefix);
             #endif
 
             //if theres more data in the buffer than the packet just read references, process data
             //again with the offset covering the just-parsed packet. 
-            //logic: 
-            //1st pass, keep packet -> second pass : drop packet -> third pass : keep packet -> EOS 
-            //-> return from 3rd -> return from 2nd -> return from 1st: to SockHook.
+            //logic: ProcessData returns a new Packet(fullpacket, length);
+            //last-updated packet should cascade down to the parent.
             if (offset + length < data.Length)
-                packet = ProcessData(data, 0, offset + length);
+                fpacket = ProcessData(data, 0, offset + length);
 
-            //only gets here if theres no data left to process.
-            return packet;
+            //the updated packet data is in packet, either becasue we're at the end of the packet,
+            //or because we weren't and packet was updated.
+            return new Packet(fpacket.Data, fpacket.Length);
 
         }
         private static void OutputPacket(byte[] data, string prefix)
@@ -246,9 +251,11 @@ namespace TerrariaHooker
 
         private static Packet HandleDestroyBlock(byte[] data)
         {
+            var p = new packet_DestroyTile(data);
+
             var packet = new Packet(data, data.Length);
             #region NEW WHITELIST CODE
-            if (Whitelist.IsActive && !whitelisted[data[5]])
+            if (Whitelist.IsActive && !whitelisted[p.PlayerId])
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
@@ -1033,6 +1040,8 @@ namespace TerrariaHooker
         }
 
     }
+
+    //stub
     public class packet_DestroyTile : packet_Base
     {
         internal packet_DestroyTile(byte[] data)
@@ -1111,7 +1120,6 @@ namespace TerrariaHooker
         internal bool KeyJump;
         internal bool UsingItem;
         internal int Direction = -1;
-        internal packet_DestroyTile destroyTile;
 
         internal packet_PlayerState(byte[] data)
             : base(data)
@@ -1134,18 +1142,6 @@ namespace TerrariaHooker
             if ((ButtonState & 64) == 64) Direction = 1;
             //
 
-            //packet_DestroyTile related garbage, what a fuckaround.
-            /*try
-            {
-                if (data[24] == 0x0B)
-                {
-                }
-                
-                Console.WriteLine("INCLUDES APPENDED DATA");
-            } catch
-            {
-                Console.WriteLine("NO APPENDED DATA");
-            }*/
         }
     }
 
