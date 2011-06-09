@@ -79,7 +79,8 @@ namespace TerrariaHooker
             }
 
             Whitelist.IsActive = settings.EnableWhitelist;
-            allowUnwhiteLogin = settings.EnableAnonLogin;
+            //allowUnwhiteLogin = settings.EnableAnonLogin;
+            allowUnwhiteLogin = false;
         }
 
         /// <summary>
@@ -282,7 +283,7 @@ namespace TerrariaHooker
             LASTID = 0xFE;
 
             var packet = new Packet(data, data.Length);
-
+            #region PROTECT SPAWN
             //create a rect around the spawn, check if the point being acted on is part of the spawn rect.
             if (protectSpawn)
             {
@@ -296,15 +297,17 @@ namespace TerrariaHooker
                 if ((d.X > rect.Left && d.X < rect.Right) && (d.Y > rect.Top && d.Y < rect.Bottom))
                     isIn = true;
 
-                //destroying blocks
+                //destroying and creating blocks
                 if ((p.ActionType == 0 || p.ActionType == 4 || p.ActionType == 1) && (isIn))
                 {
-                    SendChatMsg("You can not make block changes here.", p.PlayerId, Color.Red);
+                    //SendChatMsg("You can not make block changes here.", p.PlayerId, Color.Red);
                     return CreateDummyPacket(data);
                 }
             }
+            #endregion
 
             #region NEW WHITELIST CODE
+            /*
             if (Whitelist.IsActive && !whitelisted[p.PlayerId])
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
@@ -313,7 +316,9 @@ namespace TerrariaHooker
                     return CreateDummyPacket(data);
                 }
             }
+            */
             #endregion
+
 
             return packet;
         }
@@ -347,19 +352,16 @@ namespace TerrariaHooker
 
             var p = new packet_PlayerState(data);
 
+
+            #region BLOCK ALL PLAYER STATE ACTIONS
+            if (Whitelist.IsActive && !whitelisted[p.PlayerId])
+            {
+                return CreateDummyPacket(data);
+            }
+            #endregion
+
             if (p.UsingItem)
                {
-                   #region NEW WHITELIST CODE
-                   if (Whitelist.IsActive && !whitelisted[p.PlayerId])
-                   {
-                       if (anonPrivs.Has(Actions.NOUSEITEMS))
-                       {
-                           //SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
-                           return CreateDummyPacket(data);
-                       }
-                   }
-                   #endregion
-
                 foreach (byte i in riskItems)
                     {
                         var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
@@ -929,13 +931,13 @@ namespace TerrariaHooker
                     Whitelist.IsActive = false;
                     SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
                     break;
-                case ("allowlogin"):
+                /*case ("allowlogin"):
                     allowUnwhiteLogin = !allowUnwhiteLogin;
                     string state = allowUnwhiteLogin ? "enabled." : "disabled.";
                     SendChatMsg( "Allow un-whitelisted users login: " + state, packetChatMsg.PlayerId, Color.Green );
                     settings.EnableAnonLogin = allowUnwhiteLogin;
                     settings.Save();
-                    break;
+                    break;*/
                 default:
                     return false;
                         

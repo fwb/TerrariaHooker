@@ -513,6 +513,7 @@
             // check_anonLoginEnabled
             // 
             this.check_anonLoginEnabled.AutoSize = true;
+            this.check_anonLoginEnabled.Enabled = false;
             this.check_anonLoginEnabled.Location = new System.Drawing.Point(6, 42);
             this.check_anonLoginEnabled.Name = "check_anonLoginEnabled";
             this.check_anonLoginEnabled.Size = new System.Drawing.Size(199, 17);

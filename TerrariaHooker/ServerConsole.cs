@@ -404,7 +404,7 @@ namespace TerrariaHooker {
             Commands.protectSpawn = check_ProtectSpawn.Checked;
             Commands.spawnAllowBreak = check_SpawnDisallowBreak.Checked;
             Commands.spawnAllowUse = check_SpawnDisallowUse.Checked;
-            Commands.spawnAllowUse = check_SpawnDisallowPlace.Checked;
+            Commands.spawnAllowPlace = check_SpawnDisallowPlace.Checked;
 
         }
 
