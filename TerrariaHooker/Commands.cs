@@ -67,15 +67,28 @@ namespace TerrariaHooker
         /// <param name="data">The data.</param>
         /// <param name="direction">The direction of travel. 0 = RECV, 1 = SEND</param>
         /// <returns>A packet structure, complete with Data and Data Length</returns>
-        public static Packet ProcessData(byte[] data, int direction)
+        public static Packet ProcessData(byte[] data, int direction, int offset = 0)
         {
             byte type;
-            try { type = data[4]; } 
+            try { type = data[offset+4]; } 
             catch { return new Packet(data, data.Length); }
 
+                    
+            int length = data[offset] + 4;
+            var nData = new byte[length]; //buffer containing just the packet we're working om
+
+            try
+            {
+                Buffer.BlockCopy(data, offset, nData, 0, length);
+            } catch
+            {
+                //if the blockcopy failed (because the packet had an invalid header
+                //just return the original packet, we don't want to process it.
+                return new Packet(data, data.Length);
+            }
+
+            var packet = new Packet(nData, nData.Length);
             string prefix;
-            //string details = null;
-            var packet = new Packet(data, data.Length);
 
             switch (type)
             {
@@ -88,7 +101,7 @@ namespace TerrariaHooker
                 case 0x04:
                     prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
                     // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting( data );
+                    packet = HandleGreeting( nData );
                     if( Whitelist.IsActive ) {
                         CheckWhitelist( data );
                     }
@@ -104,20 +117,22 @@ namespace TerrariaHooker
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                    if (Whitelist.IsActive && !whitelisted[data[5]])
+                    if (Whitelist.IsActive && !whitelisted[data[offset+5]])
                         SendChatMsg("You are not whitelisted, some actions are restricted.", data[5], Color.Peru);
       
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
-                    packet = HandlePlayerState(data);
+                    packet = HandlePlayerState(nData);
+                    
                     break;
                 case 0x10:
                     prefix = "PLAYER CURRENT/MAX HEALTH UPDATE";
                     break;
                 case 0x11:
                     prefix = "PLAYER DESTROY BLOCK";
-                    packet = HandleDestroyBlock(data);
+                    packet = HandleDestroyBlock(nData);
+
                     break;
                 case 0x13:
                     prefix = "PLAYER USE DOOR";
@@ -137,7 +152,7 @@ namespace TerrariaHooker
                     break;
                 case 0x19:
                     prefix = "CHAT MESSAGE";
-                    packet = HandleChatMsg(data);   //pass data to handler. 
+                    packet = HandleChatMsg(nData);   //pass data to handler. 
                     //ALL handlers assume a Packet struct as input.
                     //and ALL handlers return a Packet struct as output.
 
@@ -180,7 +195,7 @@ namespace TerrariaHooker
                     break;
                 case 0x2c:
                     prefix = "PLAYER DIED";
-                    packet = handleDeath(data);
+                    packet = handleDeath(nData);
                     break;
                 case 0x2d:
                     prefix = "PLAYER PARTY UPDATE";
@@ -197,18 +212,24 @@ namespace TerrariaHooker
                     break;
             }
 
-#if DEBUG   
-            if( direction == 0 ) {
+            Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
+            #if DEBUG
+            OutputPacket(nData, prefix);
+            #endif  
+            if (offset + length < data.Length)
+                ProcessData(data, 0, offset + length);
+
+            return packet;
+
+        }
+        private static void OutputPacket(byte[] data, string prefix)
+        {
                 var sBuffer = new StringBuilder( );
                 foreach( byte t in data ) {
                     sBuffer.Append( Convert.ToInt32( t ).ToString( "x" ).PadLeft( 2, '0' ) + " " );
                 }
 
                Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
-            }
-#endif
-            return packet;
-
         }
 
         private static Packet HandleDestroyBlock(byte[] data)
@@ -259,18 +280,20 @@ namespace TerrariaHooker
             
                 //much, much more aggressive. no longer checks if the user is using an item since apparently that doesn't
                 //much matter past the server doing some weird shit like telling other users they're swinging an axe.
-                #region NEW WHITELIST CODE
-                if (Whitelist.IsActive && !whitelisted[p.PlayerId])
-                {
-                    if (anonPrivs.Has(Actions.NOUSEITEMS))
-                    {
-                        //SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
-                        return CreateDummyPacket(data);
-                    }
-                }
-                #endregion
+               
                if (p.UsingItem)
                {
+                   #region NEW WHITELIST CODE
+                   if (Whitelist.IsActive && !whitelisted[p.PlayerId])
+                   {
+                       if (anonPrivs.Has(Actions.NOUSEITEMS))
+                       {
+                           //SendChatMsg("You cannot use items until whitelisted.", p.PlayerId, Color.Purple);
+                           return CreateDummyPacket(data);
+                       }
+                   }
+                   #endregion
+
                 foreach (byte i in riskItems)
                     {
                         var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
@@ -1001,6 +1024,15 @@ namespace TerrariaHooker
         }
 
     }
+    public class packet_DestroyTile : packet_Base
+    {
+        internal packet_DestroyTile(byte[] data)
+            : base(data)
+        {
+            PlayerId = data[5];
+
+        }
+    }
 
     public class packet_UpdateProjectile : packet_Base
     {
@@ -1070,6 +1102,7 @@ namespace TerrariaHooker
         internal bool KeyJump;
         internal bool UsingItem;
         internal int Direction = -1;
+        internal packet_DestroyTile destroyTile;
 
         internal packet_PlayerState(byte[] data)
             : base(data)
@@ -1091,6 +1124,19 @@ namespace TerrariaHooker
             if ((ButtonState & 32) == 32) UsingItem = true;
             if ((ButtonState & 64) == 64) Direction = 1;
             //
+
+            //packet_DestroyTile related garbage, what a fuckaround.
+            /*try
+            {
+                if (data[24] == 0x0B)
+                {
+                }
+                
+                Console.WriteLine("INCLUDES APPENDED DATA");
+            } catch
+            {
+                Console.WriteLine("NO APPENDED DATA");
+            }*/
         }
     }
 

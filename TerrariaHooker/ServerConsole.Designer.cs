@@ -90,7 +90,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(489, 365);
+            this.tabControl1.Size = new System.Drawing.Size(491, 365);
             this.tabControl1.TabIndex = 6;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexchanged);
             // 
@@ -101,7 +101,7 @@
             this.tabPage5.Controls.Add(this.textBox1);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(481, 339);
+            this.tabPage5.Size = new System.Drawing.Size(648, 339);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Console";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -116,7 +116,7 @@
             this.consoleInput.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.consoleInput.Location = new System.Drawing.Point(3, 315);
             this.consoleInput.Name = "consoleInput";
-            this.consoleInput.Size = new System.Drawing.Size(474, 23);
+            this.consoleInput.Size = new System.Drawing.Size(641, 23);
             this.consoleInput.TabIndex = 2;
             this.consoleInput.TextChanged += new System.EventHandler(this.consoleInput_TextChanged);
             this.consoleInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.consoleInputKeyPress);
@@ -146,7 +146,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(474, 312);
+            this.textBox1.Size = new System.Drawing.Size(641, 312);
             this.textBox1.TabIndex = 0;
             // 
             // tabPage4
@@ -159,7 +159,7 @@
             this.tabPage4.Controls.Add(this.RefreshPlayers);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(481, 339);
+            this.tabPage4.Size = new System.Drawing.Size(483, 339);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Clients";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -167,7 +167,7 @@
             // button8
             // 
             this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button8.Location = new System.Drawing.Point(410, 313);
+            this.button8.Location = new System.Drawing.Point(412, 313);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(68, 23);
             this.button8.TabIndex = 5;
@@ -178,7 +178,7 @@
             // button7
             // 
             this.button7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button7.Location = new System.Drawing.Point(342, 313);
+            this.button7.Location = new System.Drawing.Point(344, 313);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(62, 23);
             this.button7.TabIndex = 4;
@@ -189,7 +189,7 @@
             // button6
             // 
             this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button6.Location = new System.Drawing.Point(280, 313);
+            this.button6.Location = new System.Drawing.Point(282, 313);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(47, 23);
             this.button6.TabIndex = 3;
@@ -200,7 +200,7 @@
             // button5
             // 
             this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button5.Location = new System.Drawing.Point(227, 313);
+            this.button5.Location = new System.Drawing.Point(229, 313);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(47, 23);
             this.button5.TabIndex = 2;
@@ -512,7 +512,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(416, 383);
+            this.button1.Location = new System.Drawing.Point(418, 383);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(86, 23);
             this.button1.TabIndex = 7;
@@ -523,7 +523,7 @@
             // button4
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button4.Location = new System.Drawing.Point(302, 383);
+            this.button4.Location = new System.Drawing.Point(304, 383);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(108, 23);
             this.button4.TabIndex = 8;
@@ -535,7 +535,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(514, 413);
+            this.ClientSize = new System.Drawing.Size(516, 413);
             this.ControlBox = false;
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button1);
