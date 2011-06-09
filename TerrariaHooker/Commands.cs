@@ -34,7 +34,7 @@ namespace TerrariaHooker
 
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
-        internal const int MAX_LINE_LENGTH = 30;
+        internal const int MAX_LINE_LENGTH = 70;
 
         static Commands()
         {
@@ -524,7 +524,7 @@ namespace TerrariaHooker
                         o += l + ", ";
                     }
 
-                    SendChatMsg("Available landmarks: "+ o.Substring(0,o.Length-2),packetChatMsg.PlayerId, Color.GreenYellow);
+                    SendChatMsgSafe("Available landmarks: "+ o.Substring(0,o.Length-2),packetChatMsg.PlayerId, Color.GreenYellow);
                     return true;
                 }
 
@@ -913,6 +913,14 @@ namespace TerrariaHooker
             return;
         }
 
+        private static void SendChatMsgSafe( string msg, int playerId, Color color ) {
+            if( playerId == 0xFC ) {
+                Console.WriteLine( msg );
+            } else {
+                SendDataSafe( 25, playerId, -1, msg, 255, color.R, color.G, color.B );
+            }
+        }
+
         /// <summary>
         /// Unknown Command Handler
         /// </summary>
@@ -948,6 +956,7 @@ namespace TerrariaHooker
                 NetMessage.SendData( msgId, playerId, j, m, k, r, g, b );
             }
         }
+
     }
 
 
