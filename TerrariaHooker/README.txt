@@ -18,6 +18,8 @@ Bugs/Work In Progress:
 - ServerConsole Options tab lets you toggle whitelist and allowlogin settings
 - Choose a player in the Clients tab to kick/ban/manage whitelist settings
 - With a player selected in the Clients tab, use the NPC tab to spawn mobs
+- .itemban replaced with .itemrisk, rather than preventing use it will warn on use of risky items e.g. dynamite and lava buckets.
+  This is on by default.
 
 2011 June 07
 - Client commands

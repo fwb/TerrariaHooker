@@ -234,8 +234,8 @@ namespace TerrariaHooker
             if (offset + length < data.Length)
                 fpacket = ProcessData(data, 0, offset + length);
 
-            //the updated packet data is in packet, either becasue we're at the end of the packet,
-            //or because we weren't and packet was updated.
+            //the updated packet data is in fpacket, either becasue we're at the end of the packet,
+            //or because we weren't and fpacket was passed back to us from the child call.
             return new Packet(fpacket.Data, fpacket.Length);
 
         }
