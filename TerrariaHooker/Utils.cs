@@ -1,4 +1,6 @@
-﻿namespace TerrariaHooker {
+﻿using System.Collections.Generic;
+
+namespace TerrariaHooker {
     class Utils {
 
         public static string ParseEndPointAddr( string s ) {
@@ -9,6 +11,28 @@
             }
 
             return s;
+        }
+
+        public static List<string> GetLines( string s, int maxLineLength ) {
+            var list = new List<string>( );
+
+            if( maxLineLength >= s.Length ) {
+                list.Add( s );
+            } else {
+                var curLine = "";
+                foreach( var word in s.Split( ' ' ) ) {
+                    if( curLine.Length + word.Length + 1 > maxLineLength ) {
+                        list.Add( curLine );
+                        curLine = "";
+                    }
+                    curLine += word + " ";
+                }
+                if( curLine != "" ) {
+                    list.Add( curLine );
+                }
+            }
+
+            return list;
         }
 
     }
