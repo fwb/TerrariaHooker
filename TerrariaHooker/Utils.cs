@@ -13,6 +13,16 @@ namespace TerrariaHooker {
             return s;
         }
 
+        public static string concat(List<string> n, string delimiter=", ")
+        {
+            string o = null;
+            foreach (var i in n)
+            {
+                o += i + delimiter;
+            }
+            return o.Substring(0, o.Length - 2);
+        }
+
         public static List<string> GetLines( string s, int maxLineLength ) {
             var list = new List<string>( );
 

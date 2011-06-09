@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -35,6 +36,7 @@ namespace TerrariaHooker
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
+        internal const int MAX_LANDMARK_LENGTH = 10;
 
         static Commands()
         {
@@ -183,8 +185,8 @@ namespace TerrariaHooker
                 case 0x2d:
                     prefix = "PLAYER PARTY UPDATE";
                     break;
-                case 0x2F:
-                    prefix = "PLAYER USE/PLACE SIGN";
+                case 0x2E:
+                    prefix = "PLAYER READ SIGN";
                     break;
                 case 0x31:
                     prefix = "PLAYER SPAWN";
@@ -496,8 +498,7 @@ namespace TerrariaHooker
             //generate list of landmarks
             if (tag == null)
             {
-                var locations = new string[20];
-                int nLocs = 0;
+                var locations = new List<string>();
                 foreach (var sign in Main.sign)
                 {
                     if (sign == null)
@@ -509,22 +510,17 @@ namespace TerrariaHooker
                         int rLoc = sign.text.IndexOf(">");
                         if (rLoc != -1)
                         {
-                            locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1).ToLower();
-                            nLocs++;
+                            if ((rLoc - lLoc) -1 <= MAX_LANDMARK_LENGTH)
+                                locations.Add(sign.text.Substring(lLoc + 1, (rLoc-lLoc)-1).ToLower());
                         }
                     }
                 }
-                string o = null;
-                if (nLocs > 0)
+                
+                if (locations.Count > 0)
                 {
-                    foreach (string l in locations)
-                    {
-                        if (l == null)
-                            break;
-                        o += l + ", ";
-                    }
+                    string r = Utils.concat(locations);
 
-                    SendChatMsgSafe("Available landmarks: "+ o.Substring(0,o.Length-2),packetChatMsg.PlayerId, Color.GreenYellow);
+                    SendChatMsgSafe("Available landmarks: "+ r,packetChatMsg.PlayerId, Color.GreenYellow);
                     return true;
                 }
 
