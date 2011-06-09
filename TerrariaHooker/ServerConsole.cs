@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
+using Microsoft.Xna.Framework;
 using Terraria;
 
 namespace TerrariaHooker {
@@ -330,6 +331,7 @@ namespace TerrariaHooker {
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.AddEntry(ip);
             Commands.whitelisted[id] = true;
+            Commands.SendChatMsg("You are now whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
         }
 
@@ -344,6 +346,7 @@ namespace TerrariaHooker {
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.RemoveEntry(ip);
             Commands.whitelisted[id] = false;
+            Commands.SendChatMsg("You are no longer whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
         }
 

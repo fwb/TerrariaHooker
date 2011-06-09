@@ -903,7 +903,7 @@ namespace TerrariaHooker
         /// <param name="msg">Message to send</param>
         /// <param name="playerId">Player index to send to, or -1 for broadcast</param>
         /// <param name="color">The color, as a Color type.</param>
-        private static void SendChatMsg(string msg, int playerId, Color color)
+        public static void SendChatMsg(string msg, int playerId, Color color)
         {
             if (playerId == 0xFC)
                 Console.WriteLine(msg);
