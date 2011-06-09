@@ -31,15 +31,20 @@ namespace TerrariaHooker
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
-        private static TextWriter w = new StreamWriter(ServerConsole._out);
+        //private static TextWriter w = new StreamWriter(ServerConsole._out);
 
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
         internal const int MAX_LANDMARK_LENGTH = 20;
 
+        //10x10 box around spawn
+        internal const int SPAWN_PROTECT_WIDTH = 5;
+        internal const int SPAWN_PROTECT_HEIGHT = 5;
+
         static Commands()
         {
+            
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
             {
@@ -134,8 +139,8 @@ namespace TerrariaHooker
                     prefix = "PLAYER CURRENT/MAX HEALTH UPDATE";
                     break;
                 case 0x11:
-                    prefix = "PLAYER DESTROY BLOCK";
-                    packet = HandleDestroyBlock(nData);
+                    prefix = "PLAYER DESTROY/CREATE BLOCK";
+                    packet = HandleBlockChange(nData);
 
                     break;
                 case 0x13:
@@ -249,11 +254,27 @@ namespace TerrariaHooker
                Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
         }
 
-        private static Packet HandleDestroyBlock(byte[] data)
+        private static Packet HandleBlockChange(byte[] data)
         {
-            var p = new packet_DestroyTile(data);
+            var p = new packet_BlockChange(data);
 
             var packet = new Packet(data, data.Length);
+
+            /*//create a rect around the spawn, check if the point being acted on is part of the spawn rect.
+            if (p.Type == 0 || p.Type == 4)
+            {
+                Vector2 d = new Vector2(p.Position.X,p.Position.Y);
+                Rectangle rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16), 
+                                               Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16), 
+                                               SPAWN_PROTECT_WIDTH * 2 * 16, 
+                                               SPAWN_PROTECT_HEIGHT * 2 * 16);
+
+                if ((d.X > rect.Left && d.X < rect.Right) && (d.Y > rect.Top && d.Y < rect.Bottom))
+                    Console.WriteLine("Destroyed block is in spawn rect");
+            
+
+            }*/
+
             #region NEW WHITELIST CODE
             if (Whitelist.IsActive && !whitelisted[p.PlayerId])
             {
@@ -1042,13 +1063,24 @@ namespace TerrariaHooker
     }
 
     //stub
-    public class packet_DestroyTile : packet_Base
+    public class packet_BlockChange : packet_Base
     {
-        internal packet_DestroyTile(byte[] data)
+        internal Vector2 Position;
+        internal int Type;
+
+        internal packet_BlockChange(byte[] data)
             : base(data)
         {
             PlayerId = data[5];
-
+            Position.X = BitConverter.ToInt32(data, 6);
+            Position.Y = BitConverter.ToInt32(data, 10);
+            Type = data[11];
+            /* 0 = Destroy Tile
+             * 1 = Place Tile
+             * 2 = Kill Wall
+             * 3 = Place Wall
+             * 4 = Destroy Tile (drop no item)
+             */
         }
     }
 
