@@ -507,7 +507,7 @@ namespace TerrariaHooker
                         int rLoc = sign.text.IndexOf(">");
                         if (rLoc != -1)
                         {
-                            locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1);
+                            locations[nLocs] = sign.text.Substring(lLoc + 1, (rLoc-lLoc) -1).ToLower();
                             nLocs++;
                         }
                     }
@@ -539,7 +539,7 @@ namespace TerrariaHooker
                 if (n == null)
                     continue;
 
-                int found = n.text.IndexOf("<" + tag + ">");
+                int found = n.text.ToLower().IndexOf("<" + tag + ">");
                 if (found !=  -1)
                 {
                     //get sign coords, teleport user using 0x0D
