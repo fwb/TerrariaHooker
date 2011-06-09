@@ -152,6 +152,7 @@ namespace TerrariaHooker
                 case 0x19:
                     prefix = "CHAT MESSAGE";
                     packet = HandleChatMsg(nData); 
+
                     break;
                 case 0x1A:
                     prefix = "PLAYER HURT PLAYER";
@@ -160,7 +161,7 @@ namespace TerrariaHooker
                     prefix = "PLAYER PROJECTILE UPDATE";
                     break;
                 case 0x1C:
-                    prefix = "?PLAYER PROJECTILE HIT NPC";
+                    prefix = "?PLAYER PROJECTILE HIT NPC?";
                     break;
                 case 0x1D:
                     prefix = "PLAYER DESTROY PROJECTILE";
@@ -197,6 +198,7 @@ namespace TerrariaHooker
                 case 0x2c:
                     prefix = "PLAYER DIED";
                     packet = handleDeath(nData);
+
                     break;
                 case 0x2d:
                     prefix = "PLAYER PARTY UPDATE";
@@ -213,13 +215,22 @@ namespace TerrariaHooker
                     break;
             }
 
+            //write the returned packet back into the original data buffer. packet can either be
+            //the original data,  modified original data, or a dummy packet created.
             Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
             #if DEBUG
             OutputPacket(nData, prefix);
-            #endif  
-            if (offset + length < data.Length)
-                ProcessData(data, 0, offset + length);
+            #endif
 
+            //if theres more data in the buffer than the packet just read references, process data
+            //again with the offset covering the just-parsed packet. 
+            //logic: 
+            //1st pass, keep packet -> second pass : drop packet -> third pass : keep packet -> EOS 
+            //-> return from 3rd -> return from 2nd -> return from 1st: to SockHook.
+            if (offset + length < data.Length)
+                packet = ProcessData(data, 0, offset + length);
+
+            //only gets here if theres no data left to process.
             return packet;
 
         }
