@@ -89,10 +89,6 @@ namespace TerrariaHooker
         /// There are possibly ways to modify packet data to be inert, if reducing a recieved
         /// packet to a stub is necessary.
         /// 
-        /// To block typical incoming data, use WSASendHooked e.g. preventing lines of chat,
-        /// undoing world changes (in this case, buffer changes in WSARecv, revert, and block
-        /// outgoing updates in WSASend. It's a hacky method, but works.
-        /// 
         /// NOTES: Buffer is a ref to an WSABuffer structure. To access packet data, it needs
         /// to be marshalled. Marshal.Copy(Buffer.buf, newbuffer, number_of_bytes) is the
         /// safest way. number_of_bytes can be retrieved by marshalling bytesTransferred to
@@ -157,19 +153,7 @@ namespace TerrariaHooker
         /// <summary>
         /// WSASend Hook. Use this to modify any particular outgoing data, or use
         /// outgoing data to modify internal structures (e.g. parse world update
-        /// sends and use parsed data to change NPC locations, block types, etc.)
-        /// 
-        /// Also, currently, this is the only place to properly add /commands to the
-        /// game, without having code split between WSARecv and here. Process data in
-        /// Buffer.buf searching for:
-        /// 0x?? 0x?? 0x?? 0x?? 0x19 PID, 0xRR 0xGG 0xBB byte[] message. Return 0 from
-        /// the function without calling the original WSASend method and the game loop
-        /// will continue unfussed.
-        /// 
-        /// WSASend doesn't suffer from the same issues as WSARecv as there are no
-        /// callback structures, all data passed to WSASend is isolated and changes
-        /// can be made without any effect on anything except the current invocation
-        /// of WSASend. 
+        /// sends and use parsed data to change NPC locations, block types, etc.
         /// 
         /// NOTES: Buffer is a ref to an WSABuffer structure. To access packet data, it 
         /// needs to be marshalled. Marshal.Copy(Buffer.buf, newbuffer, number_of_bytes) 

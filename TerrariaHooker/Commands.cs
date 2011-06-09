@@ -140,25 +140,18 @@ namespace TerrariaHooker
                 case 0x13:
                     prefix = "PLAYER USE DOOR";
                     break;
+                case 0x15:
+                    prefix = "PLAYER PICKUP/DROP ITEM";
+                    break;
                 case 0x16:
-                    prefix = "DETERMINE ITEM OWNER";    //UPDATE: apparently item[x].active defines whether the item is
-                    //active within the game world (outside of inventories). I assume
-                    //the shit in FindOwner is to determine who the new owner of a newly
-                    //dropped item is (owner is the current dropper, so they don't have
-                    //preference on the item by being closest). Also seems to be called
-                    //when you try to pick up an item you don't have room for, which explains
-                    //the erroneus captures I was recieving.
-
+                    prefix = "DETERMINE ITEM OWNER"; 
                     break;
                 case 0x18:
                     prefix = "PLAYER HURT NPC";
                     break;
                 case 0x19:
                     prefix = "CHAT MESSAGE";
-                    packet = HandleChatMsg(nData);   //pass data to handler. 
-                    //ALL handlers assume a Packet struct as input.
-                    //and ALL handlers return a Packet struct as output.
-
+                    packet = HandleChatMsg(nData); 
                     break;
                 case 0x1A:
                     prefix = "PLAYER HURT PLAYER";
@@ -192,6 +185,11 @@ namespace TerrariaHooker
                     break;
                 case 0x28:
                     prefix = "PLAYER INTERACT NPC";
+                    break;
+                case 0x29:  //hard to give a short description, but this packet
+                            //seems to set the player-following item's animation
+                            //and rotation details. e.g. those floating balls of light
+                    prefix = "PLAYER ITEM ANIMATION/ROTATION";
                     break;
                 case 0x2A:
                     prefix = "PLAYER CURRENT/MAX MANA UPDATE";
