@@ -116,7 +116,7 @@ namespace TerrariaHooker {
                     playerList.Items.Add(new ListViewItem(new string[] {
                                                                         i.ToString(),
                                                                         p.name,
-                                                                        Terraria.Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
+                                                                        Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
                                                                         Commands.whitelisted[i].ToString(),}) );
                 }
             }
@@ -142,6 +142,7 @@ namespace TerrariaHooker {
         }
 
         private void SpawnNearPlayer( int playerNum, int npcType, bool useNearSpawn ) {
+            //todo: i want to move implementation to Commands.cs
             //Calculate our own spawn location
             var position = Main.player[playerNum].position;
             NPC.NewNPC( (int)position.X, (int)position.Y, npcType );
@@ -159,9 +160,7 @@ namespace TerrariaHooker {
 
 
         private void SpawnButtonClick( object sender, EventArgs e ) {
-            //MessageBox.Show( String.Format( "Index [{0}], PlayerNum [{1}]", mobPicker.SelectedIndex,
-            //                                playerSelectSlider.Value ) );
-            //if( npcPicker.SelectedIndex > 0 ) {
+            //todo: i want to move implementation to Commands.cs
             if( npcPicker.SelectedItem != null && selectedPlayer != -1) {
                 var npc = npcPicker.SelectedItem as NPCInfo;
                 SpawnNearPlayer( selectedPlayer, npc.Type, false);
@@ -237,7 +236,6 @@ namespace TerrariaHooker {
             foreach (char i in c)
             {
                 n[index].EventType = 0x0001;
-                //n[index].KeyEvent = new KEY_EVENT_RECORD();
                 n[index].KeyEvent.bKeyDown = 1;
                 n[index].KeyEvent.wRepeatCount = 1;
                 n[index].KeyEvent.UnicodeChar = i;
@@ -245,7 +243,6 @@ namespace TerrariaHooker {
             }
 
             n[index].EventType = 0x0001;
-            //n[index].KeyEvent = new KEY_EVENT_RECORD();
             n[index].KeyEvent.bKeyDown = 1;
             n[index].KeyEvent.dwControlKeyState = 0;
             n[index].KeyEvent.wRepeatCount = 1;
@@ -254,7 +251,6 @@ namespace TerrariaHooker {
             n[index].KeyEvent.wVirtualScanCode = (ushort)MapVirtualKey(0x0D, 0x00);
 
             uint events;
-            //WriteConsoleInput(Program.STDIN_HANDLE, n, (uint) c.Length + 1, out events);
             WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length + 1, out events);
             consoleInput.Clear();
         }
@@ -328,6 +324,10 @@ namespace TerrariaHooker {
             if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
                 return;
 
+            /* TODO: now that anon login is out of the question, these buttons are probably
+             * not necessary except for removing people that are being stupid, but ban beats
+             * that outright.
+             */
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.AddEntry(ip);
             Commands.whitelisted[id] = true;
@@ -411,6 +411,39 @@ namespace TerrariaHooker {
         private void button_EnemyApply_Click(object sender, EventArgs e)
         {
             Commands.disableSpawns(check_DisableEnemies.Checked);
+            if (check_enableCustomRates.Checked && !check_DisableEnemies.Checked)
+            {
+                int a; //spawnrate
+                int b; //maxspawns
+                if (int.TryParse(text_maxSpawns.Text, out b) == false)
+                {
+                    MessageBox.Show("Max Spawns must be a number");
+                    return;
+                }
+                if (int.TryParse(text_spawnRate.Text, out a) == false)
+                {
+                    MessageBox.Show("Spawn Rate must be a number");
+                    return;
+                }
+
+                Commands.setSpawnValues(a, b);
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            text_spawnRate.Text = "700";
+            text_maxSpawns.Text = "4";
+        }
+
+        private void check_DisableEnemies_CheckedChanged(object sender, EventArgs e)
+        {
+            panel_customSpawn.Enabled = !check_DisableEnemies.Checked;
+        }
+
+        private void label10_Click(object sender, EventArgs e)
+        {
+
         }
 
     }

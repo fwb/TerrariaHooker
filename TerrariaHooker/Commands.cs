@@ -581,14 +581,18 @@ namespace TerrariaHooker
         {
             if (mode)
             {
-                defaultSpawnRate.SetValue(null, 0);
-                defaultMaxSpawns.SetValue(null, 0);
+                setSpawnValues(0,0);
             } else
             {
-                defaultSpawnRate.SetValue(null, 700);
-                defaultMaxSpawns.SetValue(null, 4);
+                setSpawnValues(700,4);
             }
             return;
+        }
+
+        public static void setSpawnValues(int spawnrate, int maxspawns)
+        {
+            defaultSpawnRate.SetValue(null, spawnrate);
+            defaultMaxSpawns.SetValue(null, maxspawns);
         }
 
         private static void cmdCoords(packet_ChatMsg packetChatMsg)
