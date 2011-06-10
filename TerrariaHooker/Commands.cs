@@ -39,6 +39,9 @@ namespace TerrariaHooker
         private static Assembly terrariaAssembly;
         private static Type netplay;
         private static FieldInfo serverSock;
+        private static Type npc;
+        private static FieldInfo defaultMaxSpawns;
+        private static FieldInfo defaultSpawnRate;
         //private static TextWriter w = new StreamWriter(ServerConsole._out);
 
 
@@ -69,12 +72,27 @@ namespace TerrariaHooker
                 return;
             }
             netplay = terrariaAssembly.GetType("Terraria.Netplay");
+            npc = terrariaAssembly.GetType("Terraria.NPC");
 
             foreach (var f in netplay.GetFields())
             {
                 if (f.Name == "serverSock")
                 {
                     serverSock = f;
+                }
+            }
+
+            foreach (var f in npc.GetFields(BindingFlags.Static | BindingFlags.NonPublic))
+            {
+                if (f.Name == "defaultMaxSpawns")
+                {
+                    defaultMaxSpawns = f;
+                    continue;
+                }
+                if (f.Name == "defaultSpawnRate")
+                {
+                    defaultSpawnRate = f;
+                    continue;
                 }
             }
 
@@ -511,6 +529,9 @@ namespace TerrariaHooker
                     case (".coords"):
                         cmdCoords(p);
                         break;
+                    case (".noenemy"):
+                        if (!cmdDisableSpawns(commands, p)) cmdUsage("USAGE: .noenemy on|off", p.PlayerId);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -519,6 +540,55 @@ namespace TerrariaHooker
             }
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static bool cmdDisableSpawns(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            if ((AccountManager.GetRights(packetChatMsg.PlayerId) & Rights.ADMIN) != Rights.ADMIN)
+            {
+                SendAccessDeniedMsg(packetChatMsg.PlayerId, commands[0]);
+                return true;
+            }
+
+            if (commands.Length < 2)
+                return false;
+
+            switch(commands[1])
+            {
+                case ("on"):
+                    disableSpawns(true);
+                    SendChatMsg("Spawns Disabled.", packetChatMsg.PlayerId, Color.Green);
+                    break;
+                case ("off"):
+                    disableSpawns(false);
+                    SendChatMsg("Spawns Enabled.", packetChatMsg.PlayerId, Color.Green);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+
+        }
+
+
+        /// <summary>
+        /// Enable/Disable spawns (public)
+        /// TODO: test if this is actually callable from code outside terrarias space e.g.
+        /// not invoked from WSARecv.
+        /// </summary>
+        /// <param name="mode">true/false whether to disable or enable spawns.</param>
+        public static void disableSpawns(bool mode)
+        {
+            if (mode)
+            {
+                defaultSpawnRate.SetValue(null, 0);
+                defaultMaxSpawns.SetValue(null, 0);
+            } else
+            {
+                defaultSpawnRate.SetValue(null, 700);
+                defaultMaxSpawns.SetValue(null, 4);
+            }
+            return;
         }
 
         private static void cmdCoords(packet_ChatMsg packetChatMsg)
@@ -967,14 +1037,14 @@ namespace TerrariaHooker
             return param != null ? param.Trim() : null;
         }
 
-        private static void banUser(int id)
+        public static void banUser(int id)
         {
             //built-in terraria ban method
             Netplay.AddBan(id);
             return;
         }
 
-        private static void kickUser(int id)
+        public static void kickUser(int id)
         {
             NetMessage.SendData(2, id, -1, "Kicked from server.", 0, 0f, 0f, 0f);
             return;

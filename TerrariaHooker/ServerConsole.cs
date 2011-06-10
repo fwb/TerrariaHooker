@@ -304,7 +304,7 @@ namespace TerrariaHooker {
             if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
                 return;
 
-            NetMessage.SendData(2, id, -1, "Kicked from server.", 0, 0f, 0f, 0f);
+            Commands.kickUser(id);
             LoadPlayerInfo();
 
         }
@@ -317,7 +317,7 @@ namespace TerrariaHooker {
             if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
                 return;
 
-            Netplay.AddBan(id);
+            Commands.banUser(id);
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -406,6 +406,11 @@ namespace TerrariaHooker {
             Commands.spawnAllowUse = check_SpawnDisallowUse.Checked;
             Commands.spawnAllowPlace = check_SpawnDisallowPlace.Checked;
 
+        }
+
+        private void button_EnemyApply_Click(object sender, EventArgs e)
+        {
+            Commands.disableSpawns(check_DisableEnemies.Checked);
         }
 
     }
