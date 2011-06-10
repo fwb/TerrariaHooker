@@ -81,13 +81,13 @@
             this.check_DisableEnemies = new System.Windows.Forms.CheckBox();
             this.button_EnemyApply = new System.Windows.Forms.Button();
             this.check_enableCustomRates = new System.Windows.Forms.CheckBox();
-            this.text_spawnRate = new System.Windows.Forms.TextBox();
             this.text_maxSpawns = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.button10 = new System.Windows.Forms.Button();
             this.panel_customSpawn = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
+            this.track_spawnRate = new System.Windows.Forms.TrackBar();
+            this.label11 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
@@ -99,6 +99,7 @@
             this.groupBox4.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.panel_customSpawn.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.track_spawnRate)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -493,7 +494,6 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.label10);
             this.tabPage1.Controls.Add(this.groupBox6);
             this.tabPage1.Controls.Add(this.groupBox5);
             this.tabPage1.Controls.Add(this.groupBox4);
@@ -677,9 +677,10 @@
             this.groupBox6.Controls.Add(this.panel_customSpawn);
             this.groupBox6.Controls.Add(this.button_EnemyApply);
             this.groupBox6.Controls.Add(this.check_DisableEnemies);
+            this.groupBox6.Controls.Add(this.button10);
             this.groupBox6.Location = new System.Drawing.Point(13, 96);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(234, 139);
+            this.groupBox6.Size = new System.Drawing.Size(234, 204);
             this.groupBox6.TabIndex = 4;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Enemies";
@@ -698,9 +699,9 @@
             // button_EnemyApply
             // 
             this.button_EnemyApply.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.button_EnemyApply.Location = new System.Drawing.Point(7, 110);
+            this.button_EnemyApply.Location = new System.Drawing.Point(7, 175);
             this.button_EnemyApply.Name = "button_EnemyApply";
-            this.button_EnemyApply.Size = new System.Drawing.Size(221, 23);
+            this.button_EnemyApply.Size = new System.Drawing.Size(142, 23);
             this.button_EnemyApply.TabIndex = 1;
             this.button_EnemyApply.Text = "Apply";
             this.button_EnemyApply.UseVisualStyleBackColor = true;
@@ -711,22 +712,14 @@
             this.check_enableCustomRates.AutoSize = true;
             this.check_enableCustomRates.Location = new System.Drawing.Point(0, 3);
             this.check_enableCustomRates.Name = "check_enableCustomRates";
-            this.check_enableCustomRates.Size = new System.Drawing.Size(128, 17);
+            this.check_enableCustomRates.Size = new System.Drawing.Size(164, 17);
             this.check_enableCustomRates.TabIndex = 2;
-            this.check_enableCustomRates.Text = "Enable Custom Rates";
+            this.check_enableCustomRates.Text = "Enable Custom Spawn Rates";
             this.check_enableCustomRates.UseVisualStyleBackColor = true;
-            // 
-            // text_spawnRate
-            // 
-            this.text_spawnRate.Location = new System.Drawing.Point(0, 45);
-            this.text_spawnRate.Name = "text_spawnRate";
-            this.text_spawnRate.Size = new System.Drawing.Size(72, 20);
-            this.text_spawnRate.TabIndex = 3;
-            this.text_spawnRate.Text = "700";
             // 
             // text_maxSpawns
             // 
-            this.text_maxSpawns.Location = new System.Drawing.Point(78, 45);
+            this.text_maxSpawns.Location = new System.Drawing.Point(6, 45);
             this.text_maxSpawns.Name = "text_maxSpawns";
             this.text_maxSpawns.Size = new System.Drawing.Size(75, 20);
             this.text_maxSpawns.TabIndex = 4;
@@ -735,16 +728,17 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(0, 27);
+            this.label8.Location = new System.Drawing.Point(180, 71);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(69, 13);
+            this.label8.Size = new System.Drawing.Size(39, 13);
             this.label8.TabIndex = 5;
-            this.label8.Text = "Spawn Rate:";
+            this.label8.Text = "Slower";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(75, 27);
+            this.label9.Location = new System.Drawing.Point(3, 29);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(68, 13);
             this.label9.TabIndex = 6;
@@ -752,9 +746,9 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(157, 45);
+            this.button10.Location = new System.Drawing.Point(155, 175);
             this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(64, 23);
+            this.button10.Size = new System.Drawing.Size(71, 23);
             this.button10.TabIndex = 7;
             this.button10.Text = "Reset";
             this.button10.UseVisualStyleBackColor = true;
@@ -763,26 +757,36 @@
             // panel_customSpawn
             // 
             this.panel_customSpawn.BackColor = System.Drawing.Color.Transparent;
+            this.panel_customSpawn.Controls.Add(this.label11);
             this.panel_customSpawn.Controls.Add(this.label9);
-            this.panel_customSpawn.Controls.Add(this.button10);
+            this.panel_customSpawn.Controls.Add(this.track_spawnRate);
             this.panel_customSpawn.Controls.Add(this.label8);
             this.panel_customSpawn.Controls.Add(this.check_enableCustomRates);
-            this.panel_customSpawn.Controls.Add(this.text_spawnRate);
             this.panel_customSpawn.Controls.Add(this.text_maxSpawns);
             this.panel_customSpawn.Location = new System.Drawing.Point(7, 38);
             this.panel_customSpawn.Name = "panel_customSpawn";
-            this.panel_customSpawn.Size = new System.Drawing.Size(222, 70);
+            this.panel_customSpawn.Size = new System.Drawing.Size(222, 131);
             this.panel_customSpawn.TabIndex = 5;
             // 
-            // label10
+            // track_spawnRate
             // 
-            this.label10.Location = new System.Drawing.Point(16, 238);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(222, 35);
-            this.label10.TabIndex = 5;
-            this.label10.Text = "Note: Lower spawn rate = faster spawns. It should probably be spawn interval (ms)" +
-                ".";
-            this.label10.Click += new System.EventHandler(this.label10_Click);
+            this.track_spawnRate.Location = new System.Drawing.Point(3, 86);
+            this.track_spawnRate.Maximum = 1400;
+            this.track_spawnRate.Minimum = 10;
+            this.track_spawnRate.Name = "track_spawnRate";
+            this.track_spawnRate.Size = new System.Drawing.Size(216, 42);
+            this.track_spawnRate.TabIndex = 6;
+            this.track_spawnRate.TickFrequency = 50;
+            this.track_spawnRate.Value = 700;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(3, 70);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(36, 13);
+            this.label11.TabIndex = 8;
+            this.label11.Text = "Faster";
             // 
             // ServerConsole
             // 
@@ -813,6 +817,7 @@
             this.groupBox6.PerformLayout();
             this.panel_customSpawn.ResumeLayout(false);
             this.panel_customSpawn.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.track_spawnRate)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -880,9 +885,9 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox text_maxSpawns;
-        private System.Windows.Forms.TextBox text_spawnRate;
         private System.Windows.Forms.CheckBox check_enableCustomRates;
         private System.Windows.Forms.Panel panel_customSpawn;
-        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TrackBar track_spawnRate;
     }
 }

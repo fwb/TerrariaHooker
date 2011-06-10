@@ -413,16 +413,11 @@ namespace TerrariaHooker {
             Commands.disableSpawns(check_DisableEnemies.Checked);
             if (check_enableCustomRates.Checked && !check_DisableEnemies.Checked)
             {
-                int a; //spawnrate
+                int a = track_spawnRate.Value; //spawnrate
                 int b; //maxspawns
                 if (int.TryParse(text_maxSpawns.Text, out b) == false)
                 {
                     MessageBox.Show("Max Spawns must be a number");
-                    return;
-                }
-                if (int.TryParse(text_spawnRate.Text, out a) == false)
-                {
-                    MessageBox.Show("Spawn Rate must be a number");
                     return;
                 }
 
@@ -432,7 +427,7 @@ namespace TerrariaHooker {
 
         private void button10_Click(object sender, EventArgs e)
         {
-            text_spawnRate.Text = "700";
+            track_spawnRate.Value = 700;
             text_maxSpawns.Text = "4";
         }
 
