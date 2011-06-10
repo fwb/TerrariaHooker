@@ -411,6 +411,7 @@ namespace TerrariaHooker {
         private void button_EnemyApply_Click(object sender, EventArgs e)
         {
             Commands.disableSpawns(check_DisableEnemies.Checked);
+            button_EnemyApply.Enabled = false;
             if (check_enableCustomRates.Checked && !check_DisableEnemies.Checked)
             {
                 int a = track_spawnRate.Value; //spawnrate
@@ -420,23 +421,52 @@ namespace TerrariaHooker {
                     MessageBox.Show("Max Spawns must be a number");
                     return;
                 }
-
+                
                 Commands.setSpawnValues(a, b);
+                label_customRateEnabled.Text = check_enableCustomRates.Checked ? "Custom Rates: ENABLED" : "Custom Rates: DISABLED";
+                label_maxSpawns.Text = String.Format("Max Spawns: {0}", b);
+                label_spawnInterval.Text = String.Format("Spawn Rate: {0} (ms)", track_spawnRate.Value); 
+
             }
+            label_spawnsEnabled.Text = !check_DisableEnemies.Checked ? "Spawns: ENABLED" : "Spawns: DISABLED";
+
         }
 
         private void button10_Click(object sender, EventArgs e)
         {
             track_spawnRate.Value = 700;
             text_maxSpawns.Text = "4";
+            button_EnemyApply.Enabled = true;
         }
 
         private void check_DisableEnemies_CheckedChanged(object sender, EventArgs e)
         {
             panel_customSpawn.Enabled = !check_DisableEnemies.Checked;
+            button_EnemyApply.Enabled = true;
         }
 
         private void label10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void check_enableCustomRates_CheckedChanged(object sender, EventArgs e)
+        {
+            panel_CustomInternal.Enabled = check_enableCustomRates.Checked;
+            button_EnemyApply.Enabled = true;
+        }
+
+        private void text_maxSpawns_TextChanged(object sender, EventArgs e)
+        {
+            button_EnemyApply.Enabled = true;
+        }
+
+        private void track_spawnRate_Scroll(object sender, EventArgs e)
+        {
+            button_EnemyApply.Enabled = true;
+        }
+
+        private void label13_Click(object sender, EventArgs e)
         {
 
         }
