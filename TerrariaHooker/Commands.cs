@@ -117,6 +117,14 @@ namespace TerrariaHooker
             catch { return new Packet(data, data.Length); }
  
             int length = data[offset] + 4;
+
+            //some preemptive terribleness. if the detected length of the packet is greater
+            //than the entire remaining length of the packet, return because the packet is 
+            //split and unable to be acted on. also return if the length is less than 6, because 6 is the
+            //minimum required for playerId.
+            if (length > data.Length - offset || length < 6)
+                return new Packet(data, data.Length);
+
             var nData = new byte[length]; //buffer containing just the packet we're working om
 
             //there's some cases where so much data is pushed to the server it exceeds the buffer length
@@ -149,7 +157,7 @@ namespace TerrariaHooker
                     // Clear AccountManager refs in HandleGreeting( )
                     packet = HandleGreeting( nData );
                     if( Whitelist.IsActive ) {
-                        CheckWhitelist( data );
+                        CheckWhitelist( nData );
                     }
                     break;
                 case 0x05:
