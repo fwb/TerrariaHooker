@@ -759,9 +759,7 @@ namespace TerrariaHooker
             var id = getPlayerIdFromName(name);
             if (id != -1)
             {
-                Main.player[packetChatMsg.PlayerId].position.X = Main.player[id].position.X;
-                Main.player[packetChatMsg.PlayerId].position.Y = Main.player[id].position.Y;
-                NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
+                teleportPlayer((int)Main.player[id].position.X*16, (int)Main.player[id].position.Y*16,packetChatMsg.PlayerId);
                 return true;
             }
             SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
@@ -808,10 +806,6 @@ namespace TerrariaHooker
                 return true;
             }
 
-            //Main.player[targetId].position.X = finalCoords.X * 16;
-            //Main.player[targetId].position.Y = finalCoords.Y * 16;
-            //Main.player[targetId].SpawnX = (int) finalCoords.X*16;
-            //Main.player[targetId].SpawnY = (int) finalCoords.Y*16;
             int x = (int)finalCoords.X;
             int y = (int)finalCoords.Y;
 
@@ -830,12 +824,11 @@ namespace TerrariaHooker
             Main.spawnTileX = x;
             Main.spawnTileY = y;
             var n = Main.worldName;
+            //dummy world name
             Main.worldName = "12345--ass";
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
-            //0x0c: respawn, checks worldname for spawn coords
-            //NetMessage.SendData(0x0C, targetId, -1, "", targetId);
             killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
             Main.worldName = n;
             Main.spawnTileX = oldSpawnTileX;
