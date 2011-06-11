@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -16,6 +17,9 @@ namespace TerrariaHooker
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr GetStdHandle(int nStdHandle);
+
+        [DllImport( "user32.dll" )]
+        public static extern bool ShowWindow( IntPtr hWind, int nCmdShow );
         /*
          [DllImport("kernel32.dll",
             EntryPoint = "AllocConsole",
@@ -63,6 +67,12 @@ namespace TerrariaHooker
                    //NEW 1.0.3
                     var sf = new Thread(showServerConsole);
                     sf.Start();
+
+                    // Hide the ugly Console window
+                    var windowHandle = Process.GetCurrentProcess( ).MainWindowHandle;
+                    if( windowHandle != IntPtr.Zero ) {
+                        ShowWindow( windowHandle, 0 );
+                    }
 
                     Netplay.serverPort = l.LaunchWorldPort;
                     s.SetNetPlayers(l.LaunchWorldPlayers);
