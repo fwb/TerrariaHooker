@@ -125,7 +125,7 @@ namespace TerrariaHooker {
         private void LoadNPCInfo( ) {
             npcPicker.Items.Clear( );
             var npc = new NPC( );
-            for( var i=1; i<=45; i++ ) {
+            for( var i=1; i<=58; i++ ) {
                 try {
                     npc.SetDefaults( i );
                 } catch {
