@@ -759,7 +759,7 @@ namespace TerrariaHooker
             var id = getPlayerIdFromName(name);
             if (id != -1)
             {
-                teleportPlayer((int)Main.player[id].position.X*16, (int)Main.player[id].position.Y*16,packetChatMsg.PlayerId);
+                teleportPlayer((int)Main.player[id].position.X/16, (int)Main.player[id].position.Y/16,packetChatMsg.PlayerId);
                 return true;
             }
             SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
@@ -829,11 +829,15 @@ namespace TerrariaHooker
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
+
+            //NetMessage.SendData(0x0C, targetId, -1, "", targetId);
             killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
             Main.worldName = n;
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
+
             
+            //TODO: try 0x0C, except update serverside position.X and position.Y.
             //reset values for worldname and spawntile
             //NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
