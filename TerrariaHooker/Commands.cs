@@ -716,12 +716,14 @@ namespace TerrariaHooker
                 if (found !=  -1)
                 {
                     //get sign coords, teleport user using 0x0D
-                    float x = n.x * 16;
-                    float y = n.y * 16 - 20;
+                    float x = n.x;
+                    float y = n.y -1;
                    
-                    Main.player[packetChatMsg.PlayerId].position.X = x;
-                    Main.player[packetChatMsg.PlayerId].position.Y = y;
-                    NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
+                    teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
+
+                    //Main.player[packetChatMsg.PlayerId].position.X = x;
+                    //Main.player[packetChatMsg.PlayerId].position.Y = y;
+                    //NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
                     return true;
                 }
             }
@@ -806,12 +808,43 @@ namespace TerrariaHooker
                 return true;
             }
 
-            Main.player[targetId].position.X = finalCoords.X * 16;
-            Main.player[targetId].position.Y = finalCoords.Y * 16;
+            //Main.player[targetId].position.X = finalCoords.X * 16;
+            //Main.player[targetId].position.Y = finalCoords.Y * 16;
+            //Main.player[targetId].SpawnX = (int) finalCoords.X*16;
+            //Main.player[targetId].SpawnY = (int) finalCoords.Y*16;
+            int x = (int)finalCoords.X;
+            int y = (int)finalCoords.Y;
 
-            NetMessage.SendData(0x0D, -1, -1, "", targetId);
+            teleportPlayer(x, y, targetId);
+            //NetMessage.SendData(0x0D, -1, -1, "", targetId);
             return true;
 
+        }
+
+        private static void teleportPlayer(int x, int y, int targetId)
+        {
+
+            //change server spawn tile.
+            var oldSpawnTileX = Main.spawnTileX;
+            var oldSpawnTileY = Main.spawnTileY;
+            Main.spawnTileX = x;
+            Main.spawnTileY = y;
+            var n = Main.worldName;
+            Main.worldName = "12345--ass";
+
+            //0x07: update spawntilex, worldname
+            NetMessage.SendData(0x07, targetId, -1, "", targetId);
+            //0x0c: respawn, checks worldname for spawn coords
+            //NetMessage.SendData(0x0C, targetId, -1, "", targetId);
+            killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+            Main.worldName = n;
+            Main.spawnTileX = oldSpawnTileX;
+            Main.spawnTileY = oldSpawnTileY;
+            
+            //reset values for worldname and spawntile
+            //NetMessage.SendData(0x07, targetId, -1, "", targetId);
+
+            
         }
 
         private static bool cmdLogin( string[] commands, packet_ChatMsg p )
@@ -843,6 +876,22 @@ namespace TerrariaHooker
                 return true;
             }
 
+            float x;
+            float y;
+
+            x = Main.player[id].position.X;
+            y = Main.player[id].position.Y;
+
+            SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
+            killWithStar(x, y, id);
+           
+
+            return true;
+
+        }
+
+        private static void killWithStar(float x, float y, int id)
+        {
             //if the player is already hostile, don't do anything
             if (!Main.player[id].hostile)
             {
@@ -852,11 +901,10 @@ namespace TerrariaHooker
             }
 
             Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
-                                                       //as far as i can tell, main.myplayer only owns projectile
-                                                       //12 [star] and everything else is either unowned, or self-owned
-            Projectile.NewProjectile(Main.player[id].position.X, Main.player[id].position.Y-300, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
-            SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
-            return true;
+            //as far as i can tell, main.myplayer only owns projectile
+            //12 [star] and everything else is either unowned, or self-owned
+            Projectile.NewProjectile(x, y, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
+            return;
 
         }
 
