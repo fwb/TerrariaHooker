@@ -167,19 +167,8 @@ namespace TerrariaHooker {
             }
         }
 
-        private void CloseButtonClick( object sender, EventArgs e )
-        {
-            settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
-            settings.EnableWhitelist = Whitelist.IsActive;
-            settings.Save();
-
-            //save and quit. redirects console output to usual stdout first.
-            var n = new StreamWriter(_out);
-            Console.SetOut(n);
-            Close();
-            //send exit command.
-            sendLineToConsole("exit");
-            //this.Close();
+        private void CloseButtonClick( object sender, EventArgs e ) {
+            Close( );
         }
 
         private void LoadNPCsClick( object sender, EventArgs e ) {
@@ -469,6 +458,36 @@ namespace TerrariaHooker {
         private void label13_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void ExitSave( ) {
+            settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
+            settings.EnableWhitelist = Whitelist.IsActive;
+            settings.Save( );
+            sendLineToConsole( "exit" );
+        }
+
+        private void ExitNoSave( ) {
+            settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
+            settings.EnableWhitelist = Whitelist.IsActive;
+            settings.Save( );
+            sendLineToConsole( "exit-nosave" );
+        }
+
+        private void ServerConsole_FormClosing( object sender, FormClosingEventArgs e ) {
+            var res = MessageBox.Show( "Do you want to save the world?", "Exiting TerrariaHooker",
+                                       MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation );
+            switch( res ) {
+                case DialogResult.Yes:
+                    ExitSave( );  
+                    break;
+                case DialogResult.No:
+                    ExitNoSave( );  
+                    break;
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    break;
+            }
         }
 
     }

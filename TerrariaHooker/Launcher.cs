@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using Terraria;
 
@@ -60,10 +61,11 @@ namespace TerrariaHooker
             maxNetPlayers.Text = settings.LoadWorldMaxNetPlayers;
 
             //Server stuff
-            Terraria.Main.LoadWorlds( );
+            Main.LoadWorlds( );
             selectWorld.Items.Clear( );
-            
-            for( int i = 0; i < 5; i++ ) {
+
+            var n = Main.loadWorld.Length;
+            for( var i = 0; i < n; i++ ) {
                 if( !String.IsNullOrWhiteSpace( Main.loadWorld[i] ) ) {
                     selectWorld.Items.Add( new WorldData( ) { ID = i, Name = Main.loadWorld[i] } );
                 }
