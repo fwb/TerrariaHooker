@@ -61,6 +61,7 @@ namespace TerrariaHooker
             maxNetPlayers.Text = settings.LoadWorldMaxNetPlayers;
 
             //Server stuff
+            Main.dedServ = true;
             Main.LoadWorlds( );
             selectWorld.Items.Clear( );
 
