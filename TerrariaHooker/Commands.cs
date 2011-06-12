@@ -568,7 +568,7 @@ namespace TerrariaHooker
                         if(!cmdLandMark(commands, p)) cmdUsage("USAGE: .landmark <name>", p.PlayerId);
                         break;
                     case (".spawn"):
-                        if(!cmdSpawnNPC(commands, p)) cmdUsage("USAGE: .spawn <npcid> <player> [count]",p.PlayerId);
+                        if(!cmdSpawnNPC(commands, p)) cmdUsage("USAGE: .spawn <player> <npcid>x[count]",p.PlayerId);
                         break;
                     case (".coords"):
                         cmdCoords(p);
