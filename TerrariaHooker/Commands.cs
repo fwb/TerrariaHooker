@@ -866,6 +866,11 @@ namespace TerrariaHooker
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
+            //reset forged data
+            Main.worldName = n;
+            Main.spawnTileX = oldSpawnTileX;
+            Main.spawnTileY = oldSpawnTileY;
+
             //and as suspected, spawn wasn't working because the client and server were out of sync.
             //fixing up serverside position fixes tile updates.
             Main.player[targetId].position.X = x*16;
@@ -873,11 +878,6 @@ namespace TerrariaHooker
 
             NetMessage.SendData(0x0C, targetId, -1, "", targetId);
             //killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
-
-            //reset forged data
-            Main.worldName = n;
-            Main.spawnTileX = oldSpawnTileX;
-            Main.spawnTileY = oldSpawnTileY;
 
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
