@@ -72,7 +72,14 @@ namespace TerrariaHooker
                     }
 
                     MethodInvoker action = delegate { _output.AppendText(t); };
-                    _output.BeginInvoke(action);
+                    try
+                    {
+                        _output.BeginInvoke(action);
+                    } catch
+                    {
+                        //.. don't care! the only time this excepts is if something tries to write to the console and it's 
+                        //not available i.e. we've closed it.
+                    }
 
                     //empty stringbuilder
                     sb.Clear();

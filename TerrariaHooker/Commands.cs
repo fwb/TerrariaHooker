@@ -157,17 +157,17 @@ namespace TerrariaHooker
             {
                 case 0x01:
                     prefix = "USER LOGIN P1";
+                    // Clear AccountManager refs in HandleGreeting( )
+                    packet = HandleGreeting( nData, pid );
+                    if( Whitelist.IsActive ) {
+                        CheckWhitelist( pid );
+                    }
                     break;
                 case 0x02:
                     prefix = "USER LOGIN RELATED";
                     break;
                 case 0x04:
                     prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
-                    // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting( nData, pid );
-                    if( Whitelist.IsActive ) {
-                        CheckWhitelist( pid );
-                    }
                     break;
                 case 0x05:
                     prefix = "PLAYER UPDATE INVENTORY/EQUIP";
@@ -394,6 +394,8 @@ namespace TerrariaHooker
                         justHostiled[i] = 0x00;
                         _numberHostiled--;
                         Main.player[p.PlayerId].hostile = false;
+                        NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn
+                        NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details
                     }
                 }
             }
@@ -513,7 +515,7 @@ namespace TerrariaHooker
             if (p.Text[0] == 0x2E) // match dot
             {
                 //check if nocommands for anons is set, if playerid is not console id, and playerid is whitelisted
-                if (anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !whitelisted[p.PlayerId])
+                if (Whitelist.IsActive && anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !whitelisted[p.PlayerId])
                 {
                     SendChatMsg("Commands disabled until Whitelisted", p.PlayerId, Color.Salmon);
                     return CreateDummyPacket(data);
@@ -898,14 +900,14 @@ namespace TerrariaHooker
 
         }
 
-        private static void teleportPlayer(int x, int y, int targetId)
+        private static void teleportPlayer(int x, int y, int targetId, bool old = false)
         {
 
             //change server spawn tile.
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
             Main.spawnTileX = x;
-            Main.spawnTileY = y+3;
+            Main.spawnTileY = y;
             var n = Main.worldName;
             //dummy world name
             Main.worldName = "12345--ass";
@@ -918,17 +920,27 @@ namespace TerrariaHooker
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
-            //and as suspected, spawn wasn't working because the client and server were out of sync.
-            //fixing up serverside position fixes tile updates.
-            Main.player[targetId].position.X = x*16;
-            Main.player[targetId].position.Y = y*16;
+            if (!old)
+            {
+                //kill player, should respawn at the forged spawnpoint
+                Main.player[targetId].noFallDmg = true; //
+                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
 
-            NetMessage.SendData(0x0C, targetId, -1, "", targetId);
-            //killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+            } else
+            {
+                //and as suspected, spawn wasn't working because the client and server were out of sync.
+                //fixing up serverside position fixes tile updates.
+                Main.player[targetId].position.X = x * 16; //
+                Main.player[targetId].position.Y = y * 16; //
+                Main.player[targetId].noFallDmg = true; //
 
-            NetMessage.SendData(0x07, targetId, -1, "", targetId);
+                NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
 
-            
+
+                Main.player[targetId].noFallDmg = false; //
+                NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
+            }
+ 
         }
 
         private static bool cmdLogin( string[] commands, packet_ChatMsg p )
@@ -967,7 +979,7 @@ namespace TerrariaHooker
             y = Main.player[id].position.Y;
 
             SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
-            killWithStar(x, y, id);
+            killWithStar(x, y-5, id);
            
 
             return true;
@@ -987,7 +999,7 @@ namespace TerrariaHooker
             Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
             //as far as i can tell, main.myplayer only owns projectile
             //12 [star] and everything else is either unowned, or self-owned
-            Projectile.NewProjectile(x, y, 0f, 5f, 12, 1000, 10f, Main.myPlayer);
+            Projectile.NewProjectile(x, y, 0f, 5f, 12, 500, 10f, Main.myPlayer);
             return;
 
         }
