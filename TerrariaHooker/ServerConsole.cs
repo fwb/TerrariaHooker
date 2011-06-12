@@ -423,8 +423,8 @@ namespace TerrariaHooker {
 
         private void button10_Click(object sender, EventArgs e)
         {
-            track_spawnRate.Value = 700;
-            text_maxSpawns.Text = "4";
+            track_spawnRate.Value = 600;
+            text_maxSpawns.Text = "5";
             button_EnemyApply.Enabled = true;
         }
 

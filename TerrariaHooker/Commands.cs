@@ -360,17 +360,17 @@ namespace TerrariaHooker
             }
             #endregion
 
-            #region NEW WHITELIST CODE
-            /*
+            #region ANON LOGIN CODE
+            
             if (Whitelist.IsActive && !whitelisted[p.PlayerId])
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
-                    SendChatMsg("You cannot destroy blocks until whitelisted.", pid, Color.Purple);
+                    SendChatMsg("You cannot destroy blocks until whitelisted. x" + pid, pid, Color.Purple);
                     return CreateDummyPacket(data);
                 }
             }
-            */
+            
             #endregion
 
 
@@ -402,21 +402,25 @@ namespace TerrariaHooker
         private static Packet HandlePlayerState(byte[] data, int pid)
         {
             var packet = new Packet(data, data.Length);
-            if (!itemRiskEnabled) return packet;
 
             var p = new packet_PlayerState(data);
-
-
-            #region BLOCK ALL PLAYER STATE ACTIONS
-            if (Whitelist.IsActive && !whitelisted[p.PlayerId])
-            {
-                return CreateDummyPacket(data);
-            }
-            #endregion
+            p.PlayerId = pid;
 
             if (p.UsingItem)
                {
-                foreach (byte i in riskItems)
+                #region ANON LOGIN CODE
+                if (Whitelist.IsActive && !whitelisted[p.PlayerId])
+                {
+                    if (anonPrivs.Has(Actions.NOUSEITEMS))
+                    {
+                        SendChatMsg("You cannot use items until whitelisted. x" + pid, pid, Color.Purple);
+                        return CreateDummyPacket(data);
+                    }
+                }
+                #endregion
+                if (itemRiskEnabled)
+                {
+                    foreach (byte i in riskItems)
                     {
                         var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
                         if (id == i)
@@ -428,6 +432,7 @@ namespace TerrariaHooker
 
                         }
                     }
+                }
                }
         
             return packet;
@@ -446,7 +451,7 @@ namespace TerrariaHooker
                     whitelisted[playerId] = false;
                     if (!allowUnwhiteLogin)
                         NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
-                    //t[playerId].kill = true;
+
                 }
                 else
                 {
@@ -470,8 +475,8 @@ namespace TerrariaHooker
             //bytes 0-3 are payload length
             //byte 4 is message type
             //payload is bytes 5-end of packet
-            //payload length must match expected length since C# uses Streams to handle data
-            //and EndRead retrieves the expected data length before WSARecv is invoked.
+            //payload length must match expected length since XNA uses Streams to handle data
+            //and the length is pre-computed.
 
             var msgHeader = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x02 }; //new data, type 0x02 is ignored by the server
             var finalPacket = new byte[data.Length];
@@ -568,6 +573,9 @@ namespace TerrariaHooker
                     case (".noenemy"):
                         if (!cmdDisableSpawns(commands, p)) cmdUsage("USAGE: .noenemy on|off", p.PlayerId);
                         break;
+                    case (".version"):
+                        SendChatMsg("Version: whatever",p.PlayerId,Color.HotPink);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -620,7 +628,7 @@ namespace TerrariaHooker
                 setSpawnValues(0,0);
             } else
             {
-                setSpawnValues(700,4);
+                setSpawnValues(600,5);
             }
             return;
         }
