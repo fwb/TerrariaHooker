@@ -618,7 +618,9 @@ namespace TerrariaHooker
             
             var name = GetParamsAsString(commands, " ", 1);
             var pid = getPlayerIdFromName(name);
-            Item.NewItem((int) Main.player[pid].position.X, (int) Main.player[pid].position.Y, 16, 16, item, stack);
+            if (pid != -1)
+                Item.NewItem((int) Main.player[pid].position.X, (int) Main.player[pid].position.Y, 16, 16, item, stack);
+
             return true;
         }
 
@@ -903,7 +905,7 @@ namespace TerrariaHooker
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
             Main.spawnTileX = x;
-            Main.spawnTileY = y;
+            Main.spawnTileY = y+3;
             var n = Main.worldName;
             //dummy world name
             Main.worldName = "12345--ass";
