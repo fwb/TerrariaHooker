@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -108,9 +109,15 @@ namespace TerrariaHooker
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="direction">The direction of travel. 0 = RECV, 1 = SEND</param>
-        /// <returns>A packet structure, complete with Data and Data Length</returns>
-        public static Packet ProcessData(byte[] data, int direction, int offset = 0)
+        /// <param name="handle">The socket handle.</param>
+        /// <param name="offset">The offset in the data to start reading from.</param>
+        /// <returns>
+        /// A packet structure, complete with Data and Data Length
+        /// </returns>
+        public static Packet ProcessData(byte[] data, int direction, int handle, int offset = 0)
         {
+            //get playerid from socket handle
+            int pid = getPlayerIdFromHandle(handle);
 
             byte type;
             try { type = data[offset+4]; } 
@@ -124,6 +131,8 @@ namespace TerrariaHooker
             //minimum required for playerId.
             if (length > data.Length - offset || length < 6)
                 return new Packet(data, data.Length);
+
+
 
             var nData = new byte[length]; //buffer containing just the packet we're working om
 
@@ -155,9 +164,9 @@ namespace TerrariaHooker
                 case 0x04:
                     prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
                     // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting( nData );
+                    packet = HandleGreeting( nData, pid );
                     if( Whitelist.IsActive ) {
-                        CheckWhitelist( nData );
+                        CheckWhitelist( pid );
                     }
                     break;
                 case 0x05:
@@ -171,16 +180,13 @@ namespace TerrariaHooker
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                    if (Whitelist.IsActive && !whitelisted[data[offset+5]])
-                        SendChatMsg("You are not whitelisted, some actions are restricted.", data[5], Color.Peru);
+                    if (Whitelist.IsActive && !whitelisted[pid])
+                        SendChatMsg("You are not whitelisted, some actions are restricted.", pid, Color.Peru);
       
                     break;
                 case 0x0D:
                     prefix = "PLAYER STATE CHANGE";
-                    //when a compound packet starting with an 0x0D occurs, some included payloads
-                    //e.g. 0x11. have no playerid associated. so we need to cache the last ID.
-                    //LASTID = data[5]; 
-                    packet = HandlePlayerState(nData);
+                    packet = HandlePlayerState(nData, pid);
                     
                     break;
                 case 0x10:
@@ -188,7 +194,7 @@ namespace TerrariaHooker
                     break;
                 case 0x11:
                     prefix = "PLAYER DESTROY/CREATE BLOCK";
-                    packet = HandleBlockChange(nData);
+                    packet = HandleBlockChange(nData, pid);
 
                     break;
                 case 0x13:
@@ -285,13 +291,36 @@ namespace TerrariaHooker
             //logic: ProcessData returns a new Packet(fullpacket, length);
             //last-updated packet should cascade down to the parent.
             if (offset + length < data.Length)
-                fpacket = ProcessData(data, 0, offset + length);
+                fpacket = ProcessData(data, 0, handle, offset + length);
 
             //the updated packet data is in fpacket, either becasue we're at the end of the packet,
             //or because we weren't and fpacket was passed back to us from the child call.
             return new Packet(fpacket.Data, fpacket.Length);
 
         }
+
+        /// <summary>
+        /// Retrieves ID of player sending data from the socket handle data was recieved on.
+        /// </summary>
+        /// <param name="handle">The socket handle.</param>
+        /// <returns>player id</returns>
+        private static int getPlayerIdFromHandle(int handle)
+        {
+            int h;
+            int pid = -1;
+            var t = (ServerSock[])serverSock.GetValue(null);
+            for (int i = 0; i <= Main.maxNetPlayers; i++)
+            {
+                h = (int)t[i].tcpClient.Client.Handle;
+                if (h == handle)
+                {
+                    pid = i;
+                    break;
+                }
+            }
+            return pid;
+        }
+
         private static void OutputPacket(byte[] data, string prefix)
         {
                 var sBuffer = new StringBuilder( );
@@ -302,11 +331,10 @@ namespace TerrariaHooker
                Console.WriteLine( "{0} :: {1}", prefix, sBuffer.ToString( ).ToUpper( ) );
         }
 
-        private static Packet HandleBlockChange(byte[] data)
+        private static Packet HandleBlockChange(byte[] data, int pid)
         {
             var p = new packet_BlockChange(data);
-            //p.PlayerId = LASTID;
-            //LASTID = 0xFE;
+            p.PlayerId = pid;
 
             var packet = new Packet(data, data.Length);
             #region PROTECT SPAWN
@@ -338,7 +366,7 @@ namespace TerrariaHooker
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
-                    //SendChatMsg("You cannot destroy blocks until whitelisted.", data[5], Color.Purple);
+                    SendChatMsg("You cannot destroy blocks until whitelisted.", pid, Color.Purple);
                     return CreateDummyPacket(data);
                 }
             }
@@ -360,7 +388,7 @@ namespace TerrariaHooker
             {
                 for (var i = 0; i < _numberHostiled; i++)
                 {
-                    if (justHostiled[i] == data[5])
+                    if (justHostiled[i] == p.PlayerId)
                     {
                         justHostiled[i] = 0x00;
                         _numberHostiled--;
@@ -371,7 +399,7 @@ namespace TerrariaHooker
             return new Packet(data, data.Length);
         }
 
-        private static Packet HandlePlayerState(byte[] data)
+        private static Packet HandlePlayerState(byte[] data, int pid)
         {
             var packet = new Packet(data, data.Length);
             if (!itemRiskEnabled) return packet;
@@ -406,10 +434,10 @@ namespace TerrariaHooker
 
         }
 
-        private static void CheckWhitelist( byte[] data ) {
+        private static void CheckWhitelist( int pid ) {
             try {
                 var t = (ServerSock[])serverSock.GetValue( null );
-                var playerId = data[5];
+                var playerId = pid;
                 var endpoint = t[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
                 var ip = Utils.ParseEndPointAddr( endpoint );
                 if (!Whitelist.IsAllowed(ip))
@@ -429,8 +457,8 @@ namespace TerrariaHooker
             }
         }
 
-        private static Packet HandleGreeting( byte[] data ) {
-            AccountManager.Logout( data[5] );
+        private static Packet HandleGreeting( byte[] data, int pid ) {
+            AccountManager.Logout( pid );
             return new Packet( data, data.Length );
         }
 
@@ -838,16 +866,20 @@ namespace TerrariaHooker
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
-            //NetMessage.SendData(0x0C, targetId, -1, "", targetId);
-            killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+            //and as suspected, spawn wasn't working because the client and server were out of sync.
+            //fixing up serverside position fixes tile updates.
+            Main.player[targetId].position.X = x*16;
+            Main.player[targetId].position.Y = y*16;
+
+            NetMessage.SendData(0x0C, targetId, -1, "", targetId);
+            //killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+
+            //reset forged data
             Main.worldName = n;
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
-            
-            //TODO: try 0x0C, except update serverside position.X and position.Y.
-            //reset values for worldname and spawntile
-            //NetMessage.SendData(0x07, targetId, -1, "", targetId);
+            NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
             
         }
