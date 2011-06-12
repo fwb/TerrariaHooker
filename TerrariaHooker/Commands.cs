@@ -309,6 +309,7 @@ namespace TerrariaHooker
             int h;
             int pid = -1;
             var t = (ServerSock[])serverSock.GetValue(null);
+
             for (int i = 0; i <= Main.maxNetPlayers; i++)
             {
                 h = (int)t[i].tcpClient.Client.Handle;
@@ -521,7 +522,9 @@ namespace TerrariaHooker
                 //split is probably no slower than substring, if the size of the strings
                 //we are pulling from user-text is variable.
                 var commands = p.Text.Split(' ');
+                
                 commands[0] = commands[0].ToLower();
+                
 
                 switch (commands[0])
                 {
@@ -576,6 +579,9 @@ namespace TerrariaHooker
                     case (".version"):
                         SendChatMsg("Version: whatever",p.PlayerId,Color.HotPink);
                         break;
+                    case (".itemat"):
+                        if (!cmdCreateItem(commands, p)) cmdUsage("USAGE: .itemat <player> <itemid>x[quantity] e.g. .itemat player 14x5", p.PlayerId);
+                        break;
                     default:
                         cmdUnknown(commands, p);
                         break;
@@ -584,6 +590,36 @@ namespace TerrariaHooker
             }
 
             return new Packet(p.Packet, p.Packet.Length);
+        }
+
+        private static bool cmdCreateItem(string[] commands, packet_ChatMsg packetChatMsg)
+        {
+            if ((AccountManager.GetRights(packetChatMsg.PlayerId) & Rights.ADMIN) != Rights.ADMIN)
+            {
+                SendAccessDeniedMsg(packetChatMsg.PlayerId, commands[0]);
+                return true;
+            }
+
+            if (commands.Length < 3)
+                return false;
+
+            int item;
+            int stack = 1;
+
+            var z = commands[commands.Length - 1].Split('x');
+            if (z.Length == 2)
+            {
+                if (int.TryParse(z[1], out stack) == false)
+                    return false;
+            }
+
+            if (int.TryParse(z[0], out item) == false)
+                return false;
+            
+            var name = GetParamsAsString(commands, " ", 1);
+            var pid = getPlayerIdFromName(name);
+            Item.NewItem((int) Main.player[pid].position.X, (int) Main.player[pid].position.Y, 16, 16, item, stack);
+            return true;
         }
 
         private static bool cmdDisableSpawns(string[] commands, packet_ChatMsg packetChatMsg)
@@ -671,21 +707,22 @@ namespace TerrariaHooker
                 return false;
                 
             int npcId;
-            int count = 0;
-            bool multi = false;
+            int count = 1;
 
-            //first argument must be an integer
-            if (int.TryParse(commands[1], out npcId) == false)
+            var z = commands[commands.Length - 1].Split('x');
+            if (z.Length == 2)
+            {
+                if (int.TryParse(z[1], out count) == false)
+                    return false;
+            }
+
+            if (int.TryParse(z[0], out npcId) == false)
                 return false;
-
-            //final argument can be an integer, but is not required
-            if (int.TryParse(commands[commands.Length - 1], out count))
-                multi = true;
 
             //don't spawn retard amounts
             if (count > MAX_SPAWNS) count = MAX_SPAWNS;
 
-            string targetName = GetParamsAsString(commands, " ", multi ? 1 : 0, 1);
+            string targetName = GetParamsAsString(commands, " ", 1);
 
             if (targetName == null)
                 return false;
@@ -693,7 +730,7 @@ namespace TerrariaHooker
             var targetId = getPlayerIdFromName(targetName);
             if (targetId != -1)
             {
-                if (!multi)
+                if (count == 1)
                 {
                     NPC.NewNPC((int) Main.player[targetId].position.X, (int) Main.player[targetId].position.Y, npcId);
                 } else
