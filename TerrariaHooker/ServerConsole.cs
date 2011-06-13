@@ -92,7 +92,7 @@ namespace TerrariaHooker {
             sockHook = new SockHook();
 
             check_wlEnabled.Checked = settings.EnableWhitelist;
-            check_anonLoginEnabled.Checked = settings.EnableAnonLogin;
+            check_anonLoginEnabled.Checked = false;
 
         }
 
@@ -416,6 +416,10 @@ namespace TerrariaHooker {
                 label_maxSpawns.Text = String.Format("Max Spawns: {0}", b);
                 label_spawnInterval.Text = String.Format("Spawn Rate: {0} (ms)", track_spawnRate.Value); 
 
+            } else
+            {
+                //if it's unchecked, reset to defaults.
+                Commands.setSpawnValues(600,5);
             }
             label_spawnsEnabled.Text = !check_DisableEnemies.Checked ? "Spawns: ENABLED" : "Spawns: DISABLED";
 

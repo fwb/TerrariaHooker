@@ -24,7 +24,7 @@ namespace TerrariaHooker
         public static bool[] whitelisted = new bool[255];
 
         //.star <player> related variables
-        private static int[] justHostiled = new int[10];
+        private static int[] justHostiled = new int[255];
         private static int _numberHostiled;
 
         public static bool protectSpawn;
@@ -131,8 +131,6 @@ namespace TerrariaHooker
             //minimum required for playerId.
             if (length > data.Length - offset || length < 6)
                 return new Packet(data, data.Length);
-
-
 
             var nData = new byte[length]; //buffer containing just the packet we're working om
 
@@ -280,7 +278,7 @@ namespace TerrariaHooker
             Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
 
             //now, fpacket is a clone of the updated packet
-            Packet fpacket = new Packet(data, data.Length);
+            var fpacket = new Packet(data, data.Length);
 
             #if DEBUG
             OutputPacket(nData, prefix);
@@ -343,8 +341,8 @@ namespace TerrariaHooker
             if (protectSpawn)
             {
                 bool isIn = false;
-                Vector2 d = new Vector2(p.Position.X, p.Position.Y);
-                Rectangle rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16),
+                var d = new Vector2(p.Position.X, p.Position.Y);
+                var rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16),
                                                Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16),
                                                SPAWN_PROTECT_WIDTH * 2* 16,
                                                SPAWN_PROTECT_HEIGHT * 2 * 16);
@@ -373,8 +371,6 @@ namespace TerrariaHooker
             }
             
             #endregion
-
-
             return packet;
         }
 
@@ -395,7 +391,7 @@ namespace TerrariaHooker
                         _numberHostiled--;
                         Main.player[p.PlayerId].hostile = false;
                         NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn
-                        NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details
+                        NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
                     }
                 }
             }
@@ -430,7 +426,6 @@ namespace TerrariaHooker
                         {
                             //packet = CreateDummyPacket(data);
                             var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
-                            //MakeItHarder.serverConsole.AddChatLine("Player: " + p.Name + " tried to use " + itemName);
                             Console.WriteLine("RISK: Player '{0}' used {1}", Main.player[p.PlayerId].name, itemName);
 
                         }
@@ -546,7 +541,7 @@ namespace TerrariaHooker
                         if (!cmdKick(commands, p)) cmdUsage("USAGE: .kick <player>",p.PlayerId);
                         break;
                     case (".itemrisk"):
-                        cmdItemBanToggle( commands, p); //usage is .itemban, cares not for args
+                        cmdItemBanToggle( commands, p); //usage is .itemrisk, cares not for args
                         break;
                     case (".ban"):
                         if (!cmdBanUser(commands, p)) cmdUsage("USAGE: .ban <player>",p.PlayerId);
@@ -657,7 +652,6 @@ namespace TerrariaHooker
 
         /// <summary>
         /// Enable/Disable spawns (public)
-        /// TODO: test if this is actually callable from code outside terrarias space e.g.
         /// not invoked from WSARecv.
         /// </summary>
         /// <param name="mode">true/false whether to disable or enable spawns.</param>
@@ -691,7 +685,7 @@ namespace TerrariaHooker
                 SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
                 return;
             }
-            SendChatMsg( String.Format( "Available Commands: .wl, .broadcast, .ban, .kick, .kickban, .itemban," ),
+            SendChatMsg( String.Format( "Available Commands: .wl, .broadcast, .ban, .kick, .kickban, .itemrisk" ),
                          packetChatMsg.PlayerId, Color.GreenYellow );
             SendChatMsg( String.Format( ".meteor, .star, .spawn, .landmark, .teleport, .teleportto " ), packetChatMsg.PlayerId, Color.GreenYellow );
         }
@@ -800,15 +794,12 @@ namespace TerrariaHooker
                 int found = n.text.ToLower().IndexOf("<" + tag + ">");
                 if (found !=  -1)
                 {
-                    //get sign coords, teleport user using 0x0D
+
                     float x = n.x;
                     float y = n.y -1;
                    
                     teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
 
-                    //Main.player[packetChatMsg.PlayerId].position.X = x;
-                    //Main.player[packetChatMsg.PlayerId].position.Y = y;
-                    //NetMessage.SendData(0x0D, -1, -1, "", packetChatMsg.PlayerId, 0f, 0f, 0f);
                     return true;
                 }
             }
@@ -891,8 +882,8 @@ namespace TerrariaHooker
                 return true;
             }
 
-            int x = (int)finalCoords.X;
-            int y = (int)finalCoords.Y;
+            var x = (int)finalCoords.X;
+            var y = (int)finalCoords.Y;
 
             teleportPlayer(x, y, targetId);
             //NetMessage.SendData(0x0D, -1, -1, "", targetId);
@@ -908,14 +899,15 @@ namespace TerrariaHooker
             var oldSpawnTileY = Main.spawnTileY;
             Main.spawnTileX = x;
             Main.spawnTileY = y;
-            var n = Main.worldName;
+
             //dummy world name
+            var n = Main.worldName;
             Main.worldName = "12345--ass";
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
-            //reset forged data
+            //reset forged data (Serverside)
             Main.worldName = n;
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
@@ -972,14 +964,11 @@ namespace TerrariaHooker
                 return true;
             }
 
-            float x;
-            float y;
-
-            x = Main.player[id].position.X;
-            y = Main.player[id].position.Y;
+            float x = Main.player[id].position.X;
+            float y = Main.player[id].position.Y - (14 * 16); //spawn star 14 tiles above player
 
             SendChatMsg("Sending death to " + name + ".", packetChatMsg.PlayerId, Color.Red);
-            killWithStar(x, y-5, id);
+            killWithStar(x, y, id);
            
 
             return true;
@@ -999,7 +988,7 @@ namespace TerrariaHooker
             Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
             //as far as i can tell, main.myplayer only owns projectile
             //12 [star] and everything else is either unowned, or self-owned
-            Projectile.NewProjectile(x, y, 0f, 5f, 12, 500, 10f, Main.myPlayer);
+            Projectile.NewProjectile(x+8, y, 0f, 5f, 12, 500, 10f, Main.myPlayer);
             return;
 
         }
@@ -1210,7 +1199,6 @@ namespace TerrariaHooker
             }
             return -1;
         }
-        //END OF HELPERS
 
         /// <summary>
         /// Helper function to send chat messages
@@ -1284,8 +1272,6 @@ namespace TerrariaHooker
     /// in the event of WSASend calls. Typically the name won't be used unless the data is already
     /// known to be of a type where name is useful, so any irregularities are of no consequence.
     /// </summary>
-    //USE A CLASS INHERITING PACKET_BASE UNLESS YOU KNOW THAT PLAYERID IS AT INDEX 5
-    //CHILD CLASSES OVERRIDE PLAYERID IF THE PACKET THEY ARE DEFINING DIFFERS FROM BASE
     public class packet_Base
     {
         internal byte Type;

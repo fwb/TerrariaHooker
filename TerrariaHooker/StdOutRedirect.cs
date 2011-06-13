@@ -22,7 +22,7 @@ namespace TerrariaHooker
         {
             try
             {
-                //base.Write(value);
+                base.Write(value);
                 //using a stringbuilder here now, since STDOUT apparently sends data character-at-a-time
                 //so it was using an enormous amount of processor to append text to a textbox.
                 sb.Append(value);
