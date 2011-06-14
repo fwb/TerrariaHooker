@@ -25,7 +25,7 @@ namespace TerrariaHooker {
             SetLastError = true,
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
-        static extern bool WriteConsoleInput(SafeFileHandle hConsoleInput,
+        public static extern bool WriteConsoleInput(SafeFileHandle hConsoleInput,
            INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsWritten);
 
         [DllImport("user32.dll",
@@ -33,7 +33,7 @@ namespace TerrariaHooker {
             SetLastError = true,
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
-        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
 
         public class PlayerInfo : ListViewItem
@@ -231,36 +231,10 @@ namespace TerrariaHooker {
             }
             textBox1.AppendText(consoleInput.Text + Environment.NewLine);
             //hooray!
-            sendLineToConsole(consoleInput.Text);
-            //UpdateForm();
-
-        }
-
-        private void sendLineToConsole(string text)
-        {
-            char[] c = text.ToCharArray();
-            var n = new INPUT_RECORD[c.Length + 1];
-            int index = 0;
-            foreach (char i in c)
-            {
-                n[index].EventType = 0x0001;
-                n[index].KeyEvent.bKeyDown = 1;
-                n[index].KeyEvent.wRepeatCount = 1;
-                n[index].KeyEvent.UnicodeChar = i;
-                index++;
-            }
-
-            n[index].EventType = 0x0001;
-            n[index].KeyEvent.bKeyDown = 1;
-            n[index].KeyEvent.dwControlKeyState = 0;
-            n[index].KeyEvent.wRepeatCount = 1;
-            n[index].KeyEvent.wVirtualKeyCode = 0x0D;
-            n[index].KeyEvent.UnicodeChar = (char)0x0D;
-            n[index].KeyEvent.wVirtualScanCode = (ushort)MapVirtualKey(0x0D, 0x00);
-
-            uint events;
-            WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length + 1, out events);
+            Utils.sendLineToConsole(consoleInput.Text);
             consoleInput.Clear();
+
+
         }
 
 
@@ -482,7 +456,7 @@ namespace TerrariaHooker {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
             settings.EnableWhitelist = Whitelist.IsActive;
             settings.Save();
-            sendLineToConsole("exit");
+            Utils.sendLineToConsole("exit");
         }
 
         private void ExitNoSave()
@@ -490,7 +464,7 @@ namespace TerrariaHooker {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
             settings.EnableWhitelist = Whitelist.IsActive;
             settings.Save();
-            sendLineToConsole("exit-nosave");
+            Utils.sendLineToConsole("exit-nosave");
         }
 
         private void ServerConsole_FormClosing(object sender, FormClosingEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -516,6 +517,17 @@ namespace TerrariaHooker
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
             //...
             //act on packet fields, generate new data etc.
+            if (p.Text[0] == 0x25)
+            {
+
+                var n = p.Text.Split(' ');
+                n[0] = n[0].ToLower();
+
+                basicCommand(n,p);
+
+                return CreateDummyPacket(data);
+            }
+
 
             if (p.Text[0] == 0x2E) // match dot
             {
@@ -599,6 +611,25 @@ namespace TerrariaHooker
             return new Packet(p.Packet, p.Packet.Length);
         }
 
+        private static void basicCommand(string[] n, packet_ChatMsg packetChatMsg)
+        {
+            if ((AccountManager.GetRights(packetChatMsg.PlayerId) & Rights.ADMIN) != Rights.ADMIN)
+            {
+                SendAccessDeniedMsg(packetChatMsg.PlayerId, n[0]);
+                return;
+            }
+
+            if (n[0] == "%dawn" || n[0] == "%noon" || n[0] == "%dusk" || n[0] == "%midnight" || n[0] == "%settle")
+            {
+                var b = GetParamsAsString(n, " ", 0, -1);
+                var cmd = b.Substring(1, b.Length - 1);
+
+                Utils.sendLineToConsole(cmd);
+                return;
+            }
+            SendChatMsg("Available Commands: %dawn, %noon, %dusk, %midnight, %settle", packetChatMsg.PlayerId, Color.IndianRed);
+        }
+
         private static bool cmdCreateItem(string[] commands, packet_ChatMsg packetChatMsg)
         {
             if ((AccountManager.GetRights(packetChatMsg.PlayerId) & Rights.ADMIN) != Rights.ADMIN)
@@ -677,6 +708,11 @@ namespace TerrariaHooker
             return;
         }
 
+        /// <summary>
+        /// Sets the default values for Terraria NPC/Enemy spawns.
+        /// </summary>
+        /// <param name="spawnrate">The default spawnrate.</param>
+        /// <param name="maxspawns">The default maximum spawns at an instant (per player).</param>
         public static void setSpawnValues(int spawnrate, int maxspawns)
         {
             defaultSpawnRate.SetValue(null, spawnrate);
@@ -782,6 +818,8 @@ namespace TerrariaHooker
                 
                 if (locations.Count > 0)
                 {
+                    //remove duplicates from list (since the code will only ever teleport to the first found instance)
+                    locations = locations.Distinct().ToList();
                     string r = Utils.concat(locations);
 
                     SendChatMsgSafe("Available landmarks: "+ r,packetChatMsg.PlayerId, Color.GreenYellow);
@@ -1171,7 +1209,7 @@ namespace TerrariaHooker
         /// <returns></returns>
         private static string GetParamsAsString(string[] commands, string delimiter = " ", int negOffset = 0, int posOffset = 0)
         {
-            if (commands.Length == 1)
+            if (commands.Length == 1 && posOffset != -1)
                 return null;
 
             string param = null;

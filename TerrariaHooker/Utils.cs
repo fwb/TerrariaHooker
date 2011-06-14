@@ -45,5 +45,32 @@ namespace TerrariaHooker {
             return list;
         }
 
+        public static void sendLineToConsole(string text)
+        {
+            char[] c = text.ToCharArray();
+            var n = new INPUT_RECORD[c.Length + 1];
+            int index = 0;
+            foreach (char i in c)
+            {
+                n[index].EventType = 0x0001;
+                n[index].KeyEvent.bKeyDown = 1;
+                n[index].KeyEvent.wRepeatCount = 1;
+                n[index].KeyEvent.UnicodeChar = i;
+                index++;
+            }
+
+            n[index].EventType = 0x0001;
+            n[index].KeyEvent.bKeyDown = 1;
+            n[index].KeyEvent.dwControlKeyState = 0;
+            n[index].KeyEvent.wRepeatCount = 1;
+            n[index].KeyEvent.wVirtualKeyCode = 0x0D;
+            n[index].KeyEvent.UnicodeChar = (char)0x0D;
+            n[index].KeyEvent.wVirtualScanCode = (ushort)ServerConsole.MapVirtualKey(0x0D, 0x00);
+
+            uint events;
+            ServerConsole.WriteConsoleInput(Program.STDIN_HANDLE, n, (uint)c.Length + 1, out events);
+
+        }
+
     }
 }
