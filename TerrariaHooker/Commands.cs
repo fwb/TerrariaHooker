@@ -26,28 +26,20 @@ namespace TerrariaHooker
         private static Properties.Settings settings = new Properties.Settings();
         
         public static byte[] riskItems = new byte[] { 0xCF,   //lava bucket
-                                                        0xA7 }; //dynamite
+                                                      0xA7 }; //dynamite
 
-        private static bool itemRiskEnabled = true;
+        private static bool itemRiskEnabled = false;
         //public static bool whitelistEnabled;
         public static bool allowUnwhiteLogin;
         public static PlayerInfo[] player = new PlayerInfo[255];
 
-
-        //public static bool[] whitelisted = new bool[255];
-
-        //.star <player> related variables
-        //private static int[] justHostiled = new int[255];
-        //private static int _numberHostiled;
 
         public static bool protectSpawn;
         public static bool spawnAllowUse;
         public static bool spawnAllowBreak;
         public static bool spawnAllowPlace;
 
-        //fucked up shit
-        //private static int LASTID = 0;
-
+        //REVOKED privileges for unwhitelisted/anonymous users.
         private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
         
         private static Assembly terrariaAssembly;
@@ -680,7 +672,7 @@ namespace TerrariaHooker
                 setSpawnValues(0,0);
             } else
             {
-                setSpawnValues(600,5);
+                setSpawnValues(Data.DEFAULT_SPAWN_RATE,Data.DEFAULT_MAX_SPAWNS);
             }
             return;
         }

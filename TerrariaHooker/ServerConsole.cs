@@ -82,7 +82,6 @@ namespace TerrariaHooker {
 
 
         private TextWriter _writer = null;
-        //private delegate void AddChatLineCallback( string text );
         private delegate void SpawnMeteorCallback();
         public static Stream _out;
 
@@ -102,6 +101,14 @@ namespace TerrariaHooker {
             check_wlEnabled.Checked = settings.EnableWhitelist;
             check_anonLoginEnabled.Checked = false;
 
+            //initialize spawn defaults.
+            InitSpawns();
+
+        }
+        private void InitSpawns()
+        {
+            track_spawnRate.Value = Data.DEFAULT_SPAWN_RATE;
+            text_maxSpawns.Text = Data.DEFAULT_MAX_SPAWNS.ToString();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -125,11 +132,11 @@ namespace TerrariaHooker {
                 var p = Terraria.Main.player[i];
                 if (p.active)
                 {
-                    playerList.Items.Add(new ListViewItem(new string[] {
-                                                                        i.ToString(),
-                                                                        p.name,
-                                                                        Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
-                                                                        Commands.player[i].Whitelisted.ToString(),}));
+                    playerList.Items.Add(new ListViewItem(new[] {
+                                                          i.ToString(),
+                                                          p.name,
+                                                          Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
+                                                          Commands.player[i].Whitelisted.ToString(),}));
                 }
             }
         }
@@ -166,17 +173,6 @@ namespace TerrariaHooker {
             var position = Main.player[playerNum].position;
             NPC.NewNPC((int)position.X, (int)position.Y, npcType);
         }
-
-        //private void SendBroadcast( string msg ) {
-        //    for( var i = 0; i < 8; i++ ) {
-        //        if( Terraria.Main.player[i].active ) {
-        //            // last 3 args are RGB color values
-        //            Terraria.NetMessage.SendData( (int)MessageTypes.BROADCAST,
-        //                                          i, -1, msg, 8, 204f, 153f, 0f );
-        //        }
-        //    }
-        //}
-
 
         private void SpawnButtonClick(object sender, EventArgs e)
         {
@@ -284,10 +280,6 @@ namespace TerrariaHooker {
             sockHook.InitializeHooks();
         }
 
-        private void consoleInput_TextChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void playerList_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -336,10 +328,6 @@ namespace TerrariaHooker {
             if (int.TryParse(playerList.FocusedItem.SubItems[0].Text, out id) == false)
                 return;
 
-            /* TODO: now that anon login is out of the question, these buttons are probably
-             * not necessary except for removing people that are being stupid, but ban beats
-             * that outright.
-             */
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.AddEntry(ip);
             Commands.player[id].Whitelisted = true;
@@ -444,7 +432,8 @@ namespace TerrariaHooker {
             {
                 //if it's unchecked, reset to defaults.
                 if (!check_DisableEnemies.Checked)
-                    Commands.setSpawnValues(600, 5);
+                    Commands.disableSpawns(false);  //method name is deceptive, using disablespawns(false)
+                                                    //resets spawn rate to defaults.
             }
             label_spawnsEnabled.Text = !check_DisableEnemies.Checked ? "Spawns: ENABLED" : "Spawns: DISABLED";
 
@@ -452,8 +441,7 @@ namespace TerrariaHooker {
 
         private void button10_Click(object sender, EventArgs e)
         {
-            track_spawnRate.Value = 600;
-            text_maxSpawns.Text = "5";
+            InitSpawns();
             button_EnemyApply.Enabled = true;
         }
 
@@ -584,11 +572,6 @@ namespace TerrariaHooker {
             Main.chest[c].item[1].SetDefaults("Gold Pickaxe");
             Main.chest[c].item[1].name = "TEST ITEM 2";
 
-
-
-
-
-
         }
 
         private void npcPicker_SelectedIndexChanged(object sender, EventArgs e)
@@ -600,10 +583,7 @@ namespace TerrariaHooker {
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
 
-        }
     }
 
 }
