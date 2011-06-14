@@ -357,9 +357,9 @@ namespace TerrariaHooker
                 bool isIn = false;
                 var d = new Vector2(p.Position.X, p.Position.Y);
                 var rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16),
-                                               Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16),
-                                               SPAWN_PROTECT_WIDTH * 2* 16,
-                                               SPAWN_PROTECT_HEIGHT * 2 * 16);
+                                         Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16),
+                                         SPAWN_PROTECT_WIDTH * 2* 16,
+                                         SPAWN_PROTECT_HEIGHT * 2 * 16);
 
                 if ((d.X > rect.Left && d.X < rect.Right) && (d.Y > rect.Top && d.Y < rect.Bottom))
                     isIn = true;
@@ -947,7 +947,7 @@ namespace TerrariaHooker
         /// <param name="y">Y coord</param>
         /// <param name="targetId">The target Player ID</param>
         /// <param name="old">if set to <c>true</c> run [old] code.</param>
-        private static void teleportPlayer(int x, int y, int targetId, bool old = false)
+        private static void teleportPlayer(int x, int y, int targetId, bool old = true)
         {
 
             //change server spawn tile.
@@ -970,6 +970,12 @@ namespace TerrariaHooker
 
             if (old)
             {
+                if (!Main.player[targetId].hostile)
+                {
+                    Main.player[targetId].hostile = true;
+                    player[targetId].ForcedHostile = true;
+                }
+
                 //and as suspected, spawn wasn't working because the client and server were out of sync.
                 //fixing up serverside position fixes tile updates.
                 Main.player[targetId].position.X = x*16; //
@@ -1400,6 +1406,9 @@ namespace TerrariaHooker
              * 3 = Place Wall
              * 4 = Destroy Tile (drop no item)
              */
+            //TODO: need to change this to include the byte for fail
+            //so can effectively include blocking for actions that break
+            //blocks, skipping actions that merely touch blocks.
         }
     }
 
