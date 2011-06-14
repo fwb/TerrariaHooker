@@ -958,7 +958,14 @@ namespace TerrariaHooker
 
             //dummy world name
             var n = Main.worldName;
-            Main.worldName = "12345--ass";
+            Random random = new Random();
+            int randomNumber = random.Next(0,100000000);
+
+            Main.worldName = "assassass-" + randomNumber;   //worldname for .landmark is now random
+                                                            //in case for some reason the client doesn't
+                                                            //recieve the 0x07 resetting world name.
+                                                            //worst case the user gets a few extra entries
+                                                            //for visited worlds with spawns set, boo hoo.
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
