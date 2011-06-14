@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -41,7 +39,7 @@ namespace TerrariaHooker
         public static bool spawnAllowPlace;
 
         //REVOKED privileges for unwhitelisted/anonymous users.
-        private static Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
+        private const Actions anonPrivs = Actions.NOBREAKBLOCK | Actions.NOUSEITEMS| Actions.NOCOMMANDS;
         
         private static Assembly terrariaAssembly;
         private static Type netplay;
@@ -331,6 +329,11 @@ namespace TerrariaHooker
             return pid;
         }
 
+        /// <summary>
+        /// Output the recieved/sent packet to console, as hexadecimal with prefix
+        /// </summary>
+        /// <param name="data">The packet data</param>
+        /// <param name="prefix">The human-readable prefix</param>
         private static void OutputPacket(byte[] data, string prefix)
         {
                 var sBuffer = new StringBuilder( );
@@ -431,13 +434,10 @@ namespace TerrariaHooker
                     foreach (byte i in riskItems)
                     {
                         var id = Main.player[p.PlayerId].inventory[p.SelectedItemId].type;
-                        if (id == i)
-                        {
-                            //packet = CreateDummyPacket(data);
-                            var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
-                            Console.WriteLine("RISK: Player '{0}' used {1}", Main.player[p.PlayerId].name, itemName);
-
-                        }
+                        if (id != i) continue;
+                        //packet = CreateDummyPacket(data);
+                        var itemName = Main.player[p.PlayerId].inventory[p.SelectedItemId].name;
+                        Console.WriteLine("RISK: Player '{0}' used {1}", Main.player[p.PlayerId].name, itemName);
                     }
                 }
                }
@@ -457,7 +457,7 @@ namespace TerrariaHooker
                     Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
                     player[playerId].Whitelisted = false;
                     if (!allowUnwhiteLogin)
-                        NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
+                        NetMessage.SendData( 2, playerId, -1, "Not on whitelist." );
 
                 }
                 else
@@ -465,7 +465,7 @@ namespace TerrariaHooker
                     player[playerId].Whitelisted = true;
                 }
             } catch( Exception e ) {
-                Console.WriteLine( String.Format( "Exception during Whitelist processing: {0}", e.ToString( ) ) );
+                Console.WriteLine( String.Format( "Exception during Whitelist processing: {0}", e ) );
             }
         }
 
@@ -476,6 +476,13 @@ namespace TerrariaHooker
             return new Packet( data, data.Length );
         }
 
+        /// <summary>
+        /// Creates a dummy packet the same length as [data], that has no effect
+        /// when recieved by the server. Used to prevent an incoming packet from
+        /// being processed by the server.
+        /// </summary>
+        /// <param name="data">The original packet data</param>
+        /// <returns></returns>
         private static Packet CreateDummyPacket(byte[] data)
         {
             int msgLength = 1;
@@ -515,11 +522,10 @@ namespace TerrariaHooker
         public static Packet HandleChatMsg(byte[] data)
         {
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
-            //...
-            //act on packet fields, generate new data etc.
-            if (p.Text[0] == 0x25)
+         
+            //built-in commands (prefixed with %).
+            if (p.Text[0] == 0x25) //match %, for built-in commands.
             {
-
                 var n = p.Text.Split(' ');
                 n[0] = n[0].ToLower();
 
@@ -538,10 +544,7 @@ namespace TerrariaHooker
                     return CreateDummyPacket(data);
                 }
 
-                //split is probably no slower than substring, if the size of the strings
-                //we are pulling from user-text is variable.
                 var commands = p.Text.Split(' ');
-                
                 commands[0] = commands[0].ToLower();
                 
 
@@ -611,6 +614,11 @@ namespace TerrariaHooker
             return new Packet(p.Packet, p.Packet.Length);
         }
 
+        /// <summary>
+        /// Handles basic, built-in terraria server commands.
+        /// </summary>
+        /// <param name="n">The line entered.</param>
+        /// <param name="packetChatMsg">The chat message packet</param>
         private static void basicCommand(string[] n, packet_ChatMsg packetChatMsg)
         {
             if ((AccountManager.GetRights(packetChatMsg.PlayerId) & Rights.ADMIN) != Rights.ADMIN)
@@ -805,15 +813,11 @@ namespace TerrariaHooker
                         continue;
 
                     var lLoc = sign.text.IndexOf("<");
-                    if (lLoc != -1)
-                    {
-                        int rLoc = sign.text.IndexOf(">");
-                        if (rLoc != -1)
-                        {
-                            if ((rLoc - lLoc) -1 <= MAX_LANDMARK_LENGTH)
-                                locations.Add(sign.text.Substring(lLoc + 1, (rLoc-lLoc)-1).ToLower());
-                        }
-                    }
+                    if (lLoc == -1) continue;
+                    int rLoc = sign.text.IndexOf(">");
+                    if (rLoc == -1) continue;
+                    if ((rLoc - lLoc) -1 <= MAX_LANDMARK_LENGTH)
+                        locations.Add(sign.text.Substring(lLoc + 1, (rLoc-lLoc)-1).ToLower());
                 }
                 
                 if (locations.Count > 0)
@@ -840,16 +844,13 @@ namespace TerrariaHooker
                     continue;
 
                 int found = n.text.ToLower().IndexOf("<" + tag + ">");
-                if (found !=  -1)
-                {
-
-                    float x = n.x;
-                    float y = n.y -1;
+                if (found == -1) continue;
+                float x = n.x;
+                float y = n.y -1;
                    
-                    teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
+                teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
 
-                    return true;
-                }
+                return true;
             }
             SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
             return true;
@@ -939,6 +940,13 @@ namespace TerrariaHooker
 
         }
 
+        /// <summary>
+        /// Teleports a player to X,Y coords
+        /// </summary>
+        /// <param name="x">X coord</param>
+        /// <param name="y">Y coord</param>
+        /// <param name="targetId">The target Player ID</param>
+        /// <param name="old">if set to <c>true</c> run [old] code.</param>
         private static void teleportPlayer(int x, int y, int targetId, bool old = false)
         {
 
@@ -960,18 +968,12 @@ namespace TerrariaHooker
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
-            if (!old)
-            {
-                //kill player, should respawn at the forged spawnpoint
-                Main.player[targetId].noFallDmg = true; //
-                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
-
-            } else
+            if (old)
             {
                 //and as suspected, spawn wasn't working because the client and server were out of sync.
                 //fixing up serverside position fixes tile updates.
-                Main.player[targetId].position.X = x * 16; //
-                Main.player[targetId].position.Y = y * 16; //
+                Main.player[targetId].position.X = x*16; //
+                Main.player[targetId].position.Y = y*16; //
                 Main.player[targetId].noFallDmg = true; //
 
                 NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
@@ -980,7 +982,12 @@ namespace TerrariaHooker
                 Main.player[targetId].noFallDmg = false; //
                 NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
             }
- 
+            else
+            {
+                //kill player, should respawn at the forged spawnpoint
+                Main.player[targetId].noFallDmg = true; //
+                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+            }
         }
 
         private static bool cmdLogin( string[] commands, packet_ChatMsg p )
@@ -1221,6 +1228,10 @@ namespace TerrariaHooker
             return param != null ? param.Trim() : null;
         }
 
+        /// <summary>
+        /// Bans a player from the server
+        /// </summary>
+        /// <param name="id">Player ID</param>
         public static void banUser(int id)
         {
             //built-in terraria ban method
@@ -1228,21 +1239,28 @@ namespace TerrariaHooker
             return;
         }
 
+        /// <summary>
+        /// Kicks a user from the server
+        /// </summary>
+        /// <param name="id">Player ID</param>
         public static void kickUser(int id)
         {
-            NetMessage.SendData(2, id, -1, "Kicked from server.", 0, 0f, 0f, 0f);
+            NetMessage.SendData(2, id, -1, "Kicked from server.");
             return;
         }
 
+        /// <summary>
+        /// Given a player Name, returns their Player ID
+        /// </summary>
+        /// <param name="name">The players Name</param>
+        /// <returns>The players ID, or -1 if user is not found.</returns>
         private static int getPlayerIdFromName(string name)
         {
             for (int i = 0; i < Main.maxNetPlayers; i++)
             {
-                if (Main.player[i].name.ToLower() == name.ToLower())
-                {
-                    if (Main.player[i].active)
-                        return i;
-                }
+                if (Main.player[i].name.ToLower() != name.ToLower()) continue;
+                if (Main.player[i].active)
+                    return i;
             }
             return -1;
         }
@@ -1263,6 +1281,13 @@ namespace TerrariaHooker
             return;
         }
 
+        /// <summary>
+        /// Sends a chat message with content exceeding MAX_LINE_LENGTH split
+        /// into multiple messages.
+        /// </summary>
+        /// <param name="msg">The message to be sent</param>
+        /// <param name="playerId">The target Player ID</param>
+        /// <param name="color">The color of the Text</param>
         private static void SendChatMsgSafe( string msg, int playerId, Color color ) {
             if( playerId == 0xFC ) {
                 Console.WriteLine( msg );
@@ -1286,6 +1311,8 @@ namespace TerrariaHooker
         /// Broadcast Command Handler
         /// </summary>
         /// <param name="commands">The array of space-delimited words</param>
+        /// <param name="packetChatMsg">The chat message packet</param>
+        /// <returns></returns>
         private static bool cmdBroadcast( string[] commands, packet_ChatMsg packetChatMsg )
         {
             if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {

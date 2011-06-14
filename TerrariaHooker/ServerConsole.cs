@@ -18,7 +18,7 @@ namespace TerrariaHooker {
         private static Properties.Settings settings = new Properties.Settings();
 
 
-        private delegate void NCallback();
+        //private delegate void NCallback();
 
         [DllImport("kernel32.dll",
             EntryPoint = "WriteConsoleInput",
@@ -423,11 +423,6 @@ namespace TerrariaHooker {
         {
             panel_customSpawn.Enabled = !check_DisableEnemies.Checked;
             button_EnemyApply.Enabled = true;
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void check_enableCustomRates_CheckedChanged(object sender, EventArgs e)
