@@ -9,8 +9,9 @@ using Terraria;
 
 namespace TerrariaHooker {
 
-    
-    public partial class ServerConsole : Form {
+
+    public partial class ServerConsole : Form
+    {
 
         public static SockHook sockHook;
         private static int selectedPlayer = -1;
@@ -35,22 +36,26 @@ namespace TerrariaHooker {
         static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
 
-        public class PlayerInfo : ListViewItem {
+        public class PlayerInfo : ListViewItem
+        {
             public int Id { get; set; }
             public string PlayerName { get; set; }
 
-            public PlayerInfo( int id, string name ) {
+            public PlayerInfo(int id, string name)
+            {
                 Id = id;
                 PlayerName = name;
             }
 
-            public override string ToString( ) {
+            public override string ToString()
+            {
                 return PlayerName;
             }
 
         }
 
-        public class NPCInfo {
+        public class NPCInfo
+        {
             public int Type { get; set; }
             public string Name { get; set; }
             public int Damage { get; set; }
@@ -58,8 +63,9 @@ namespace TerrariaHooker {
             public int LifeMax { get; set; }
             public Single DropValue { get; set; }
 
-            public NPCInfo( int id, string name, int damage, int defense, 
-                            int lifemax, Single dropvalue ) {
+            public NPCInfo(int id, string name, int damage, int defense,
+                            int lifemax, Single dropvalue)
+            {
                 Type = id;
                 Name = name;
                 Damage = damage;
@@ -68,7 +74,8 @@ namespace TerrariaHooker {
                 DropValue = dropvalue;
             }
 
-            public override string ToString( ) {
+            public override string ToString()
+            {
                 return Name;
             }
         }
@@ -79,11 +86,12 @@ namespace TerrariaHooker {
         private delegate void SpawnMeteorCallback();
         public static Stream _out;
 
-        
-        public ServerConsole() {
 
-            InitializeComponent( );
-            LoadLauncherSettings( );
+        public ServerConsole()
+        {
+
+            InitializeComponent();
+            LoadLauncherSettings();
             _writer = new StdOutRedirect(textBox1);
             // Redirect the out Console stream
             _out = Console.OpenStandardOutput();
@@ -96,56 +104,67 @@ namespace TerrariaHooker {
 
         }
 
-        protected override void OnLoad( EventArgs e ) {
-            base.OnLoad( e );
-            sockHook.InitializeHooks( );
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            sockHook.InitializeHooks();
         }
 
-        private void LoadLauncherSettings( ) {
+        private void LoadLauncherSettings()
+        {
             //enableInvasion.Checked = mih.InfiniteInvasion;
             //enableBloodMoon.Checked = mih.InfiniteBloodMoon;
             //enableEyeSpawn.Checked = mih.InfiniteEye;
         }
 
-        private void LoadPlayerInfo( ) {
-            playerList.Items.Clear( );
-            for( var i = 0; i < Terraria.Main.maxNetPlayers; i++ ) {
+        private void LoadPlayerInfo()
+        {
+            playerList.Items.Clear();
+            for (var i = 0; i < Terraria.Main.maxNetPlayers; i++)
+            {
                 var p = Terraria.Main.player[i];
-                if( p.active )
+                if (p.active)
                 {
                     playerList.Items.Add(new ListViewItem(new string[] {
                                                                         i.ToString(),
                                                                         p.name,
                                                                         Netplay.serverSock[i].tcpClient.Client.RemoteEndPoint.ToString(),
-                                                                        Commands.whitelisted[i].ToString(),}) );
+                                                                        Commands.player[i].Whitelisted.ToString(),}));
                 }
             }
         }
 
-        private void LoadNPCInfo( ) {
-            npcPicker.Items.Clear( );
-            var npc = new NPC( );
-            for( var i=1; i<=58; i++ ) {
-                try {
-                    npc.SetDefaults( i );
-                } catch {
-                    MessageBox.Show( string.Format( "Error loading NPC type [{0}]", i ) );
+        private void LoadNPCInfo()
+        {
+            npcPicker.Items.Clear();
+            var npc = new NPC();
+            for (var i = 1; i <= 58; i++)
+            {
+                try
+                {
+                    npc.SetDefaults(i);
+                }
+                catch
+                {
+                    MessageBox.Show(string.Format("Error loading NPC type [{0}]", i));
                 }
 
-                if( npc.name != null ) {
-                    npcPicker.Items.Add( new NPCInfo( npc.type, npc.name, npc.damage,
+                if (npc.name != null)
+                {
+                    npcPicker.Items.Add(new NPCInfo(npc.type, npc.name+ " [" + npc.type + "]", npc.damage,
                                                       npc.defense, npc.lifeMax,
-                                                      npc.value ) );
+                                                      npc.value));
                 }
             }
             npcPicker.SelectedIndex = 0;
         }
 
-        private void SpawnNearPlayer( int playerNum, int npcType, bool useNearSpawn ) {
+        private void SpawnNearPlayer(int playerNum, int npcType, bool useNearSpawn)
+        {
             //todo: i want to move implementation to Commands.cs
             //Calculate our own spawn location
             var position = Main.player[playerNum].position;
-            NPC.NewNPC( (int)position.X, (int)position.Y, npcType );
+            NPC.NewNPC((int)position.X, (int)position.Y, npcType);
         }
 
         //private void SendBroadcast( string msg ) {
@@ -159,23 +178,27 @@ namespace TerrariaHooker {
         //}
 
 
-        private void SpawnButtonClick( object sender, EventArgs e ) {
+        private void SpawnButtonClick(object sender, EventArgs e)
+        {
             //todo: i want to move implementation to Commands.cs
-            if( npcPicker.SelectedItem != null && selectedPlayer != -1) {
+            if (npcPicker.SelectedItem != null && selectedPlayer != -1)
+            {
                 var npc = npcPicker.SelectedItem as NPCInfo;
-                SpawnNearPlayer( selectedPlayer, npc.Type, false);
+                SpawnNearPlayer(selectedPlayer, npc.Type, false);
             }
         }
 
-        private void CloseButtonClick( object sender, EventArgs e ) {
-            Close( );
+        private void CloseButtonClick(object sender, EventArgs e)
+        {
+            Close();
         }
 
-        private void LoadNPCsClick( object sender, EventArgs e ) {
-            LoadNPCInfo( );
+        private void LoadNPCsClick(object sender, EventArgs e)
+        {
+            LoadNPCInfo();
         }
 
-        private void SpawnMeteorButtonClick( object sender, EventArgs e )
+        private void SpawnMeteorButtonClick(object sender, EventArgs e)
         {
             SpawnMeteor();
         }
@@ -187,23 +210,23 @@ namespace TerrariaHooker {
         }
 
 
-        private void RefreshPlayersClick( object sender, EventArgs e )
+        private void RefreshPlayersClick(object sender, EventArgs e)
         {
-            LoadPlayerInfo( );
+            LoadPlayerInfo();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-       
-            if (consoleInput.Text.Substring(0,1) == ".")
+
+            if (consoleInput.Text.Substring(0, 1) == ".")
             {
                 textBox1.AppendText(consoleInput.Text + Environment.NewLine);
                 var finalBuf = new byte[consoleInput.Text.Length + 9];
                 //0xFC is our player ID for the console. hopefully never going to really be used
-                var buf = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x19, 0xFC, 0x00, 0x00, 0x00};
+                var buf = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x19, 0xFC, 0x00, 0x00, 0x00 };
 
                 var t = Encoding.ASCII.GetBytes(consoleInput.Text);
-                Buffer.BlockCopy(buf,0,finalBuf,0,buf.Length);
+                Buffer.BlockCopy(buf, 0, finalBuf, 0, buf.Length);
                 Buffer.BlockCopy(t, 0, finalBuf, 9, t.Length);
                 consoleInput.Clear();
                 Commands.HandleChatMsg(finalBuf);
@@ -319,7 +342,7 @@ namespace TerrariaHooker {
              */
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.AddEntry(ip);
-            Commands.whitelisted[id] = true;
+            Commands.player[id].Whitelisted = true;
             Commands.SendChatMsg("You are now whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
         }
@@ -334,7 +357,7 @@ namespace TerrariaHooker {
 
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             Whitelist.RemoveEntry(ip);
-            Commands.whitelisted[id] = false;
+            Commands.player[id].Whitelisted = false;
             Commands.SendChatMsg("You are no longer whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
         }
@@ -351,7 +374,7 @@ namespace TerrariaHooker {
         }
         private void tabControl1_SelectedIndexchanged(object sender, EventArgs e)
         {
-            switch (((TabControl) sender).SelectedIndex)
+            switch (((TabControl)sender).SelectedIndex)
             {
                 case 4:
                     check_wlEnabled.Checked = Whitelist.IsActive;
@@ -363,10 +386,10 @@ namespace TerrariaHooker {
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-           
-                check_SpawnDisallowBreak.Enabled = check_ProtectSpawn.Checked;
-                check_SpawnDisallowPlace.Enabled = check_ProtectSpawn.Checked;
-                check_SpawnDisallowUse.Enabled = check_ProtectSpawn.Checked;
+
+            check_SpawnDisallowBreak.Enabled = check_ProtectSpawn.Checked;
+            check_SpawnDisallowPlace.Enabled = check_ProtectSpawn.Checked;
+            check_SpawnDisallowUse.Enabled = check_ProtectSpawn.Checked;
 
         }
 
@@ -410,16 +433,18 @@ namespace TerrariaHooker {
                     MessageBox.Show("Max Spawns must be a number");
                     return;
                 }
-                
+
                 Commands.setSpawnValues(a, b);
                 label_customRateEnabled.Text = check_enableCustomRates.Checked ? "Custom Rates: ENABLED" : "Custom Rates: DISABLED";
                 label_maxSpawns.Text = String.Format("Max Spawns: {0}", b);
-                label_spawnInterval.Text = String.Format("Spawn Rate: {0} (ms)", track_spawnRate.Value); 
+                label_spawnInterval.Text = String.Format("Spawn Rate: {0} (ms)", track_spawnRate.Value);
 
-            } else
+            }
+            else
             {
                 //if it's unchecked, reset to defaults.
-                Commands.setSpawnValues(600,5);
+                if (!check_DisableEnemies.Checked)
+                    Commands.setSpawnValues(600, 5);
             }
             label_spawnsEnabled.Text = !check_DisableEnemies.Checked ? "Spawns: ENABLED" : "Spawns: DISABLED";
 
@@ -464,29 +489,33 @@ namespace TerrariaHooker {
 
         }
 
-        private void ExitSave( ) {
+        private void ExitSave()
+        {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
             settings.EnableWhitelist = Whitelist.IsActive;
-            settings.Save( );
-            sendLineToConsole( "exit" );
+            settings.Save();
+            sendLineToConsole("exit");
         }
 
-        private void ExitNoSave( ) {
+        private void ExitNoSave()
+        {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
             settings.EnableWhitelist = Whitelist.IsActive;
-            settings.Save( );
-            sendLineToConsole( "exit-nosave" );
+            settings.Save();
+            sendLineToConsole("exit-nosave");
         }
 
-        private void ServerConsole_FormClosing( object sender, FormClosingEventArgs e ) {
-            var res = MessageBox.Show( "Do you want to save the world?", "Exiting TerrariaHooker",
-                                       MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation );
-            switch( res ) {
+        private void ServerConsole_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var res = MessageBox.Show("Do you want to save the world?", "Exiting TerrariaHooker",
+                                       MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+            switch (res)
+            {
                 case DialogResult.Yes:
-                    ExitSave( );  
+                    ExitSave();
                     break;
                 case DialogResult.No:
-                    ExitNoSave( );  
+                    ExitNoSave();
                     break;
                 case DialogResult.Cancel:
                     e.Cancel = true;
@@ -494,6 +523,87 @@ namespace TerrariaHooker {
             }
         }
 
+        private void button11_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
+            listBox2.Items.Clear();
+            int x;
+            int y;
+            int sx = Main.spawnTileX;
+            int sy = Main.spawnTileY;
+            int r = 50;
+
+            for (int i = 0; i < 1000; i++)
+            {
+                if (Main.chest[i] != null)
+                {
+                    x = Main.chest[i].x;
+                    y = Main.chest[i].y;
+                    if (!(x > sx - r && x < sx + r && y > sy - r && y < sy + r))
+                        continue;
+
+                    listBox1.Items.Add(i);
+                }
+            }
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            listBox2.Items.Clear();
+            if (listBox1.SelectedItem == null)
+                return;
+
+            int c = (int)listBox1.SelectedItem;
+            for (int i = 0; i < Chest.maxItems; i++)
+            {
+                if (Main.chest[c].item[i].name == null)
+                    continue;
+
+                listBox2.Items.Add(Main.chest[c].item[i].name);
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem == null)
+                return;
+            int c = (int)listBox1.SelectedItem;
+            Commands.MAGIC_CHEST_ID = c;
+
+
+
+            for (int i = 0; i < Chest.maxItems; i++)
+                Main.chest[c].item[i] = new Item();
+
+
+            Main.chest[c].item[0] = new Item();
+            Main.chest[c].item[0].SetDefaults("Copper Axe");
+            Main.chest[c].item[0].name = "TEST ITEM 1";
+
+            Main.chest[c].item[1] = new Item();
+            Main.chest[c].item[1].SetDefaults("Gold Pickaxe");
+            Main.chest[c].item[1].name = "TEST ITEM 2";
+
+
+
+
+
+
+        }
+
+        private void npcPicker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (npcPicker.SelectedItem != null)
+            {
+                var npc = npcPicker.SelectedItem as NPCInfo;
+                label10.Text = String.Format("ID: {0} \nDamage: {1} \nHealth: {2} \nDefense: {3}", npc.Type, npc.Damage, npc.LifeMax, npc.Defense);
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }

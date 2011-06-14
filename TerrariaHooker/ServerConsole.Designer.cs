@@ -41,10 +41,7 @@
             this.RefreshPlayers = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
-            this.disableSpawns = new System.Windows.Forms.CheckBox();
-            this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.loadNPCs = new System.Windows.Forms.Button();
             this.npcPicker = new System.Windows.Forms.ListBox();
             this.spawnButton = new System.Windows.Forms.Button();
@@ -94,10 +91,17 @@
             this.button1 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button4 = new System.Windows.Forms.Button();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.button11 = new System.Windows.Forms.Button();
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.listBox2 = new System.Windows.Forms.ListBox();
+            this.button12 = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -108,6 +112,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.track_spawnRate)).BeginInit();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.tabPage6.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -120,6 +125,7 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -295,10 +301,7 @@
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.label2);
-            this.tabPage2.Controls.Add(this.disableSpawns);
-            this.tabPage2.Controls.Add(this.button2);
             this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Controls.Add(this.label4);
             this.tabPage2.Controls.Add(this.loadNPCs);
             this.tabPage2.Controls.Add(this.npcPicker);
             this.tabPage2.Controls.Add(this.spawnButton);
@@ -321,43 +324,15 @@
             this.label2.TabIndex = 14;
             this.label2.Text = "Selected player: none";
             // 
-            // disableSpawns
-            // 
-            this.disableSpawns.AutoSize = true;
-            this.disableSpawns.Enabled = false;
-            this.disableSpawns.Location = new System.Drawing.Point(305, 12);
-            this.disableSpawns.Name = "disableSpawns";
-            this.disableSpawns.Size = new System.Drawing.Size(102, 17);
-            this.disableSpawns.TabIndex = 12;
-            this.disableSpawns.Text = "Disable Spawns";
-            this.disableSpawns.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(399, 306);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 11;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point(287, 88);
+            this.groupBox1.Controls.Add(this.label10);
+            this.groupBox1.Location = new System.Drawing.Point(287, 32);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(188, 212);
+            this.groupBox1.Size = new System.Drawing.Size(188, 268);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(302, 70);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(58, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Customize:";
+            this.groupBox1.Text = "Details";
             // 
             // loadNPCs
             // 
@@ -376,6 +351,7 @@
             this.npcPicker.Name = "npcPicker";
             this.npcPicker.Size = new System.Drawing.Size(275, 251);
             this.npcPicker.TabIndex = 6;
+            this.npcPicker.SelectedIndexChanged += new System.EventHandler(this.npcPicker_SelectedIndexChanged);
             // 
             // spawnButton
             // 
@@ -862,6 +838,63 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.button12);
+            this.tabPage6.Controls.Add(this.listBox2);
+            this.tabPage6.Controls.Add(this.listBox1);
+            this.tabPage6.Controls.Add(this.button11);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(483, 339);
+            this.tabPage6.TabIndex = 6;
+            this.tabPage6.Text = "Here be dragons";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(3, 247);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(75, 23);
+            this.button11.TabIndex = 0;
+            this.button11.Text = "button11";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(3, 3);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(186, 238);
+            this.listBox1.TabIndex = 1;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // listBox2
+            // 
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.Location = new System.Drawing.Point(195, 3);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(163, 238);
+            this.listBox2.TabIndex = 2;
+            // 
+            // button12
+            // 
+            this.button12.Location = new System.Drawing.Point(283, 247);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(75, 23);
+            this.button12.TabIndex = 3;
+            this.button12.Text = "make magic";
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(7, 20);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(175, 219);
+            this.label10.TabIndex = 0;
+            // 
             // ServerConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -879,6 +912,7 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -896,6 +930,7 @@
             this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.tabPage6.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -909,10 +944,7 @@
         private System.Windows.Forms.Button spawnButton;
         private System.Windows.Forms.ListBox npcPicker;
         private System.Windows.Forms.Button loadNPCs;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.CheckBox disableSpawns;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TabPage tabPage4;
@@ -973,5 +1005,11 @@
         private System.Windows.Forms.Label label_maxSpawns;
         private System.Windows.Forms.Label label_customRateEnabled;
         private System.Windows.Forms.Label label_spawnsEnabled;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.ListBox listBox2;
+        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.Button button12;
+        private System.Windows.Forms.Label label10;
     }
 }

@@ -10,9 +10,19 @@ using TerrariaHooker.AccountManagement;
 
 namespace TerrariaHooker
 {
+    public class PlayerInfo
+    {
+        public bool Whitelisted;
+        public bool ForcedHostile;
+        public PlayerInfo()
+        {
+        }
+
+    }
 
     class Commands
     {
+        
         private static Properties.Settings settings = new Properties.Settings();
         
         public static byte[] riskItems = new byte[] { 0xCF,   //lava bucket
@@ -21,11 +31,14 @@ namespace TerrariaHooker
         private static bool itemRiskEnabled = true;
         //public static bool whitelistEnabled;
         public static bool allowUnwhiteLogin;
-        public static bool[] whitelisted = new bool[255];
+        public static PlayerInfo[] player = new PlayerInfo[255];
+
+
+        //public static bool[] whitelisted = new bool[255];
 
         //.star <player> related variables
-        private static int[] justHostiled = new int[255];
-        private static int _numberHostiled;
+        //private static int[] justHostiled = new int[255];
+        //private static int _numberHostiled;
 
         public static bool protectSpawn;
         public static bool spawnAllowUse;
@@ -53,6 +66,9 @@ namespace TerrariaHooker
         //10x10 box around spawn
         internal static int SPAWN_PROTECT_WIDTH = 5;
         internal static int SPAWN_PROTECT_HEIGHT = 5;
+
+        //chest used to contain MAGICAL ITEMS OF MYSTERY!
+        public static int MAGIC_CHEST_ID = -1;
 
         public static int SetProtectWidth
         {
@@ -85,6 +101,8 @@ namespace TerrariaHooker
 
             foreach (var f in npc.GetFields(BindingFlags.Static | BindingFlags.NonPublic))
             {
+                
+                
                 if (f.Name == "defaultMaxSpawns")
                 {
                     defaultMaxSpawns = f;
@@ -178,7 +196,7 @@ namespace TerrariaHooker
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                    if (Whitelist.IsActive && !whitelisted[pid])
+                    if (Whitelist.IsActive && !player[pid].Whitelisted)
                         SendChatMsg("You are not whitelisted, some actions are restricted.", pid, Color.Peru);
       
                     break;
@@ -361,7 +379,7 @@ namespace TerrariaHooker
 
             #region ANON LOGIN CODE
             
-            if (Whitelist.IsActive && !whitelisted[p.PlayerId])
+            if (Whitelist.IsActive && !player[p.PlayerId].Whitelisted)
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
@@ -383,17 +401,15 @@ namespace TerrariaHooker
 
             if (Main.player[p.PlayerId].hostile)
             {
-                for (var i = 0; i < _numberHostiled; i++)
+
+                if (player[p.PlayerId].ForcedHostile)
                 {
-                    if (justHostiled[i] == p.PlayerId)
-                    {
-                        justHostiled[i] = 0x00;
-                        _numberHostiled--;
-                        Main.player[p.PlayerId].hostile = false;
-                        NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn
-                        NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
-                    }
+                    player[p.PlayerId].ForcedHostile = false;
+                    Main.player[p.PlayerId].hostile = false;
+                    NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn
+                    NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
                 }
+
             }
             return new Packet(data, data.Length);
         }
@@ -408,7 +424,7 @@ namespace TerrariaHooker
             if (p.UsingItem)
                {
                 #region ANON LOGIN CODE
-                if (Whitelist.IsActive && !whitelisted[p.PlayerId])
+                if (Whitelist.IsActive && !player[p.PlayerId].Whitelisted)
                 {
                     if (anonPrivs.Has(Actions.NOUSEITEMS))
                     {
@@ -446,14 +462,14 @@ namespace TerrariaHooker
                 if (!Whitelist.IsAllowed(ip))
                 {
                     Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
-                    whitelisted[playerId] = false;
+                    player[playerId].Whitelisted = false;
                     if (!allowUnwhiteLogin)
                         NetMessage.SendData( 2, playerId, -1, "Not on whitelist.", 0, 0f, 0f, 0f );
 
                 }
                 else
                 {
-                    whitelisted[playerId] = true;
+                    player[playerId].Whitelisted = true;
                 }
             } catch( Exception e ) {
                 Console.WriteLine( String.Format( "Exception during Whitelist processing: {0}", e.ToString( ) ) );
@@ -461,6 +477,8 @@ namespace TerrariaHooker
         }
 
         private static Packet HandleGreeting( byte[] data, int pid ) {
+            //reset playerinfo for player when a new player logs in with this socket.
+            player[pid] = new PlayerInfo();
             AccountManager.Logout( pid );
             return new Packet( data, data.Length );
         }
@@ -510,7 +528,7 @@ namespace TerrariaHooker
             if (p.Text[0] == 0x2E) // match dot
             {
                 //check if nocommands for anons is set, if playerid is not console id, and playerid is whitelisted
-                if (Whitelist.IsActive && anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !whitelisted[p.PlayerId])
+                if (Whitelist.IsActive && anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !player[p.PlayerId].Whitelisted)
                 {
                     SendChatMsg("Commands disabled until Whitelisted", p.PlayerId, Color.Salmon);
                     return CreateDummyPacket(data);
@@ -981,8 +999,7 @@ namespace TerrariaHooker
             if (!Main.player[id].hostile)
             {
                 Main.player[id].hostile = true;
-                justHostiled[_numberHostiled] = id;
-                _numberHostiled++;
+                player[id].ForcedHostile = true;
             }
 
             Main.player[Main.myPlayer].hostile = true; //i'm not sure what this actually affects?
@@ -1112,7 +1129,7 @@ namespace TerrariaHooker
                     SendChatMsg(String.Format("Adding {0} [{1}] to whitelist.", name, ip), packetChatMsg.PlayerId, Color.GreenYellow);
 
                     Whitelist.AddEntry(ip);
-                    whitelisted[targetId] = true;
+                    player[targetId].Whitelisted = true;
                     SendChatMsg("You are now whitelisted.", targetId, Color.Purple);
                     //
                     break;
