@@ -13,6 +13,7 @@ namespace TerrariaHooker
     {
         public bool Whitelisted;
         public bool ForcedHostile;
+        public bool Teleported; //was teleported by star death
         public PlayerInfo()
         {
         }
@@ -392,7 +393,7 @@ namespace TerrariaHooker
         private static Packet handleDeath(byte[] data)
         {
             //right now, death handler just fixes up hostile state if a star was dropped
-            //on them using .star.);
+            //on them using .star, or teleported by being killed by a star);
             var p = new packet_PlayerDied(data);
 
             if (Main.player[p.PlayerId].hostile)
@@ -402,9 +403,14 @@ namespace TerrariaHooker
                 {
                     player[p.PlayerId].ForcedHostile = false;
                     Main.player[p.PlayerId].hostile = false;
-                    NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn
+                }
+                if (player[p.PlayerId].Teleported) //teleported by being killed by star
+                {
+                    player[p.PlayerId].Teleported = false;
+                    NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn to teleported people
                     NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
                 }
+                
 
             }
             return new Packet(data, data.Length);
@@ -975,6 +981,10 @@ namespace TerrariaHooker
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
+            //
+            Main.player[targetId].noFallDmg = true; //
+            //
+
             if (old)
             {
                 if (!Main.player[targetId].hostile)
@@ -983,22 +993,14 @@ namespace TerrariaHooker
                     player[targetId].ForcedHostile = true;
                 }
 
-                //and as suspected, spawn wasn't working because the client and server were out of sync.
-                //fixing up serverside position fixes tile updates.
-                Main.player[targetId].position.X = x*16; //
-                Main.player[targetId].position.Y = y*16; //
-                Main.player[targetId].noFallDmg = true; //
-
                 NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
-
-
                 Main.player[targetId].noFallDmg = false; //
                 NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
             }
             else
             {
+                player[targetId].Teleported = true;
                 //kill player, should respawn at the forged spawnpoint
-                Main.player[targetId].noFallDmg = true; //
                 killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
             }
         }
