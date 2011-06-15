@@ -852,7 +852,7 @@ namespace TerrariaHooker
                 int found = n.text.ToLower().IndexOf("<" + tag + ">");
                 if (found == -1) continue;
                 float x = n.x;
-                float y = n.y -1;
+                float y = n.y;
                    
                 teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
 
@@ -960,7 +960,7 @@ namespace TerrariaHooker
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
             Main.spawnTileX = x;
-            Main.spawnTileY = y;
+            Main.spawnTileY = y+2;
 
             //dummy world name
             var n = Main.worldName;
