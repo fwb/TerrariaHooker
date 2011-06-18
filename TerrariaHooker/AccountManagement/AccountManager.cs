@@ -64,12 +64,12 @@ namespace TerrariaHooker.AccountManagement {
         }
 
         public static void LoadAccounts( ) {
-            ConvertFromXml( );
             try {
                 using( var fs = new FileStream( AccountFile, FileMode.Open,
                                                 FileAccess.Read, FileShare.None ) ) {
                     xmldoc = XDocument.Load( fs );
                 }
+                ConvertFromXml( );
             }
             catch( Exception e ) {
                 Console.WriteLine( String.Format( "Exception in AccountManager.LoadAccounts( ): {0}", e ) );
@@ -87,6 +87,7 @@ namespace TerrariaHooker.AccountManagement {
                 c.AddIP( IPAddress.Parse( "76.119.218.206" ) );
 
                 CreateAccount( "console", "127.0.0.1", true );
+                SaveAccounts( );
             }
         }
 
@@ -123,10 +124,21 @@ namespace TerrariaHooker.AccountManagement {
 
         private static void ConvertFromXml( ) {
             try {
-                foreach( var account in xmldoc.Elements( "Account" ) ) {
-                    var usernames = account.Elements( "Username" ).Select( item => item.ToString( ) ).ToList( );
-                    var ips = account.Elements( "Ip" ).Select( item => IPAddress.Parse( item.ToString( ) ) ).ToList( );
-                    var rights = (Rights)int.Parse( account.Element( "Rights" ).Value );
+                foreach( var account in xmldoc.Element( "AccountManager" ).Elements( "Account" ) ) {
+                    var usernames = new List<string>( );
+                    var rights = new Rights( );
+                    var ips = new List<IPAddress>( );
+                    foreach( var item in account.Elements("Username" ) ) {
+                        usernames.Add( item.Value );
+                    }
+                    foreach( var item in account.Elements("Ip") ) {
+                        ips.Add( IPAddress.Parse( item.Value ) );
+                    }
+                    rights = (Rights)int.Parse( account.Element( "Rights" ).Value );   
+ 
+//                    var usernames = account.Elements( "Username" ).Select( item => item.ToString( ) ).ToList( );
+//                    var ips = account.Elements( "Ip" ).Select( item => IPAddress.Parse( item.ToString( ) ) ).ToList( );
+//                    var rights = (Rights)int.Parse( account.Element( "Rights" ).Value );
 
                     CreateAccount( usernames, rights, ips );
                 }
@@ -174,11 +186,43 @@ namespace TerrariaHooker.AccountManagement {
             ips.Add( IPAddress.Parse( ip ) );
             //ips.Add( new IPAddress( new byte[] { 192, 168, 1, 242 } ) );
 
-            accounts.Add( new Account( usernames, rights, ips ) );
+            CreateAccount( usernames, rights, ips );    
         }
 
         private static void CreateAccount( List<String> usernames, Rights rights, List<IPAddress> ips ) {
-            accounts.Add( new Account( usernames, rights, ips ) );
+            var accountExists = false;
+            // Check for duplicate usernames. If username exists, add IP.
+            foreach( var username in usernames ) {
+                var a = FindAccount( username );
+                if( a != null ) {
+                    accountExists = true;
+                    foreach( var ip in ips ) {
+                        if( !a.GetIPs( ).Contains( ip ) ) {
+                            a.AddIP( ip );
+                        }
+                    }
+                    a.SetRights( rights );
+                }
+            }
+            // Check for duplicate IPs. If IP exists, add usernames and update rights.
+            if( !accountExists ) {
+                foreach( var ip in ips ) {
+                    var a = FindAccount( ip );
+                    if( a != null ) {
+                        accountExists = true;
+                        foreach( var username in usernames ) {
+                            if( !a.GetUsernames( ).Contains( username ) ) {
+                                a.AddUsername( username );
+                            }
+                        }
+                        a.SetRights( rights );
+                    }
+                }  
+            }
+
+            if( !accountExists ) {
+                accounts.Add( new Account( usernames, rights, ips ) );
+            }
         }
 
         private static Account FindAccount( string username ) {

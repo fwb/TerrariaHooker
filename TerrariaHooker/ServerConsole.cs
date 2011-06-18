@@ -305,7 +305,8 @@ namespace TerrariaHooker {
 
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
             var username = playerList.FocusedItem.SubItems[1].Text;
-            AccountManager.CreateAccount( username, ip ); 
+            AccountManager.CreateAccount( username, ip );
+            AccountManager.SaveAccounts( );
             Commands.player[id].Whitelisted = true;
             Commands.SendChatMsg("You are now whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
