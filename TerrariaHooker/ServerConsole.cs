@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using Microsoft.Xna.Framework;
 using Terraria;
+using TerrariaHooker.AccountManagement;
 
 namespace TerrariaHooker {
 
@@ -95,7 +96,7 @@ namespace TerrariaHooker {
             // Redirect the out Console stream
             _out = Console.OpenStandardOutput();
 
-            Console.SetOut(_writer);
+            Console.SetOut( _writer );
             sockHook = new SockHook();
 
             check_wlEnabled.Checked = settings.EnableWhitelist;
@@ -303,7 +304,8 @@ namespace TerrariaHooker {
                 return;
 
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
-            Whitelist.AddEntry(ip);
+            var username = playerList.FocusedItem.SubItems[1].Text;
+            AccountManager.CreateAccount( username, ip ); 
             Commands.player[id].Whitelisted = true;
             Commands.SendChatMsg("You are now whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
@@ -318,7 +320,7 @@ namespace TerrariaHooker {
                 return;
 
             var ip = Utils.ParseEndPointAddr(playerList.FocusedItem.SubItems[2].Text);
-            Whitelist.RemoveEntry(ip);
+            AccountManager.RemoveAccount( ip );
             Commands.player[id].Whitelisted = false;
             Commands.SendChatMsg("You are no longer whitelisted.", id, Color.Yellow);
             LoadPlayerInfo();
@@ -327,7 +329,7 @@ namespace TerrariaHooker {
 
         private void check_wlEnabled_CheckedChanged(object sender, EventArgs e)
         {
-            Whitelist.IsActive = check_wlEnabled.Checked;
+            AccountManager.WhitelistActive = check_wlEnabled.Checked;
         }
 
         private void check_anonLoginEnabled_CheckedChanged(object sender, EventArgs e)
@@ -339,7 +341,7 @@ namespace TerrariaHooker {
             switch (((TabControl)sender).SelectedIndex)
             {
                 case 4:
-                    check_wlEnabled.Checked = Whitelist.IsActive;
+                    check_wlEnabled.Checked = AccountManager.WhitelistActive;
                     check_anonLoginEnabled.Checked = Commands.allowUnwhiteLogin;
                     break;
             }
@@ -449,7 +451,7 @@ namespace TerrariaHooker {
         private void ExitSave()
         {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
-            settings.EnableWhitelist = Whitelist.IsActive;
+            settings.EnableWhitelist = AccountManager.WhitelistActive;
             settings.Save();
             Utils.sendLineToConsole("exit");
         }
@@ -457,7 +459,7 @@ namespace TerrariaHooker {
         private void ExitNoSave()
         {
             settings.EnableAnonLogin = Commands.allowUnwhiteLogin;
-            settings.EnableWhitelist = Whitelist.IsActive;
+            settings.EnableWhitelist = AccountManager.WhitelistActive;
             settings.Save();
             Utils.sendLineToConsole("exit-nosave");
         }
@@ -550,6 +552,14 @@ namespace TerrariaHooker {
                 var npc = npcPicker.SelectedItem as NPCInfo;
                 label10.Text = String.Format("ID: {0} \nDamage: {1} \nHealth: {2} \nDefense: {3}", npc.Type, npc.Damage, npc.LifeMax, npc.Defense);
             }
+        }
+
+        private void Save_Click( object sender, EventArgs e ) {
+            AccountManager.SaveAccounts( );
+        }
+
+        private void Load_Click( object sender, EventArgs e ) {
+            AccountManager.LoadAccounts( );
         }
 
 

@@ -107,7 +107,7 @@ namespace TerrariaHooker
                 }
             }
 
-            Whitelist.IsActive = settings.EnableWhitelist;
+            AccountManager.WhitelistActive = settings.EnableWhitelist;
             //allowUnwhiteLogin = settings.EnableAnonLogin;
             allowUnwhiteLogin = false;
         }
@@ -167,7 +167,7 @@ namespace TerrariaHooker
                     prefix = "USER LOGIN P1";
                     // Clear AccountManager refs in HandleGreeting( )
                     packet = HandleGreeting( nData, pid );
-                    if( Whitelist.IsActive ) {
+                    if( AccountManager.WhitelistActive ) {
                         CheckWhitelist( pid );
                     }
                     break;
@@ -188,7 +188,7 @@ namespace TerrariaHooker
                     break;
                 case 0x0C:
                     prefix = "PLAYER SYNC/GREET REQUEST";
-                    if (Whitelist.IsActive && !player[pid].Whitelisted)
+                    if( AccountManager.WhitelistActive && !player[pid].Whitelisted )
                         SendChatMsg("You are not whitelisted, some actions are restricted.", pid, Color.Peru);
       
                     break;
@@ -375,8 +375,8 @@ namespace TerrariaHooker
             #endregion
 
             #region ANON LOGIN CODE
-            
-            if (Whitelist.IsActive && !player[p.PlayerId].Whitelisted)
+
+            if( AccountManager.WhitelistActive && !player[p.PlayerId].Whitelisted )
             {
                 if (anonPrivs.Has(Actions.NOBREAKBLOCK))
                 {
@@ -426,7 +426,7 @@ namespace TerrariaHooker
             if (p.UsingItem)
                {
                 #region ANON LOGIN CODE
-                if (Whitelist.IsActive && !player[p.PlayerId].Whitelisted)
+                   if( AccountManager.WhitelistActive && !player[p.PlayerId].Whitelisted )
                 {
                     if (anonPrivs.Has(Actions.NOUSEITEMS))
                     {
@@ -458,7 +458,7 @@ namespace TerrariaHooker
                 var playerId = pid;
                 var endpoint = t[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
                 var ip = Utils.ParseEndPointAddr( endpoint );
-                if (!Whitelist.IsAllowed(ip))
+                if (!AccountManager.IsAllowed(ip))
                 {
                     Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
                     player[playerId].Whitelisted = false;
@@ -544,7 +544,7 @@ namespace TerrariaHooker
             if (p.Text[0] == 0x2E) // match dot
             {
                 //check if nocommands for anons is set, if playerid is not console id, and playerid is whitelisted
-                if (Whitelist.IsActive && anonPrivs.Has(Actions.NOCOMMANDS) && p.PlayerId != 0xFC && !player[p.PlayerId].Whitelisted)
+                if( AccountManager.WhitelistActive && anonPrivs.Has( Actions.NOCOMMANDS ) && p.PlayerId != 0xFC && !player[p.PlayerId].Whitelisted )
                 {
                     SendChatMsg("Commands disabled until Whitelisted", p.PlayerId, Color.Salmon);
                     return CreateDummyPacket(data);
@@ -1158,7 +1158,7 @@ namespace TerrariaHooker
                     if (commands.Length < 3)
                         return false;
                     SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
-                    Whitelist.AddEntry( commands[2] );
+                    AccountManager.CreateAccount( "(Unknown)", commands[2] ); 
                     break;
                 case ("addplayer"):
                     //NEW CODE: by ass
@@ -1180,7 +1180,7 @@ namespace TerrariaHooker
                     var ip = Utils.ParseEndPointAddr( endpoint );
                     SendChatMsg(String.Format("Adding {0} [{1}] to whitelist.", name, ip), packetChatMsg.PlayerId, Color.GreenYellow);
 
-                    Whitelist.AddEntry(ip);
+                    AccountManager.CreateAccount( name, ip ); 
                     player[targetId].Whitelisted = true;
                     SendChatMsg("You are now whitelisted.", targetId, Color.Purple);
                     //
@@ -1190,21 +1190,21 @@ namespace TerrariaHooker
                     if (commands.Length < 3)
                         return false;
                     SendChatMsg( String.Format( "Removing {0} from whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
-                    Whitelist.RemoveEntry( commands[2] );
+                    AccountManager.RemoveAccount( commands[2] ); 
                     break;
                 case ("r"):
                 case ("refresh"):
                     SendChatMsg( "Loading whitelist from file.", packetChatMsg.PlayerId, Color.GreenYellow );
-                    Whitelist.Refresh( );
+                    AccountManager.Refresh( );
                     break;
                 case ("on"):
-                    Whitelist.IsActive = true;
+                    AccountManager.WhitelistActive = true;
                     SendChatMsg( "Server whitelist is on.", packetChatMsg.PlayerId, Color.GreenYellow );
-                    settings.EnableWhitelist = Whitelist.IsActive;
+                    settings.EnableWhitelist = AccountManager.WhitelistActive;
                     settings.Save();
                     break;
                 case ("off"):
-                    Whitelist.IsActive = false;
+                    AccountManager.WhitelistActive = false;
                     SendChatMsg( "Server whitelist is off.", packetChatMsg.PlayerId, Color.GreenYellow );
                     break;
                 /*case ("allowlogin"):

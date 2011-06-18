@@ -13,8 +13,8 @@ namespace TerrariaHooker.AccountManagement {
         private Dictionary<String, ReuseTimer> timers; 
         private List<IPAddress> ips;
         private List<String> ignored; 
-        private string accountName;
-        private string steamName;
+        //private string accountName;
+        //private string steamName;
 
         public Account(  ) {
             usernames = new List<string>( );
