@@ -19,6 +19,15 @@ Direct download link: http://easyhook.codeplex.com/releases/view/24401#DownloadI
 Place all included files and EasyHook .DLLs in the same folder as Terraria.exe. This is usually C:\Program Files (x86)\Steam\steamapps\common\terraria\
 Run TerrariaHooker.exe.
 
+To create an admin account, you'll need to jump through a few hoops. Start up a server with TerrariaHooker and login. This will create the default accounts.xml file. Then use the following template to add an account with your Username and local LAN IP address:
+  <Account>
+    <Username>YourCharacterNameHere</Username>
+    <Ip>192.168.1.242</Ip>
+    <Rights>7</Rights>
+  </Account>
+
+Paste that in accounts.xml, making sure not to break the XML structure. Save and close the file, then click the "Load" button on the Accounts tab. You should then be able to use .login <Username> to log in.
+
 Bugs/Work In Progress:
 - Accounts tab is not implemented but Save and Load buttons should work.
 - NPCs and Events tabs are not fully functional.
