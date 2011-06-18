@@ -73,18 +73,7 @@ namespace TerrariaHooker.AccountManagement {
             }
             catch( Exception e ) {
                 Console.WriteLine( String.Format( "Exception in AccountManager.LoadAccounts( ): {0}", e ) );
-                Console.WriteLine( "Loading default accounts" );
-                CreateAccount( "Forfeit", "192.168.1.242", true );
-                var a = FindAccount( "Forfeit" );
-                a.AddIP( IPAddress.Parse( "173.66.80.83" ) );
-
-                CreateAccount( "ass", "192.168.0.90", true );
-                var b = FindAccount( "ass" );
-                b.AddIP( IPAddress.Parse( "123.243.252.109" ) );
-
-                CreateAccount( "Zubu", "192.168.1.201", true );
-                var c = FindAccount( "Zubu" );
-                c.AddIP( IPAddress.Parse( "76.119.218.206" ) );
+                Console.WriteLine( "Creating default console account" );
 
                 CreateAccount( "console", "127.0.0.1", true );
                 SaveAccounts( );
