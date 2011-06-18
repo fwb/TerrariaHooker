@@ -102,7 +102,6 @@
     <Compile Include="SockHook.cs" />
     <Compile Include="StdOutRedirect.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Whitelist.cs" />
     <Compile Include="WorldEvents.cs" />
     <EmbeddedResource Include="Launcher.resx">
       <DependentUpon>Launcher.cs</DependentUpon>
