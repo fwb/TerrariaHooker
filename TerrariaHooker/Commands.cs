@@ -397,29 +397,35 @@ namespace TerrariaHooker
             //on them using .star, or teleported by being killed by a star);
             var p = new packet_PlayerDied(data);
 
+            FixHostileFlag(p.PlayerId);
+
             if (Main.player[p.PlayerId].hostile)
             {
-
-                if (player[p.PlayerId].ForcedHostile)
-                {
-                    player[p.PlayerId].ForcedHostile = false;
-                    Main.player[p.PlayerId].hostile = false;
-                }
                 if (player[p.PlayerId].Teleported) //teleported by being killed by star
                 {
                     player[p.PlayerId].Teleported = false;
                     NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn to teleported people
                     NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
                 }
-                
 
             }
             return new Packet(data, data.Length);
         }
 
+        private static void FixHostileFlag(int playerId)
+        {
+            if (player[playerId].ForcedHostile)
+            {
+                player[playerId].ForcedHostile = false;
+                Main.player[playerId].hostile = false;
+            }
+        }
+
         private static Packet HandlePlayerState(byte[] data, int pid)
         {
             var packet = new Packet(data, data.Length);
+
+            FixHostileFlag(pid);
 
             var p = new packet_PlayerState(data);
             p.PlayerId = pid;
@@ -987,11 +993,11 @@ namespace TerrariaHooker
 
             if (old)
             {
-                /*if (!Main.player[targetId].hostile)
+                if (!Main.player[targetId].hostile)
                 {
                     Main.player[targetId].hostile = true;
                     player[targetId].ForcedHostile = true;
-                }*/
+                }
 
                 Main.player[targetId].position.X = x;
                 Main.player[targetId].position.Y = y;
