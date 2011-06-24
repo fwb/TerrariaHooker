@@ -455,21 +455,19 @@ namespace TerrariaHooker
 
         private static void CheckWhitelist( int pid )
         {
+            player[pid].Whitelisted = false;
+
             try {
                 //var t = (ServerSock[])serverSock.GetValue( null );
                 var playerId = pid;
                 var endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
                 var ip = Utils.ParseEndPointAddr( endpoint );
-                if (!AccountManager.IsAllowed(ip))
-                {
-                    Console.WriteLine(String.Format("Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip));
-                    player[playerId].Whitelisted = false;
-                    if (!allowUnwhiteLogin)
+                if( !AccountManager.IsAllowed( ip ) ) {
+                    Console.WriteLine( String.Format( "Player {0} connecting from {1} is not on whitelist.", Main.player[playerId].name, ip ) );
+                    if( !allowUnwhiteLogin ) {
                         NetMessage.SendData( 2, playerId, -1, "Not on whitelist." );
-
-                }
-                else
-                {
+                    }
+                } else {
                     player[playerId].Whitelisted = true;
                 }
             } catch( Exception e ) {

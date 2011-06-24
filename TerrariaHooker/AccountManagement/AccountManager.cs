@@ -69,14 +69,15 @@ namespace TerrariaHooker.AccountManagement {
                                                 FileAccess.Read, FileShare.None ) ) {
                     xmldoc = XDocument.Load( fs );
                 }
+                accounts = new List<Account>( );
                 ConvertFromXml( );
             }
             catch( Exception e ) {
                 Console.WriteLine( String.Format( "Exception in AccountManager.LoadAccounts( ): {0}", e ) );
                 Console.WriteLine( "Creating default console account" );
 
+                accounts = new List<Account>( );
                 CreateAccount( "console", "127.0.0.1", true );
-                SaveAccounts( );
             }
         }
 
