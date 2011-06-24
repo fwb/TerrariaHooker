@@ -987,11 +987,14 @@ namespace TerrariaHooker
 
             if (old)
             {
-                if (!Main.player[targetId].hostile)
+                /*if (!Main.player[targetId].hostile)
                 {
                     Main.player[targetId].hostile = true;
                     player[targetId].ForcedHostile = true;
-                }
+                }*/
+
+                Main.player[targetId].position.X = x;
+                Main.player[targetId].position.Y = y;
 
                 NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
                 Main.player[targetId].noFallDmg = false; //
