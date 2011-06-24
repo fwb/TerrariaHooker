@@ -1158,7 +1158,8 @@ namespace TerrariaHooker
                     if (commands.Length < 3)
                         return false;
                     SendChatMsg( String.Format( "Adding {0} to whitelist.", commands[2] ), packetChatMsg.PlayerId, Color.GreenYellow );
-                    AccountManager.CreateAccount( "(Unknown)", commands[2] ); 
+                    AccountManager.CreateAccount( "(Unknown)", commands[2] );
+                    AccountManager.SaveAccounts( );
                     break;
                 case ("addplayer"):
                     //NEW CODE: by ass
@@ -1180,7 +1181,8 @@ namespace TerrariaHooker
                     var ip = Utils.ParseEndPointAddr( endpoint );
                     SendChatMsg(String.Format("Adding {0} [{1}] to whitelist.", name, ip), packetChatMsg.PlayerId, Color.GreenYellow);
 
-                    AccountManager.CreateAccount( name, ip ); 
+                    AccountManager.CreateAccount( name, ip );
+                    AccountManager.SaveAccounts( );
                     player[targetId].Whitelisted = true;
                     SendChatMsg("You are now whitelisted.", targetId, Color.Purple);
                     //
