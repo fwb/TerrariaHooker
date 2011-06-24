@@ -146,7 +146,7 @@ namespace TerrariaHooker {
         {
             npcPicker.Items.Clear();
             var npc = new NPC();
-            for (var i = 1; i <= 58; i++)
+            for (var i = 1; i <= 69; i++)
             {
                 try
                 {

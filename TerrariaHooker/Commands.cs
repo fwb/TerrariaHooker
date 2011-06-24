@@ -291,7 +291,7 @@ namespace TerrariaHooker
             var fpacket = new Packet(data, data.Length);
 
             #if DEBUG
-            OutputPacket(nData, prefix);
+            //OutputPacket(nData, prefix);
             #endif
 
             //if theres more data in the buffer than the packet just read references, process data
