@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Terraria;
 using System.Reflection;
@@ -316,11 +317,11 @@ namespace TerrariaHooker
         {
             int h;
             int pid = -1;
-            var t = (ServerSock[])serverSock.GetValue(null);
+            //var t = (ServerSock[])serverSock.GetValue(null);
 
             for (int i = 0; i <= Main.maxNetPlayers; i++)
             {
-                h = (int)t[i].tcpClient.Client.Handle;
+                h = (int)Netplay.serverSock[i].tcpClient.Client.Handle;
                 if (h == handle)
                 {
                     pid = i;
@@ -452,11 +453,12 @@ namespace TerrariaHooker
 
         }
 
-        private static void CheckWhitelist( int pid ) {
+        private static void CheckWhitelist( int pid )
+        {
             try {
-                var t = (ServerSock[])serverSock.GetValue( null );
+                //var t = (ServerSock[])serverSock.GetValue( null );
                 var playerId = pid;
-                var endpoint = t[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
+                var endpoint = Netplay.serverSock[playerId].tcpClient.Client.RemoteEndPoint.ToString( );
                 var ip = Utils.ParseEndPointAddr( endpoint );
                 if (!AccountManager.IsAllowed(ip))
                 {
