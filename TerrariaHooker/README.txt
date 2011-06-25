@@ -33,6 +33,11 @@ Bugs/Work In Progress:
 - NPCs and Events tabs are not fully functional.
 - DO NOT run server with > 251 players. Not that you'd want to try this anyway. We've reserved a few connections for internal use.
 
+2011 June 25
+- Updated for 1.0.5
+- Changes to serverSock access and CheckWhiteList( ) to resolve whitelist bug
+- Changes to teleportPlayer( ) to reduce chance of sticky hostile flag causing weird pvp bugs
+
 2011 June 18
 - Some console commands are available in game to players with admin account rights:
 	%dawn
