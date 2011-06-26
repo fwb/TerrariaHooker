@@ -1053,7 +1053,7 @@ namespace TerrariaHooker
                 //additional section update details, 11 requests client determines tile frames and walls.
                 NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
 
-                teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y});
+                teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 2});
 
                
                 //if timer hasn't been created, create and initialize
