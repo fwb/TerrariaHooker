@@ -109,7 +109,7 @@ namespace TerrariaHooker
         private static LinkedList<TP> teleQueue = new LinkedList<TP>();
         private static System.Timers.Timer tTimer;
         //
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
 
         private static LinkedList<ChatCommand> chatCommands = new LinkedList<ChatCommand>();
 
@@ -180,13 +180,13 @@ namespace TerrariaHooker
             activeTypeHandlers.Add(new ActivePacketHandler(0x19, HandleChatMsg)); //custom commands
             activeTypeHandlers.Add(new ActivePacketHandler(0x0D, HandlePlayerState)); //item use, player movement
             activeTypeHandlers.Add(new ActivePacketHandler(0x11, HandleBlockChange)); //block breaking, placing
-            
+
             //PASSIVE
             passiveTypeHandlers.Add(new PassivePacketHandler(0x01, HandleGreeting)); //whitelist check
-            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, HandleDeath)); //reset hostile flag if recently hostiled.
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, FixHostileFlag)); //reset hostile flag if forced hostile
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x0D, FixHostileFlag)); //reset hostile flag if forced hostile
             passiveTypeHandlers.Add(new PassivePacketHandler(0x0C, HandleLogin)); //warn a user he is unwhitelisted, if anon enabled.
             #endregion
-
 
             //get any private terraria fields here
             GetFields();
@@ -352,7 +352,7 @@ namespace TerrariaHooker
         /// </summary>
         /// <param name="data">The packet data</param>
         /// <param name="prefix">The human-readable prefix</param>
-        private static void OutputPacket(byte[] data, string prefix)
+        private static void OutputPacket(IEnumerable<byte> data, string prefix)
         {
                 var sBuffer = new StringBuilder( );
                 foreach( byte t in data ) {
@@ -364,8 +364,7 @@ namespace TerrariaHooker
 
         private static Packet HandleBlockChange(byte[] data, int pid)
         {
-            var p = new packet_BlockChange(data);
-            p.PlayerId = pid;
+            var p = new packet_BlockChange(data) {PlayerId = pid};
 
             var packet = new Packet(data, data.Length);
             #region PROTECT SPAWN
@@ -406,28 +405,7 @@ namespace TerrariaHooker
             return packet;
         }
 
-        //basic death handler.
-        private static void HandleDeath(byte[] data, int pid)
-        {
-            //right now, death handler just fixes up hostile state if a star was dropped
-            //on them using .star, or teleported by being killed by a star);
-            var p = new packet_PlayerDied(data);
-
-            FixHostileFlag(p.PlayerId);
-
-            if (Main.player[p.PlayerId].hostile)
-            {
-                if (player[p.PlayerId].Teleported) //teleported by being killed by star
-                {
-                    player[p.PlayerId].Teleported = false;
-                    NetMessage.SendData(0x0C, p.PlayerId, -1, "", p.PlayerId); //immediate respawn to teleported people
-                    NetMessage.SendData(0x07, p.PlayerId, -1, "", p.PlayerId); //reset server details (to client)
-                }
-
-            }
-        }
-
-        private static void FixHostileFlag(int playerId)
+        private static void FixHostileFlag(byte[] data, int playerId)
         {
             if (player[playerId].ForcedHostile)
             {
@@ -440,10 +418,7 @@ namespace TerrariaHooker
         {
             var packet = new Packet(data, data.Length);
 
-            FixHostileFlag(pid);
-
-            var p = new packet_PlayerState(data);
-            p.PlayerId = pid;
+            var p = new packet_PlayerState(data) {PlayerId = pid};
 
             if (p.UsingItem)
                {
@@ -919,54 +894,46 @@ namespace TerrariaHooker
         private static void teleportPlayer(int x, int y, int targetId, bool old = true)
         {
 
-            if (old)
+            while (x % 2 != 0) x++;
+            while (y % 2 != 0) y++;
+
+            if (x > Main.maxTilesX - 2 || y > Main.maxTilesY - 2)
             {
-                while (x % 2 != 0) x++;
-                while (y % 2 != 0) y++;
+                SendChatMsg("Landmark out of range, or coords off-map.", targetId, Color.Purple);
+                return;
+            }
 
-                if (x > Main.maxTilesX - 2 || y > Main.maxTilesY - 2)
+            SendChatMsg("Preparing teleport!", targetId, Color.Bisque);
+
+            int sectionX = Netplay.GetSectionX(x);
+            int sectionY = Netplay.GetSectionY(y);
+
+            for (int m = sectionX - 1; m < sectionX + 2; m++)
+            {
+                for (int n = sectionY - 1; n < sectionY + 1; n++)
                 {
-                    SendChatMsg("Landmark out of range, or coords off-map.", targetId, Color.Purple);
-                    return;
+                    NetMessage.SendSection(targetId, m, n);
                 }
-                SendChatMsg("Preparing teleport!", targetId, Color.Bisque);
+            }
 
-                int sectionX = Netplay.GetSectionX(x);
-                int sectionY = Netplay.GetSectionY(y);
+            //additional section update details, 11 requests client determines tile frames and walls.
+            NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
 
-                for (int m = sectionX - 1; m < sectionX + 2; m++)
-                {
-                    for (int n = sectionY - 1; n < sectionY + 1; n++)
-                    {
-                        NetMessage.SendSection(targetId, m, n);
-                    }
-                }
-
-                //additional section update details, 11 requests client determines tile frames and walls.
-                NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
-
-                teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 2});
+            teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 2});
 
                
-                //if timer hasn't been created, create and initialize
-                if (tTimer == null)
-                {
-                    tTimer = new System.Timers.Timer(3000);
-                    tTimer.Elapsed += new ElapsedEventHandler(TeleportTrigger);
-                    tTimer.Enabled = true;
-                } else
-                {   //else just enable it
-                    tTimer.Enabled = true;
-                }
-
-
-            }
-            else
+            //if timer hasn't been created, create and initialize
+            if (tTimer == null)
             {
-                player[targetId].Teleported = true;
-                //kill player, should respawn at the forged spawnpoint
-                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+                tTimer = new System.Timers.Timer(3000);
+                tTimer.Elapsed += new ElapsedEventHandler(TeleportTrigger);
+                tTimer.Enabled = true;
+            } else
+            {   //else just enable it
+                tTimer.Enabled = true;
             }
+
+
         }
 
         /// <summary>
