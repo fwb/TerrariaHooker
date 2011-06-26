@@ -67,6 +67,7 @@ namespace TerrariaHooker
         private static LinkedList<TP> teleQueue = new LinkedList<TP>();
         private static System.Timers.Timer tTimer;
         //
+        private static Random random = new Random();
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
@@ -331,9 +332,8 @@ namespace TerrariaHooker
         /// <returns>player id</returns>
         private static int getPlayerIdFromHandle(int handle)
         {
-            int h;
             int pid = -1;
-
+            int h;
             for (int i = 0; i <= Main.maxNetPlayers; i++)
             {
                 h = Netplay.serverSock[i].tcpClient.Client.Handle.ToInt32();
@@ -1003,16 +1003,25 @@ namespace TerrariaHooker
                         NetMessage.SendSection(targetId, m, n);
                     }
                 }
+
+                //additional section update details, 11 requests client determines tile frames and walls.
                 NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
 
                 teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y});
-                //OnTeleportTrigger();
-                if (tTimer == null || !tTimer.Enabled)
+
+               
+                //if timer hasn't been created, create and initialize
+                if (tTimer == null)
                 {
                     tTimer = new System.Timers.Timer(3000);
-                    tTimer.Elapsed += new ElapsedEventHandler(OnTeleportTrigger);
+                    tTimer.Elapsed += new ElapsedEventHandler(TeleportTrigger);
+                    tTimer.Enabled = true;
+                } else
+                {   //else just enable it
                     tTimer.Enabled = true;
                 }
+
+
             }
             else
             {
@@ -1024,11 +1033,16 @@ namespace TerrariaHooker
 
         /// <summary>
         /// Trigger called from timer, to teleport a player to their destination.
+        /// Prereqs: LinkedList<teleQueue> with a list of clients that requested teleports
+        /// to map locations, or landmarks.
+        /// 
+        /// Logic: checks teleQueue, if there are no queued teleports it will disable the timer and return.
+        /// If queued items exist, it will get the details of the first client and process that client only.
+        /// That entry is then removed from the queue, and the next tick will process the next in line.
         /// </summary>
-        /// <param name="targetId">The target player id.</param>
-        private static void OnTeleportTrigger(object source, ElapsedEventArgs e)
+        private static void TeleportTrigger(object source, ElapsedEventArgs e)
         {
-            //
+            
             int x;
             int y;
             int targetId;
@@ -1053,7 +1067,7 @@ namespace TerrariaHooker
 
             //dummy world name
             var n = Main.worldName;
-            Random random = new Random();
+            
             int randomNumber = random.Next(0, 100000000);
 
             Main.worldName = "assassass-" + randomNumber;
@@ -1070,7 +1084,6 @@ namespace TerrariaHooker
             Main.player[targetId].position.Y = y;
 
             NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
-            Main.player[targetId].noFallDmg = false; //
             NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
 
         }
