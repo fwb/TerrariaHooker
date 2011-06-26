@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using System.Reflection;
 using TerrariaHooker.AccountManagement;
+using System.Timers;
 
 namespace TerrariaHooker
 {
@@ -19,6 +20,16 @@ namespace TerrariaHooker
         {
         }
 
+    }
+
+    /// <summary>
+    /// Just a class to hold details of queued teleports
+    /// </summary>
+    public class TP
+    {
+        public int targetId;
+        public int x;
+        public int y;
     }
 
     class Commands
@@ -51,6 +62,11 @@ namespace TerrariaHooker
         private static FieldInfo defaultSpawnRate;
         //private static TextWriter w = new StreamWriter(ServerConsole._out);
 
+        //teleport timer related
+        //private delegate void Teleporter(int targetId, int x, int y);
+        private static LinkedList<TP> teleQueue = new LinkedList<TP>();
+        private static System.Timers.Timer tTimer;
+        //
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
@@ -947,7 +963,6 @@ namespace TerrariaHooker
             var y = (int)finalCoords.Y;
 
             teleportPlayer(x, y, targetId);
-            //NetMessage.SendData(0x0D, -1, -1, "", targetId);
             return true;
 
         }
@@ -962,22 +977,75 @@ namespace TerrariaHooker
         private static void teleportPlayer(int x, int y, int targetId, bool old = true)
         {
 
+            if (old)
+            {
+                while (x % 2 != 0) x++;
+                while (y % 2 != 0) y++;
+
+                int sectionX = Netplay.GetSectionX(x);
+                int sectionY = Netplay.GetSectionY(y);
+
+                for (int m = sectionX - 1; m < sectionX + 2; m++)
+                {
+                    for (int n = sectionY - 1; n < sectionY + 1; n++)
+                    {
+                        NetMessage.SendSection(targetId, m, n);
+                    }
+                }
+                NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
+
+                teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y});
+                OnTeleportTrigger();
+                //if (tTimer == null || !tTimer.Enabled)
+                //{
+                //    tTimer = new System.Timers.Timer(4000);
+                //    tTimer.Elapsed += new ElapsedEventHandler(OnTeleportTrigger);
+                //    tTimer.Enabled = true;
+                //}
+            }
+            else
+            {
+                player[targetId].Teleported = true;
+                //kill player, should respawn at the forged spawnpoint
+                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
+            }
+        }
+
+        /// <summary>
+        /// Trigger called from timer, to teleport a player to their destination.
+        /// </summary>
+        /// <param name="targetId">The target player id.</param>
+        private static void OnTeleportTrigger()
+        {
+            //object source, ElapsedEventArgs e
+            int x;
+            int y;
+            int targetId;
+            if (teleQueue.Count > 0)
+            {
+                x = teleQueue.First.Value.x;
+                y = teleQueue.First.Value.y;
+                targetId = teleQueue.First.Value.targetId;
+                teleQueue.RemoveFirst();
+            } 
+            else
+            {
+                //tTimer.Enabled = false;
+                return;
+            }
+
             //change server spawn tile.
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
             Main.spawnTileX = x;
-            Main.spawnTileY = y+2;
+            Main.spawnTileY = y;
 
             //dummy world name
             var n = Main.worldName;
             Random random = new Random();
-            int randomNumber = random.Next(0,100000000);
+            int randomNumber = random.Next(0, 100000000);
 
-            Main.worldName = "assassass-" + randomNumber;   //worldname for .landmark is now random
-                                                            //in case for some reason the client doesn't
-                                                            //recieve the 0x07 resetting world name.
-                                                            //worst case the user gets a few extra entries
-                                                            //for visited worlds with spawns set, boo hoo.
+            Main.worldName = "assassass-" + randomNumber;
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
@@ -987,31 +1055,13 @@ namespace TerrariaHooker
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
-            //
-            Main.player[targetId].noFallDmg = true; //
-            //
+            Main.player[targetId].position.X = x;
+            Main.player[targetId].position.Y = y;
 
-            if (old)
-            {
-                if (!Main.player[targetId].hostile)
-                {
-                    Main.player[targetId].hostile = true;
-                    player[targetId].ForcedHostile = true;
-                }
+            NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
+            Main.player[targetId].noFallDmg = false; //
+            NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
 
-                Main.player[targetId].position.X = x;
-                Main.player[targetId].position.Y = y;
-
-                NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
-                Main.player[targetId].noFallDmg = false; //
-                NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
-            }
-            else
-            {
-                player[targetId].Teleported = true;
-                //kill player, should respawn at the forged spawnpoint
-                killWithStar(Main.player[targetId].position.X, Main.player[targetId].position.Y, targetId);
-            }
         }
 
         private static bool cmdLogin( string[] commands, packet_ChatMsg p )
