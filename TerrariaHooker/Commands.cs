@@ -16,10 +16,6 @@ namespace TerrariaHooker
         public bool Whitelisted;
         public bool ForcedHostile;
         public bool Teleported; //was teleported by star death
-        public PlayerInfo()
-        {
-        }
-
     }
 
     /// <summary>
@@ -117,7 +113,6 @@ namespace TerrariaHooker
             chatCommands.AddLast(new ChatCommand(".landmark", cmdLandMark, Rights.NONE, ".landmark <name>"));
             chatCommands.AddLast(new ChatCommand(".coords", cmdCoords, Rights.NONE, null));
             chatCommands.AddLast(new ChatCommand(".help", cmdHelp, Rights.NONE, null));
-
             chatCommands.AddLast(new ChatCommand(".version", cmdVersion, Rights.NONE, null));
 
             //admin commands
@@ -145,10 +140,8 @@ namespace TerrariaHooker
 
             //whitelist related
             chatCommands.AddLast(new ChatCommand(".wl", cmdWhitelist, Rights.ADMIN, ".wl (a)dd | (d)el | (r)efresh | on | off"));
-            
-            
-            //
 
+            //
 
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
@@ -168,8 +161,7 @@ namespace TerrariaHooker
 
             foreach (var f in npc.GetFields(BindingFlags.Static | BindingFlags.NonPublic))
             {
-                
-                
+
                 if (f.Name == "defaultMaxSpawns")
                 {
                     defaultMaxSpawns = f;
@@ -347,7 +339,6 @@ namespace TerrariaHooker
                 case 0x2c:
                     prefix = "PLAYER DIED";
                     packet = handleDeath(nData);
-
                     break;
                 case 0x2d:
                     prefix = "PLAYER PARTY UPDATE";
@@ -358,7 +349,6 @@ namespace TerrariaHooker
                 case 0x31:
                     prefix = "PLAYER SPAWN";
                     break;
-
                 default:
                     prefix = "UNDEFINED";
                     break;
@@ -375,15 +365,9 @@ namespace TerrariaHooker
             //OutputPacket(nData, prefix);
             #endif
 
-            //if theres more data in the buffer than the packet just read references, process data
-            //again with the offset covering the just-parsed packet. 
-            //logic: ProcessData returns a new Packet(fullpacket, length);
-            //last-updated packet should cascade down to the parent.
             if (offset + length < data.Length)
                 fpacket = ProcessData(data, 0, handle, offset + length);
 
-            //the updated packet data is in fpacket, either becasue we're at the end of the packet,
-            //or because we weren't and fpacket was passed back to us from the child call.
             return new Packet(fpacket.Data, fpacket.Length);
 
         }
@@ -710,7 +694,16 @@ namespace TerrariaHooker
             var name = GetParamsAsString(commands, " ", 1);
             var pid = getPlayerIdFromName(name);
             if (pid != -1)
-                Item.NewItem((int) Main.player[pid].position.X, (int) Main.player[pid].position.Y, 16, 16, item, stack);
+            {
+                try
+                {
+                    Item.NewItem((int)Main.player[pid].position.X, (int)Main.player[pid].position.Y, 16, 16, item, stack);
+                }
+                //when called from the console, NewItem throws a nullref exception becaue it's not run directly from
+                //the socket hook, and outside terraria code. the command still works though, so we'll just continue
+                catch (NullReferenceException ex) { }
+
+            }
 
             return true;
         }
