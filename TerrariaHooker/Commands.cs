@@ -176,12 +176,12 @@ namespace TerrariaHooker
 
 
             #region HANDLERS
-            //ACTIVE - only one ACTIVE handler can exist for any given type
+            //ACTIVE
             activeTypeHandlers.Add(new ActivePacketHandler(0x19, HandleChatMsg)); //custom commands
             activeTypeHandlers.Add(new ActivePacketHandler(0x0D, HandlePlayerState)); //item use, player movement
             activeTypeHandlers.Add(new ActivePacketHandler(0x11, HandleBlockChange)); //block breaking, placing
             
-            //PASSIVE - unlimited (within reason) passive handlers can exist for any given type
+            //PASSIVE
             passiveTypeHandlers.Add(new PassivePacketHandler(0x01, HandleGreeting)); //whitelist check
             passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, HandleDeath)); //reset hostile flag if recently hostiled.
             passiveTypeHandlers.Add(new PassivePacketHandler(0x0C, HandleLogin)); //warn a user he is unwhitelisted, if anon enabled.
@@ -264,10 +264,6 @@ namespace TerrariaHooker
  
             int length = data[offset] + 4;
 
-            //some preemptive terribleness. if the detected length of the packet is greater
-            //than the entire remaining length of the packet, return because the packet is 
-            //split and unable to be acted on. also return if the length is less than 6, because 6 is the
-            //minimum required for playerId.
             if (length > data.Length - offset || length < 6)
                 return new Packet(data, data.Length);
 
@@ -288,30 +284,31 @@ namespace TerrariaHooker
 
             //packet is JUST the current packet.
             var packet = new Packet(nData, nData.Length);
-            string prefix;
 
-            //this needs to change, its clumsy having multiple classes for something better handled by
-            //a single class or inheritance.
-            foreach (ActivePacketHandler h in activeTypeHandlers)
-            {
-                if (type == h.Type)
-                {
-                    packet = h.Handler(nData, pid);
-                    break;
-                }
-            }
-
+            //TODO: active/passive should inherit from a single class.
+            //passives first, so modifications by actives won't stop inspection on arrival.
             foreach (PassivePacketHandler h in passiveTypeHandlers)
             {
                 if (type == h.Type)
                     h.Handler(nData, pid);
             }
 
-            //write the returned packet back into the original data buffer. packet can either be
-            //the original data,  modified original data, or a dummy packet created.
-            Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
+            foreach (ActivePacketHandler h in activeTypeHandlers)
+            {
+                if (type == h.Type)
+                {
+                    packet = h.Handler(nData, pid);
 
-            //now, fpacket is a clone of the updated packet
+                    //matched, and a packet returned. Re-write new (possibly unmodified) data to stream
+                    //and reload nData and type, incase type was modified by the previous method e.g.
+                    //CreateDummyPacket will change packet type, we don't want to act on that again.
+                    Buffer.BlockCopy(packet.Data, 0, data, offset, packet.Length);
+                    Buffer.BlockCopy(data, offset, nData, 0, length);
+                    type = nData[4];
+                }
+            }
+
+            //fpacket is a clone of the updated packet
             var fpacket = new Packet(data, data.Length);
 
             #if DEBUG
@@ -322,7 +319,6 @@ namespace TerrariaHooker
                 fpacket = ProcessData(data, 0, handle, offset + length);
 
             return new Packet(fpacket.Data, fpacket.Length);
-
         }
 
         /// <summary>
