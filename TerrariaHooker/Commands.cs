@@ -333,13 +333,17 @@ namespace TerrariaHooker
         {
             int h;
             int pid = -1;
-            //var t = (ServerSock[])serverSock.GetValue(null);
 
             for (int i = 0; i <= Main.maxNetPlayers; i++)
             {
-                h = (int)Netplay.serverSock[i].tcpClient.Client.Handle;
+                h = Netplay.serverSock[i].tcpClient.Client.Handle.ToInt32();
                 if (h == handle)
                 {
+                    //ensure a client is connected on this socket, and not return the pid of
+                    //a disconnected, disposed/disposing socket.
+                    if (Netplay.serverSock[i].tcpClient.Client.Connected == false)
+                        continue;
+
                     pid = i;
                     break;
                 }
@@ -987,6 +991,7 @@ namespace TerrariaHooker
                     SendChatMsg("Landmark out of range, or coords off-map.", targetId, Color.Purple);
                     return;
                 }
+                SendChatMsg("Preparing teleport!", targetId, Color.Bisque);
 
                 int sectionX = Netplay.GetSectionX(x);
                 int sectionY = Netplay.GetSectionY(y);

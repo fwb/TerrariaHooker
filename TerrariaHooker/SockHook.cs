@@ -134,7 +134,7 @@ namespace TerrariaHooker
                 //easyhook to detach.
                 try
                 {
-                    var packet = Commands.ProcessData(newBuffer, 0, (int)socketHandle);
+                    var packet = Commands.ProcessData(newBuffer, 0, socketHandle.ToInt32());
                     //write packet data to buffer. keep it in the try/catch because if
                     //processdata fails, this will fail because packet is null.
                     Marshal.Copy(packet.Data, 0, Buffer.buf, packet.Length);
