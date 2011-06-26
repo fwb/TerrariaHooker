@@ -32,7 +32,24 @@ namespace TerrariaHooker
         public int y;
     }
 
-    class Commands
+    public class ChatCommand
+    {
+        public Commands.ChatCommandHandler Handler;
+        public string Trigger;
+        public string UsageString;
+        public Rights PermissionsRequired;
+
+        public ChatCommand(string trigger, Commands.ChatCommandHandler handler, Rights permissions, string usage)
+        {
+            Trigger = trigger;
+            Handler = handler;
+            PermissionsRequired = permissions;
+            UsageString = usage;
+        }
+
+    }
+
+    public class Commands
     {
         
         private static Properties.Settings settings = new Properties.Settings();
@@ -63,11 +80,16 @@ namespace TerrariaHooker
         //private static TextWriter w = new StreamWriter(ServerConsole._out);
 
         //teleport timer related
-        //private delegate void Teleporter(int targetId, int x, int y);
         private static LinkedList<TP> teleQueue = new LinkedList<TP>();
         private static System.Timers.Timer tTimer;
         //
         private static Random random = new Random();
+
+        #if NEWHANDLER
+        private static LinkedList<ChatCommand> chatCommands = new LinkedList<ChatCommand>();
+        public delegate bool ChatCommandHandler(string[] command, packet_ChatMsg p);
+        #endif
+
 
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
@@ -92,6 +114,10 @@ namespace TerrariaHooker
 
         static Commands()
         {
+            #if NEWHANDLER
+            chatCommands.AddLast(new ChatCommand(".star", cmdLaunchStar, Rights.ADMIN, ".star <target>"));
+            chatCommands.AddLast(new ChatCommand(".teleport", cmdTeleport, Rights.ADMIN, ".teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>"));
+            #endif
             
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
@@ -578,7 +604,25 @@ namespace TerrariaHooker
 
                 var commands = p.Text.Split(' ');
                 commands[0] = commands[0].ToLower();
-                
+
+                #if NEWHANDLER
+                foreach (ChatCommand c in chatCommands)
+                {
+                    if (commands[0] == c.Trigger)
+                    {
+                        if ((AccountManager.GetRights(p.PlayerId) & c.PermissionsRequired) == c.PermissionsRequired)
+                        {
+                            if (!c.Handler(commands, p))
+                                cmdUsage(String.Format("Usage: {0}", c.UsageString), p.PlayerId);
+                        } else
+                        {
+                            SendAccessDeniedMsg(p.PlayerId, commands[0]);
+                        }
+
+                        return CreateDummyPacket(data);
+                    }
+                }
+                #endif
 
                 switch (commands[0])
                 {
@@ -606,12 +650,14 @@ namespace TerrariaHooker
                     case (".kickban"):
                         if (!cmdKickBan(commands, p)) cmdUsage("USAGE: .kickban <player>",p.PlayerId);
                         break;
+                    #if !NEWHANDLER
                     case (".star"):
                         if (!cmdLaunchStar(commands, p)) cmdUsage("USAGE: .star <player>",p.PlayerId);
                         break;
                     case (".teleport"):
                         if (!cmdTeleport(commands, p)) cmdUsage("USAGE: .teleport <player> <xcoord:ycoord>; or .teleport <xcoord:ycoord>",p.PlayerId);
                         break;
+                    #endif
                     case (".teleportto"):
                         if (!cmdTeleportTo(commands, p)) cmdUsage("USAGE: .teleportto <player>",p.PlayerId);
                         break;
@@ -1102,10 +1148,7 @@ namespace TerrariaHooker
 
         private static bool cmdLaunchStar(string[] commands, packet_ChatMsg packetChatMsg)
         {
-            if( ( AccountManager.GetRights( packetChatMsg.PlayerId ) & Rights.ADMIN ) != Rights.ADMIN ) {
-                SendAccessDeniedMsg( packetChatMsg.PlayerId, commands[0] );
-                return true;
-            }
+
             var name = GetParamsAsString(commands);
             if (name == null)
                 return false;
