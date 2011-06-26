@@ -28,14 +28,44 @@ namespace TerrariaHooker
         public int y;
     }
 
+    public class ActivePacketHandler
+    {
+        public delegate Packet TypeHandler(byte[] d, int pid);
+        public TypeHandler Handler;
+        public byte Type;
+
+        public ActivePacketHandler(byte type, TypeHandler handler)
+        {
+            Type = type;
+            Handler = handler;
+        }
+
+    }
+
+    public class PassivePacketHandler
+    {
+        public delegate void TypeHandler(byte[] d, int pid);
+        public TypeHandler Handler;
+        public byte Type;
+
+        public PassivePacketHandler(byte type, TypeHandler handler)
+        {
+            Type = type;
+            Handler = handler;
+        }
+
+    }
+
+
     public class ChatCommand
     {
-        public Commands.ChatCommandHandler Handler;
+        public delegate bool ChatCommandHandler(string[] command, packet_ChatMsg p);
+        public ChatCommandHandler Handler;
         public string Trigger;
         public string UsageString;
         public Rights PermissionsRequired;
 
-        public ChatCommand(string trigger, Commands.ChatCommandHandler handler, Rights permissions, string usage)
+        public ChatCommand(string trigger, ChatCommandHandler handler, Rights permissions, string usage)
         {
             Trigger = trigger;
             Handler = handler;
@@ -82,7 +112,9 @@ namespace TerrariaHooker
         private static Random random = new Random();
 
         private static LinkedList<ChatCommand> chatCommands = new LinkedList<ChatCommand>();
-        public delegate bool ChatCommandHandler(string[] command, packet_ChatMsg p);
+
+        private static List<ActivePacketHandler> activeTypeHandlers = new List<ActivePacketHandler>();
+        private static List<PassivePacketHandler> passiveTypeHandlers = new List<PassivePacketHandler>();
         
         internal static int MAX_SPAWNS = 50; //maximum number of spawns using .spawn (at a single time)
         internal const int MAX_LINE_LENGTH = 70;
@@ -107,7 +139,7 @@ namespace TerrariaHooker
 
         static Commands()
         {
-            //COMMAND DEFINITION BLOCK
+            #region COMMAND HANDLERS
             //non-admin commands
             chatCommands.AddLast(new ChatCommand(".login", cmdLogin, Rights.NONE, ".login <username>"));
             chatCommands.AddLast(new ChatCommand(".landmark", cmdLandMark, Rights.NONE, ".landmark <name>"));
@@ -140,9 +172,31 @@ namespace TerrariaHooker
 
             //whitelist related
             chatCommands.AddLast(new ChatCommand(".wl", cmdWhitelist, Rights.ADMIN, ".wl (a)dd | (d)el | (r)efresh | on | off"));
+            #endregion
 
-            //
 
+            #region HANDLERS
+            //ACTIVE - only one ACTIVE handler can exist for any given type
+            activeTypeHandlers.Add(new ActivePacketHandler(0x19, HandleChatMsg)); //custom commands
+            activeTypeHandlers.Add(new ActivePacketHandler(0x0D, HandlePlayerState)); //item use, player movement
+            activeTypeHandlers.Add(new ActivePacketHandler(0x11, HandleBlockChange)); //block breaking, placing
+            
+            //PASSIVE - unlimited (within reason) passive handlers can exist for any given type
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x01, HandleGreeting)); //whitelist check
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, HandleDeath)); //reset hostile flag if recently hostiled.
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x0C, HandleLogin)); //warn a user he is unwhitelisted, if anon enabled.
+            #endregion
+
+
+            //get any private terraria fields here
+            GetFields();
+
+            AccountManager.WhitelistActive = settings.EnableWhitelist;
+            allowUnwhiteLogin = false;
+        }
+
+        private static void GetFields()
+        {
             terrariaAssembly = Assembly.GetAssembly(typeof(Main));
             if (terrariaAssembly == null)
             {
@@ -173,10 +227,12 @@ namespace TerrariaHooker
                     continue;
                 }
             }
+        }
 
-            AccountManager.WhitelistActive = settings.EnableWhitelist;
-            //allowUnwhiteLogin = settings.EnableAnonLogin;
-            allowUnwhiteLogin = false;
+        private static void HandleLogin(byte[] d, int pid)
+        {
+            if (AccountManager.WhitelistActive && !player[pid].Whitelisted)
+                SendChatMsg("You are not whitelisted, some actions are restricted.", pid, Color.Peru);
         }
 
         private static bool cmdVersion(string[] command, packet_ChatMsg p)
@@ -234,124 +290,21 @@ namespace TerrariaHooker
             var packet = new Packet(nData, nData.Length);
             string prefix;
 
-            switch (type)
+            //this needs to change, its clumsy having multiple classes for something better handled by
+            //a single class or inheritance.
+            foreach (ActivePacketHandler h in activeTypeHandlers)
             {
-                case 0x01:
-                    prefix = "USER LOGIN P1";
-                    // Clear AccountManager refs in HandleGreeting( )
-                    packet = HandleGreeting( nData, pid );
-                    if( AccountManager.WhitelistActive ) {
-                        CheckWhitelist( pid );
-                    }
+                if (type == h.Type)
+                {
+                    packet = h.Handler(nData, pid);
                     break;
-                case 0x02:
-                    prefix = "USER LOGIN RELATED";
-                    break;
-                case 0x04:
-                    prefix = "USER LOGIN RELATED [CHARACTER DETAILS]";
-                    break;
-                case 0x05:
-                    prefix = "PLAYER UPDATE INVENTORY/EQUIP";
-                    break;
-                case 0x06:
-                    prefix = "PLAYER SEND COMPLETE [LOGIN]";
-                    break;
-                case 0x08:
-                    prefix = "PLAYER REQUEST TILE DATA";
-                    break;
-                case 0x0C:
-                    prefix = "PLAYER SYNC/GREET REQUEST";
-                    if( AccountManager.WhitelistActive && !player[pid].Whitelisted )
-                        SendChatMsg("You are not whitelisted, some actions are restricted.", pid, Color.Peru);
-      
-                    break;
-                case 0x0D:
-                    prefix = "PLAYER STATE CHANGE";
-                    packet = HandlePlayerState(nData, pid);
-                    
-                    break;
-                case 0x10:
-                    prefix = "PLAYER CURRENT/MAX HEALTH UPDATE";
-                    break;
-                case 0x11:
-                    prefix = "PLAYER DESTROY/CREATE BLOCK";
-                    packet = HandleBlockChange(nData, pid);
+                }
+            }
 
-                    break;
-                case 0x13:
-                    prefix = "PLAYER USE DOOR";
-                    break;
-                case 0x15:
-                    prefix = "PLAYER PICKUP/DROP ITEM";
-                    break;
-                case 0x16:
-                    prefix = "DETERMINE ITEM OWNER"; 
-                    break;
-                case 0x18:
-                    prefix = "PLAYER HURT NPC";
-                    break;
-                case 0x19:
-                    prefix = "CHAT MESSAGE";
-                    packet = HandleChatMsg(nData); 
-
-                    break;
-                case 0x1A:
-                    prefix = "PLAYER HURT PLAYER";
-                    break;
-                case 0x1B:
-                    prefix = "PLAYER PROJECTILE UPDATE";
-                    break;
-                case 0x1C:
-                    prefix = "?PLAYER PROJECTILE HIT NPC?";
-                    break;
-                case 0x1D:
-                    prefix = "PLAYER DESTROY PROJECTILE";
-                    break;
-                case 0x1E:
-                    prefix = "PLAYER TOGGLED PVP";
-                    break;
-                case 0x1F:
-                    prefix = "PLAYER USE CHEST";
-                    break;
-                case 0x20:
-                    prefix = "?PLAYER PLACED CHEST?";
-                    break;
-                case 0x23:
-                    prefix = "PLAYER HEAL EFFECT";
-                    break;
-                case 0x24:
-                    prefix = "PLAYER ZONE UPDATE";
-                    break;
-                case 0x26:
-                    prefix = "SEND PASSWORD";
-                    break;
-                case 0x28:
-                    prefix = "PLAYER INTERACT NPC";
-                    break;
-                case 0x29:  //hard to give a short description, but this packet
-                            //seems to set the player-following item's animation
-                            //and rotation details. e.g. those floating balls of light
-                    prefix = "PLAYER ITEM ANIMATION/ROTATION";
-                    break;
-                case 0x2A:
-                    prefix = "PLAYER CURRENT/MAX MANA UPDATE";
-                    break;
-                case 0x2c:
-                    prefix = "PLAYER DIED";
-                    packet = handleDeath(nData);
-                    break;
-                case 0x2d:
-                    prefix = "PLAYER PARTY UPDATE";
-                    break;
-                case 0x2E:
-                    prefix = "PLAYER READ SIGN";
-                    break;
-                case 0x31:
-                    prefix = "PLAYER SPAWN";
-                    break;
-                default:
-                    prefix = "UNDEFINED";
-                    break;
+            foreach (PassivePacketHandler h in passiveTypeHandlers)
+            {
+                if (type == h.Type)
+                    h.Handler(nData, pid);
             }
 
             //write the returned packet back into the original data buffer. packet can either be
@@ -458,7 +411,7 @@ namespace TerrariaHooker
         }
 
         //basic death handler.
-        private static Packet handleDeath(byte[] data)
+        private static void HandleDeath(byte[] data, int pid)
         {
             //right now, death handler just fixes up hostile state if a star was dropped
             //on them using .star, or teleported by being killed by a star);
@@ -476,7 +429,6 @@ namespace TerrariaHooker
                 }
 
             }
-            return new Packet(data, data.Length);
         }
 
         private static void FixHostileFlag(int playerId)
@@ -548,11 +500,16 @@ namespace TerrariaHooker
             }
         }
 
-        private static Packet HandleGreeting( byte[] data, int pid ) {
+        private static void HandleGreeting( byte[] data, int pid ) {
             //reset playerinfo for player when a new player logs in with this socket.
             player[pid] = new PlayerInfo();
             AccountManager.Logout( pid );
-            return new Packet( data, data.Length );
+
+            if (AccountManager.WhitelistActive)
+            {
+                CheckWhitelist(pid);
+            }
+
         }
 
         /// <summary>
@@ -598,7 +555,7 @@ namespace TerrariaHooker
 
         }
 
-        public static Packet HandleChatMsg(byte[] data)
+        public static Packet HandleChatMsg(byte[] data, int pid)
         {
             var p = new packet_ChatMsg(data); //initialize packet class, populate fields from data
          

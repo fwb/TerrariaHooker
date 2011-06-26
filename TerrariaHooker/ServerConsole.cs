@@ -226,7 +226,7 @@ namespace TerrariaHooker {
                 Buffer.BlockCopy(buf, 0, finalBuf, 0, buf.Length);
                 Buffer.BlockCopy(t, 0, finalBuf, 9, t.Length);
                 consoleInput.Clear();
-                Commands.HandleChatMsg(finalBuf);
+                Commands.HandleChatMsg(finalBuf, 0);
                 return;
 
             }
