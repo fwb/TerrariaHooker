@@ -1036,7 +1036,7 @@ namespace TerrariaHooker
             } 
             else
             {
-                //tTimer.Enabled = false;
+                tTimer.Enabled = false;
                 return;
             }
 
