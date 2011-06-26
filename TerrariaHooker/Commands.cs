@@ -982,6 +982,12 @@ namespace TerrariaHooker
                 while (x % 2 != 0) x++;
                 while (y % 2 != 0) y++;
 
+                if (x > Main.maxTilesX - 2 || y > Main.maxTilesY - 2)
+                {
+                    SendChatMsg("Landmark out of range, or coords off-map.", targetId, Color.Purple);
+                    return;
+                }
+
                 int sectionX = Netplay.GetSectionX(x);
                 int sectionY = Netplay.GetSectionY(y);
 
@@ -995,13 +1001,13 @@ namespace TerrariaHooker
                 NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
 
                 teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y});
-                OnTeleportTrigger();
-                //if (tTimer == null || !tTimer.Enabled)
-                //{
-                //    tTimer = new System.Timers.Timer(4000);
-                //    tTimer.Elapsed += new ElapsedEventHandler(OnTeleportTrigger);
-                //    tTimer.Enabled = true;
-                //}
+                //OnTeleportTrigger();
+                if (tTimer == null || !tTimer.Enabled)
+                {
+                    tTimer = new System.Timers.Timer(3000);
+                    tTimer.Elapsed += new ElapsedEventHandler(OnTeleportTrigger);
+                    tTimer.Enabled = true;
+                }
             }
             else
             {
@@ -1015,9 +1021,9 @@ namespace TerrariaHooker
         /// Trigger called from timer, to teleport a player to their destination.
         /// </summary>
         /// <param name="targetId">The target player id.</param>
-        private static void OnTeleportTrigger()
+        private static void OnTeleportTrigger(object source, ElapsedEventArgs e)
         {
-            //object source, ElapsedEventArgs e
+            //
             int x;
             int y;
             int targetId;
