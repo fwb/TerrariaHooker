@@ -969,23 +969,31 @@ namespace TerrariaHooker
             //change server spawn tile.
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
-            var oldWorldID = Main.worldID;
+
+            var oldPlayerSpawnX = Main.player[targetId].SpawnX;
+            var oldPlayerSpawnY = Main.player[targetId].SpawnY;
+
+            //send(0x0C) sends server stored player SpawnX and SpawnY
+            //so lets revert them to -1, so they will be ignored by the client
+            Main.player[targetId].SpawnX = -1;
+            Main.player[targetId].SpawnY = -1;
+
             Main.spawnTileX = x;
             Main.spawnTileY = y;
 
             //dummy world name
             var n = Main.worldName;
-            
+            Main.worldName = "TH-v001";
+
             //int randomNumber = random.Next(0, 100000000);
+            //Main.worldName = "TH-"+randomNumber;
 
-            //ugh, we can't make this random as if we do, it exhausts the total pool of 
-            //world spawn points terraria terribly handles.
-            Main.worldName = "TERRARIAHOOKER";
+            
+            //0x07: update spawntilex, worldname clientside
+            NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
-            //0x07: update spawntilex, worldname
-            NetMessage.SendData(0x07, targetId, -1, "", targetId);
-            NetMessage.SendData(0x07, targetId, -1, "", targetId);
-            NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
+            //client respawn
+            NetMessage.SendData(0x0C, targetId, -1, "", targetId); 
 
             //reset forged data (Serverside)
             Main.worldName = n;
@@ -993,12 +1001,15 @@ namespace TerrariaHooker
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
+            Main.player[targetId].SpawnX = oldPlayerSpawnX;
+            Main.player[targetId].SpawnY = oldPlayerSpawnY;
+
             Main.player[targetId].position.X = x;
             Main.player[targetId].position.Y = y;
+            //
 
-            
-            NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
-            NetMessage.SendData(0x07, targetId, -1, "", targetId);
+            //restore original values to client
+            NetMessage.SendData(0x07, targetId, -1, "", targetId); 
 
         }
 
