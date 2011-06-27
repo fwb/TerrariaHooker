@@ -8,6 +8,7 @@ using Terraria;
 using System.Reflection;
 using TerrariaHooker.AccountManagement;
 using System.Timers;
+using TerrariaHooker.CommandCode;
 
 namespace TerrariaHooker
 {
@@ -16,16 +17,6 @@ namespace TerrariaHooker
         public bool Whitelisted;
         public bool ForcedHostile;
         public bool Teleported; //was teleported by star death
-    }
-
-    /// <summary>
-    /// Just a class to hold details of queued teleports
-    /// </summary>
-    public class TP
-    {
-        public int targetId;
-        public int x;
-        public int y;
     }
 
     public class ActivePacketHandler
@@ -105,10 +96,7 @@ namespace TerrariaHooker
         private static FieldInfo defaultSpawnRate;
         //private static TextWriter w = new StreamWriter(ServerConsole._out);
 
-        //teleport timer related
-        private static LinkedList<TP> teleQueue = new LinkedList<TP>();
-        private static System.Timers.Timer tTimer;
-        //
+        
         private static readonly Random random = new Random();
 
         private static LinkedList<ChatCommand> chatCommands = new LinkedList<ChatCommand>();
@@ -885,7 +873,7 @@ namespace TerrariaHooker
                 float x = n.x;
                 float y = n.y;
                    
-                teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
+                Teleport.teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
 
                 return true;
             }
@@ -913,7 +901,7 @@ namespace TerrariaHooker
             var id = getPlayerIdFromName(name);
             if (id != -1)
             {
-                teleportPlayer((int)Main.player[id].position.X/16, (int)Main.player[id].position.Y/16,packetChatMsg.PlayerId);
+                Teleport.teleportPlayer((int)Main.player[id].position.X/16, (int)Main.player[id].position.Y/16,packetChatMsg.PlayerId);
                 return true;
             }
             SendChatMsg(String.Format("Player '{0}' not found", name), packetChatMsg.PlayerId, Color.Red);
@@ -959,137 +947,8 @@ namespace TerrariaHooker
             var x = (int)finalCoords.X;
             var y = (int)finalCoords.Y;
 
-            teleportPlayer(x, y, targetId);
+            Teleport.teleportPlayer(x, y, targetId);
             return true;
-
-        }
-
-        /// <summary>
-        /// Teleports a player to X,Y coords
-        /// </summary>
-        /// <param name="x">X coord</param>
-        /// <param name="y">Y coord</param>
-        /// <param name="targetId">The target Player ID</param>
-        /// <param name="old">if set to <c>true</c> run [old] code.</param>
-        private static void teleportPlayer(int x, int y, int targetId, bool old = true)
-        {
-
-            while (x % 2 != 0) x++;
-            while (y % 2 != 0) y++;
-
-            if (x > Main.maxTilesX - 2 || y > Main.maxTilesY - 2)
-            {
-                SendChatMsg("Landmark out of range, or coords off-map.", targetId, Color.Purple);
-                return;
-            }
-
-            SendChatMsg("Preparing teleport!", targetId, Color.Bisque);
-
-            int sectionX = Netplay.GetSectionX(x);
-            int sectionY = Netplay.GetSectionY(y);
-
-            for (int m = sectionX - 1; m < sectionX + 2; m++)
-            {
-                for (int n = sectionY - 1; n < sectionY + 1; n++)
-                {
-                    NetMessage.SendSection(targetId, m, n);
-                }
-            }
-
-            //additional section update details, 11 requests client determines tile frames and walls.
-            NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
-
-            teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 1});
-
-               
-            //if timer hasn't been created, create and initialize
-            if (tTimer == null)
-            {
-                tTimer = new System.Timers.Timer(3000);
-                tTimer.Elapsed += new ElapsedEventHandler(TeleportTrigger);
-                tTimer.Enabled = true;
-            } else
-            {   //else just enable it
-                tTimer.Enabled = true;
-            }
-
-
-        }
-
-        /// <summary>
-        /// Trigger called from timer, to teleport a player to their destination.
-        /// Prereqs: LinkedList<teleQueue> with a list of clients that requested teleports
-        /// to map locations, or landmarks.
-        /// 
-        /// Logic: checks teleQueue, if there are no queued teleports it will disable the timer and return.
-        /// If queued items exist, it will get the details of the first client and process that client only.
-        /// That entry is then removed from the queue, and the next tick will process the next in line.
-        /// </summary>
-        private static void TeleportTrigger(object source, ElapsedEventArgs e)
-        {
-            
-            int x;
-            int y;
-            int targetId;
-            if (teleQueue.Count > 0)
-            {
-                x = teleQueue.First.Value.x;
-                y = teleQueue.First.Value.y;
-                targetId = teleQueue.First.Value.targetId;
-                teleQueue.RemoveFirst();
-                if (teleQueue.Count == 0)
-                    tTimer.Enabled = false;
-            } else
-            {
-                tTimer.Enabled = false;
-                return;
-            }
-
-
-            //change server spawn tile.
-            var oldSpawnTileX = Main.spawnTileX;
-            var oldSpawnTileY = Main.spawnTileY;
-
-            var oldPlayerSpawnX = Main.player[targetId].SpawnX;
-            var oldPlayerSpawnY = Main.player[targetId].SpawnY;
-
-            //send(0x0C) sends server stored player SpawnX and SpawnY
-            //so lets revert them to -1, so they will be ignored by the client
-            Main.player[targetId].SpawnX = -1;
-            Main.player[targetId].SpawnY = -1;
-
-            Main.spawnTileX = x;
-            Main.spawnTileY = y;
-
-            //dummy world name
-            var n = Main.worldName;
-            Main.worldName = "TH-v001";
-
-            //int randomNumber = random.Next(0, 100000000);
-            //Main.worldName = "TH-"+randomNumber;
-
-            
-            //0x07: update spawntilex, worldname clientside
-            NetMessage.SendData(0x07, targetId, -1, "", targetId);
-
-            //client respawn
-            NetMessage.SendData(0x0C, targetId, -1, "", targetId); 
-
-            //reset forged data (Serverside)
-            Main.worldName = n;
-
-            Main.spawnTileX = oldSpawnTileX;
-            Main.spawnTileY = oldSpawnTileY;
-
-            Main.player[targetId].SpawnX = oldPlayerSpawnX;
-            Main.player[targetId].SpawnY = oldPlayerSpawnY;
-
-            Main.player[targetId].position.X = x;
-            Main.player[targetId].position.Y = y;
-            //
-
-            //restore original values to client
-            NetMessage.SendData(0x07, targetId, -1, "", targetId); 
 
         }
 

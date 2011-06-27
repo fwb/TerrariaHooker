@@ -82,6 +82,7 @@
     <Compile Include="AccountManagement\Rights.cs" />
     <Compile Include="AccountManagement\ReuseTimer.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="CommandCode\Teleport.cs" />
     <Compile Include="ConsoleStructs.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="GameStatistics.cs" />
