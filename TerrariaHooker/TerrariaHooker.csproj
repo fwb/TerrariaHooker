@@ -84,6 +84,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="ConsoleStructs.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="GameStatistics.cs" />
     <Compile Include="Launcher.cs">
       <SubType>Form</SubType>
     </Compile>

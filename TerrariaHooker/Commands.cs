@@ -180,12 +180,21 @@ namespace TerrariaHooker
             activeTypeHandlers.Add(new ActivePacketHandler(0x19, HandleChatMsg)); //custom commands
             activeTypeHandlers.Add(new ActivePacketHandler(0x0D, HandlePlayerState)); //item use, player movement
             activeTypeHandlers.Add(new ActivePacketHandler(0x11, HandleBlockChange)); //block breaking, placing
+            activeTypeHandlers.Add(new ActivePacketHandler(0x2E, StatisticsSign)); //statistics sign stuff
 
             //PASSIVE
+            
             passiveTypeHandlers.Add(new PassivePacketHandler(0x01, HandleGreeting)); //whitelist check
-            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, FixHostileFlag)); //reset hostile flag if forced hostile
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, FixHostileFlag)); //reset hostile flag if forced hostile (death)
             passiveTypeHandlers.Add(new PassivePacketHandler(0x0D, FixHostileFlag)); //reset hostile flag if forced hostile
             passiveTypeHandlers.Add(new PassivePacketHandler(0x0C, HandleLogin)); //warn a user he is unwhitelisted, if anon enabled.
+
+            //statistics related
+            //also, cmdLandMark adds to the LandmarksUsed statistic.
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x2C, UpdateDeathStat)); //update player death stat
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x13, UpdateDoorStat)); //update open doors stat
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x1C, UpdateEnemyDeathStat)); //update enemy deaths stat
+            passiveTypeHandlers.Add(new PassivePacketHandler(0x11, UpdateTilesStat)); //update enemy deaths stat
             #endregion
 
             //get any private terraria fields here
@@ -193,6 +202,75 @@ namespace TerrariaHooker
 
             AccountManager.WhitelistActive = settings.EnableWhitelist;
             allowUnwhiteLogin = false;
+        }
+
+        private static void UpdateTilesStat(byte[] d, int pid)
+        {
+            var p = new packet_BlockChange(d);
+
+            //Tile kill ActionTypes
+            if (p.ActionType == 0 || p.ActionType == 4)
+            {
+                //if packet indicates break failed, or if the player hasn't loaded the section they're trying to break, don't add anything
+                if (p.NoBreak == 1 || !Netplay.serverSock[pid].tileSection[Netplay.GetSectionX((int)p.Position.X), Netplay.GetSectionY((int)p.Position.Y)])
+                    return;
+                GameStatistics.TilesDestroyed++;
+            }
+
+            if (p.ActionType == 1)
+                GameStatistics.TilesPlaced++;
+            
+        }
+
+        private static void UpdateEnemyDeathStat(byte[] d, int pid)
+        {
+            var p = new packet_StrikeNPC(d);
+            if (Main.npc[p.npcID].life <= p.Damage)
+                GameStatistics.EnemiesKilled++;
+                
+
+        }
+
+        private static void UpdateDoorStat(byte[] d, int pid)
+        {
+            var p = new packet_UseDoor(d);
+
+            if (p.openOrClose == 0)
+                GameStatistics.DoorsOpen++;
+            else
+                GameStatistics.DoorsOpen--;
+
+            if (GameStatistics.DoorsOpen < 0) GameStatistics.DoorsOpen = 0;
+        }
+
+        private static void UpdateDeathStat(byte[] d, int pid)
+        {
+            GameStatistics.DeathCount++;
+        }
+
+        private static Packet StatisticsSign(byte[] d, int pid)
+        {
+            var p = new packet_ReadSign(d);
+            var sign = Sign.ReadSign(p.x, p.y);
+
+            //sign content includes {stats}
+            if (Main.sign[sign].text.IndexOf("{stats}") != -1)
+            {
+                Main.sign[sign].text = String.Format(
+                    "SERVER STATISTICS:\n---------------\nPlayer Deaths: {0}\nLandmarks Used: {1}\nEnemies Slain: {2}\nDoors left open (you jerks): {3}\nTiles Destroyed: {4}\nTiles Placed: {5}",
+                    GameStatistics.DeathCount, 
+                    GameStatistics.LandmarksUsed, 
+                    GameStatistics.EnemiesKilled,
+                    GameStatistics.DoorsOpen,
+                    GameStatistics.TilesDestroyed,
+                    GameStatistics.TilesPlaced);
+
+                NetMessage.SendData(47, pid, -1, "", sign);
+                Main.sign[sign].text = "{stats}";
+                return CreateDummyPacket(d);
+            }
+                
+            return new Packet(d, d.Length);
         }
 
         private static void GetFields()
@@ -759,6 +837,8 @@ namespace TerrariaHooker
 
         private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
         {
+            GameStatistics.LandmarksUsed++;
+
             var tag = GetParamsAsString(commands);
             //generate list of landmarks
             if (tag == null)
@@ -1385,23 +1465,24 @@ namespace TerrariaHooker
     {
         internal Vector2 Position;
         internal int ActionType;
+        internal int NoBreak;
 
         internal packet_BlockChange(byte[] data)
             : base(data)
         {
-            PlayerId = data[5];
+            ActionType = data[5];
             Position.X = BitConverter.ToInt32(data, 6);
             Position.Y = BitConverter.ToInt32(data, 10);
-            ActionType = data[11];
+            NoBreak = data[14];
+
+            //actiontypes
             /* 0 = Destroy Tile
              * 1 = Place Tile
              * 2 = Kill Wall
              * 3 = Place Wall
              * 4 = Destroy Tile (drop no item)
              */
-            //TODO: need to change this to include the byte for fail
-            //so can effectively include blocking for actions that break
-            //blocks, skipping actions that merely touch blocks.
+
         }
     }
 
@@ -1454,6 +1535,55 @@ namespace TerrariaHooker
             HitDirection = data[6] - 1;
             DamageTaken = BitConverter.ToInt16(data, 7);
             WasPVP = data[9] != 0;
+        }
+    }
+
+    public class packet_ReadSign : packet_Base
+    {
+        internal int x;
+        internal int y;
+
+
+        internal packet_ReadSign(byte[] data)
+            : base(data)
+        {
+            x = BitConverter.ToInt32(data, 5);
+            y = BitConverter.ToInt32(data, 9);
+        }
+    }
+
+    public class packet_UseDoor : packet_Base
+    {
+        internal int openOrClose;
+        internal int x;
+        internal int y;
+        internal int direction;
+        
+        internal packet_UseDoor(byte[] data)
+            : base(data)
+        {
+            openOrClose = data[5];
+            x = BitConverter.ToInt32(data, 6);
+            y = BitConverter.ToInt32(data, 10);
+            direction = data[14];
+            if (direction == 0) direction = -1;
+        }
+    }
+
+    public class packet_StrikeNPC : packet_Base
+    {
+        internal short npcID;
+        internal short Damage;
+        internal float knockback;
+        internal int hitDirection;
+
+        internal packet_StrikeNPC(byte[] data)
+            : base(data)
+        {
+            npcID = BitConverter.ToInt16(data, 5);
+            Damage = BitConverter.ToInt16(data, 7);
+            knockback = BitConverter.ToInt32(data, 9);
+            hitDirection = data[13];
         }
     }
 
