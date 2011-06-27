@@ -919,7 +919,7 @@ namespace TerrariaHooker
             //additional section update details, 11 requests client determines tile frames and walls.
             NetMessage.SendData(11, targetId, -1, "", sectionX - 2, (float)(sectionY - 1), (float)(sectionX + 2), (float)(sectionY + 1), 0);
 
-            teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 2});
+            teleQueue.AddLast(new TP() {targetId = targetId, x = x, y = y + 1});
 
                
             //if timer hasn't been created, create and initialize
@@ -969,29 +969,36 @@ namespace TerrariaHooker
             //change server spawn tile.
             var oldSpawnTileX = Main.spawnTileX;
             var oldSpawnTileY = Main.spawnTileY;
+            var oldWorldID = Main.worldID;
             Main.spawnTileX = x;
             Main.spawnTileY = y;
 
             //dummy world name
             var n = Main.worldName;
             
-            int randomNumber = random.Next(0, 100000000);
+            //int randomNumber = random.Next(0, 100000000);
 
-            Main.worldName = "assassass-" + randomNumber;
+            //ugh, we can't make this random as if we do, it exhausts the total pool of 
+            //world spawn points terraria terribly handles.
+            Main.worldName = "TERRARIAHOOKER";
 
             //0x07: update spawntilex, worldname
             NetMessage.SendData(0x07, targetId, -1, "", targetId);
+            NetMessage.SendData(0x07, targetId, -1, "", targetId);
+            NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
 
             //reset forged data (Serverside)
             Main.worldName = n;
+
             Main.spawnTileX = oldSpawnTileX;
             Main.spawnTileY = oldSpawnTileY;
 
             Main.player[targetId].position.X = x;
             Main.player[targetId].position.Y = y;
 
-            NetMessage.SendData(0x0C, targetId, -1, "", targetId); //client respawn
+            
             NetMessage.SendData(0x07, targetId, -1, "", targetId); //restore original values to client
+            NetMessage.SendData(0x07, targetId, -1, "", targetId);
 
         }
 
