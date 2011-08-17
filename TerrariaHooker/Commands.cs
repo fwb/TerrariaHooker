@@ -131,6 +131,7 @@ namespace TerrariaHooker
             //non-admin commands
             chatCommands.AddLast(new ChatCommand(".login", cmdLogin, Rights.NONE, ".login <username>"));
             chatCommands.AddLast(new ChatCommand(".landmark", cmdLandMark, Rights.NONE, ".landmark <name>"));
+            chatCommands.AddLast( new ChatCommand( ".lm", cmdLandMark, Rights.NONE, ".lm <name>" ) );
             chatCommands.AddLast(new ChatCommand(".coords", cmdCoords, Rights.NONE, null));
             chatCommands.AddLast(new ChatCommand(".help", cmdHelp, Rights.NONE, null));
             chatCommands.AddLast(new ChatCommand(".version", cmdVersion, Rights.NONE, null));
@@ -823,61 +824,65 @@ namespace TerrariaHooker
             return true;
         }
 
-        private static bool cmdLandMark(string[] commands, packet_ChatMsg packetChatMsg)
-        {
+        private static bool cmdLandMark( string[] commands, packet_ChatMsg packetChatMsg ) {
             GameStatistics.LandmarksUsed++;
 
-            var tag = GetParamsAsString(commands);
+            var tag = GetParamsAsString( commands );
             //generate list of landmarks
-            if (tag == null)
-            {
-                var locations = new List<string>();
-                foreach (var sign in Main.sign)
-                {
-                    if (sign == null)
+            if( tag == null ) {
+                var locations = new List<string>( );
+                foreach( var sign in Main.sign ) {
+                    if( sign == null )
                         continue;
 
-                    var lLoc = sign.text.IndexOf("<");
-                    if (lLoc == -1) continue;
-                    int rLoc = sign.text.IndexOf(">");
-                    if (rLoc == -1) continue;
-                    if ((rLoc - lLoc) -1 <= MAX_LANDMARK_LENGTH)
-                        locations.Add(sign.text.Substring(lLoc + 1, (rLoc-lLoc)-1).ToLower());
-                }
-                
-                if (locations.Count > 0)
-                {
-                    //remove duplicates from list (since the code will only ever teleport to the first found instance)
-                    locations = locations.Distinct().ToList();
-                    string r = Utils.concat(locations);
+                    var lLoc = sign.text.IndexOf( "<" );
+                    if( lLoc == -1 ) {
+                        continue;
+                    }
 
-                    SendChatMsgSafe("Available landmarks: "+ r,packetChatMsg.PlayerId, Color.GreenYellow);
+                    var s = sign.text.Substring( lLoc + 1 );
+                    var rLoc = s.IndexOf( ">" );
+                    if( rLoc == -1 ) {
+                        continue;
+                    }
+
+                    var t = s.Substring( 0, rLoc );
+                    if( t.Length <= MAX_LANDMARK_LENGTH ) {
+                        locations.Add( t.ToLower( ) );
+                    }
+                }
+
+                if( locations.Count > 0 ) {
+                    //remove duplicates from list (since the code will only ever teleport to the first found instance)
+                    locations = locations.Distinct( ).ToList( );
+                    string r = Utils.concat( locations );
+
+                    SendChatMsgSafe( "Available landmarks: " + r, packetChatMsg.PlayerId, Color.GreenYellow );
                     return true;
                 }
 
                 //fallthru, no landmarks set (nLocs = 0)
-                SendChatMsg("No landmarks set.", packetChatMsg.PlayerId, Color.GreenYellow);
+                SendChatMsg( "No landmarks set.", packetChatMsg.PlayerId, Color.GreenYellow );
                 return true;
             } //
 
 
             //this will return true on the first instance of the requested
             //tag on a sign.
-            foreach (var n in Main.sign)
-            {
-                if (n == null)
+            foreach( var n in Main.sign ) {
+                if( n == null )
                     continue;
 
-                int found = n.text.ToLower().IndexOf("<" + tag + ">");
-                if (found == -1) continue;
+                int found = n.text.ToLower( ).IndexOf( "<" + tag + ">" );
+                if( found == -1 ) continue;
                 float x = n.x;
                 float y = n.y;
-                   
-                Teleport.teleportPlayer((int)x,(int)y,packetChatMsg.PlayerId);
+
+                Teleport.teleportPlayer( (int)x, (int)y, packetChatMsg.PlayerId );
 
                 return true;
             }
-            SendChatMsg("Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow);
+            SendChatMsg( "Landmark not found.", packetChatMsg.PlayerId, Color.GreenYellow );
             return true;
         }
 
