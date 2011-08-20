@@ -304,7 +304,7 @@ namespace TerrariaHooker
 
         private static bool cmdVersion(string[] command, packet_ChatMsg p)
         {
-            SendChatMsg("Version WOOP", p.PlayerId, Color.Maroon);
+            SendChatMsg("vX.X (1.0.6 compat)", p.PlayerId, Color.Maroon);
             return true;
         }
 
@@ -439,12 +439,15 @@ namespace TerrariaHooker
             if (protectSpawn)
             {
                 bool isIn = false;
+
+                //todo: better as a point
                 var d = new Vector2(p.Position.X, p.Position.Y);
                 var rect = new Rectangle(Main.spawnTileX - (SPAWN_PROTECT_WIDTH * 16),
                                          Main.spawnTileY - (SPAWN_PROTECT_HEIGHT * 16),
                                          SPAWN_PROTECT_WIDTH * 2* 16,
                                          SPAWN_PROTECT_HEIGHT * 2 * 16);
 
+                //todo: should be rewritten to use rect.contains(point)
                 if ((d.X > rect.Left && d.X < rect.Right) && (d.Y > rect.Top && d.Y < rect.Bottom))
                     isIn = true;
 
@@ -600,10 +603,17 @@ namespace TerrariaHooker
             //built-in commands (prefixed with %).
             if (p.Text[0] == 0x25) //match %, for built-in commands.
             {
-                var n = p.Text.Split(' ');
-                n[0] = n[0].ToLower();
+                if ((AccountManager.GetRights(p.PlayerId) & Rights.ADMIN) == Rights.ADMIN)
+                {
+                    var n = p.Text.Split(' ');
+                    n[0] = n[0].ToLower();
 
-                basicCommand(n,p);
+                    basicCommand(n, p);
+                }
+                else
+                {
+                    SendAccessDeniedMsg(p.PlayerId, "[built-in %x]");
+                }
 
                 return CreateDummyPacket(data);
             }
